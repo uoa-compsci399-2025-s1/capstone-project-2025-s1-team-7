@@ -22,11 +22,11 @@ fun ScanTool() {
 
     var latitude by remember { mutableStateOf("") }
     var longitude by remember { mutableStateOf("") }
-    var roomNumber by remember { mutableStateOf("") }
+    var floorNumber by remember { mutableStateOf("") }
 
     //Fun.
     val introMessage = if ((0..10).random() == 10){
-        "Hey, you. Finally awake. You were trying..."
+        "Hey, you. Finally awake. You were trying to cross the border, right? Walked into that Imperial ambush, same as us."
     } else {
         "Where are you?"
     }
@@ -62,22 +62,22 @@ fun ScanTool() {
             modifier = Modifier.padding(horizontal=32.dp)
         ) {
             OutlinedTextField(
-                value = latitude,
-                onValueChange = { latitude = it },
-                label = { Text("Latitude (X)") },
-                modifier = Modifier.fillMaxWidth()
-            )
-
-            OutlinedTextField(
                 value = longitude,
                 onValueChange = { longitude = it },
-                label = { Text("Longitude (Y)") },
+                label = { Text("Longitude (X)") },
                 modifier = Modifier.fillMaxWidth()
             )
 
             OutlinedTextField(
-                value = roomNumber,
-                onValueChange = { roomNumber = it },
+                value = latitude,
+                onValueChange = { latitude = it },
+                label = { Text("Latitude (Y)") },
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            OutlinedTextField(
+                value = floorNumber,
+                onValueChange = { floorNumber = it },
                 label = { Text("Room Number") },
                 modifier = Modifier.fillMaxWidth()
             )
@@ -86,7 +86,7 @@ fun ScanTool() {
         Spacer(modifier = Modifier.height(25.dp))
 
         Button(
-            onClick = { captureData(context, latitude, longitude, roomNumber, showToast) },
+            onClick = { captureData(context, latitude, longitude, floorNumber, showToast) },
             colors = ButtonDefaults.buttonColors(
                 containerColor = colorResource(id = R.color.dark_blue),
                 contentColor = colorResource(id = R.color.darker_white)
@@ -104,21 +104,21 @@ fun captureData(
     context: Context,
     latitudeInput: String,
     longitudeInput: String,
-    roomNumberInput: String,
+    floorNumberInput: String,
     onError: (String) -> Unit
 ) {
-    val longitude: Int = longitudeInput.toIntOrNull() ?: run {
-        onError("Invalid Longitude. Please enter a whole number.")
+    val longitude: Float = longitudeInput.toFloatOrNull() ?: run {
+        onError("Invalid Longitude. Please enter a number.")
         return
     }
 
-    val latitude: Int = latitudeInput.toIntOrNull() ?: run {
-        onError("Invalid Latitude. Please enter a whole number.")
+    val latitude: Float = latitudeInput.toFloatOrNull() ?: run {
+        onError("Invalid Latitude. Please enter a number.")
         return
     }
 
-    val floor = roomNumberInput.firstOrNull()?.uppercaseChar() ?: run {
-        onError("Please enter a room number.")
+    val floor = floorNumberInput.toIntOrNull() ?: run {
+        onError("Please enter a floor number.")
         return
     }
 
