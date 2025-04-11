@@ -1,6 +1,9 @@
 package com.example.compsci399testproject
 
 import android.content.Context
+import android.os.Handler
+import android.os.Looper
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -15,17 +18,40 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import com.example.compsci399testproject.viewmodel.WifiViewModel
+import kotlinx.coroutines.delay
 
 
 @Composable
-fun ScanTool() {
+fun ScanTool(wifiViewModel: WifiViewModel) {
 
     var latitude by remember { mutableStateOf("") }
     var longitude by remember { mutableStateOf("") }
     var floorNumber by remember { mutableStateOf("") }
 
+    val lastScanTime by wifiViewModel.lastScanTime
+
+    var timeSinceLastScan by remember { mutableStateOf("Never") }
+    var bestSignal by remember { mutableStateOf("") }
+    var timeSeconds by remember { mutableStateOf(0) }
+
+    LaunchedEffect(lastScanTime) {
+        while (true) {
+            val now = System.currentTimeMillis()
+            timeSinceLastScan = if (lastScanTime != null) {
+                val seconds = (now - lastScanTime!!) / 1000.0
+                timeSeconds = seconds.toInt()
+                "Last scanned %.1f seconds ago".format(seconds)
+            } else {
+                "Last scanned: never"
+            }
+            delay(100)
+        }
+    }
+
+
     //Fun.
-    val introMessage = if ((0..10).random() == 10){
+    val introMessage = if (timeSeconds > 60){
         "Hey, you. Finally awake. You were trying to cross the border, right? Walked into that Imperial ambush, same as us."
     } else {
         "Where are you?"
@@ -40,7 +66,7 @@ fun ScanTool() {
     Column(modifier = Modifier
         .fillMaxSize()
         .background(colorResource(id = R.color.lighter_grey))
-        .padding(0.dp, 200.dp, 0.dp, 0.dp),
+        .padding(0.dp, 10.dp, 0.dp, 0.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Text(
@@ -51,10 +77,41 @@ fun ScanTool() {
             style = TextStyle(
                 fontSize = 24.sp
             ),
-            modifier = Modifier.padding(0.dp, 50.dp, 0.dp, 0.dp)
+            modifier = Modifier.padding(0.dp, 10.dp, 0.dp, 0.dp)
         )
 
-        Spacer(modifier = Modifier.height(100.dp))
+
+
+        val wifiSignals = wifiViewModel.getResults()
+        val strongestSignal = wifiSignals.maxByOrNull { it.level }
+        bestSignal = if (strongestSignal != null) {
+            """Best:
+                SSID: ${strongestSignal.SSID}
+                Signal Strength: ${strongestSignal.level} dBm
+            """.trimIndent()
+        } else {
+            "No WiFi signals found."
+        }
+
+
+
+        Text(
+            text = bestSignal,
+            style = TextStyle(fontSize = 16.sp),
+            color = colorResource(id = R.color.dark_blue),
+            modifier = Modifier.padding(0.dp, 0.dp, 0.dp, 10.dp)
+        )
+
+
+
+        Text(
+            text = timeSinceLastScan,
+            style = TextStyle(fontSize = 16.sp),
+            color = colorResource(id = R.color.dark_blue),
+            modifier = Modifier.padding(0.dp, 0.dp, 0.dp, 10.dp)
+        )
+
+        Spacer(modifier = Modifier.height(0.dp))
 
         Column(
             verticalArrangement = Arrangement.spacedBy(16.dp),
@@ -86,7 +143,9 @@ fun ScanTool() {
         Spacer(modifier = Modifier.height(25.dp))
 
         Button(
-            onClick = { captureData(context, latitude, longitude, floorNumber, showToast) },
+            onClick = {
+                captureData(context, latitude, longitude, floorNumber, showToast, wifiViewModel)
+            },
             colors = ButtonDefaults.buttonColors(
                 containerColor = colorResource(id = R.color.dark_blue),
                 contentColor = colorResource(id = R.color.darker_white)
@@ -105,7 +164,8 @@ fun captureData(
     latitudeInput: String,
     longitudeInput: String,
     floorNumberInput: String,
-    onError: (String) -> Unit
+    onError: (String) -> Unit,
+    wifiViewModel: WifiViewModel
 ) {
     val longitude: Float = longitudeInput.toFloatOrNull() ?: run {
         onError("Invalid Longitude. Please enter a number.")
@@ -122,7 +182,30 @@ fun captureData(
         return
     }
 
-    // val wifiSignals = getWifiSignals() - Connor to implement.
+    wifiViewModel.scan()
+
+    Handler(Looper.getMainLooper()).postDelayed({
+        val wifiSignals = wifiViewModel.getResults()
+        wifiViewModel.updateScanResults(wifiSignals)
+
+        Log.d("wifiScan", "Scan results: $wifiSignals")
+
+        if (wifiSignals.isNotEmpty()) {
+            val strongestSignal = wifiSignals.maxByOrNull { it.level }
+            val scanTime = System.currentTimeMillis()
+
+            val signalDetails = """
+                Best:
+                SSID: ${strongestSignal?.SSID}
+                Signal Strength: ${strongestSignal?.level} dBm
+                Last Scan Time: $scanTime
+            """.trimIndent()
+
+            Toast.makeText(context, signalDetails, Toast.LENGTH_LONG).show()
+        } else {
+            Toast.makeText(context, "No WiFi signals found.", Toast.LENGTH_SHORT).show()
+        }
+    }, 8000)
 
     //storePositionInformation() - Renesh to implement.
 }
