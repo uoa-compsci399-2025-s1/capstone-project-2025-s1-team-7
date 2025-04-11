@@ -1,0 +1,295 @@
+kotlin version: 2.0.21
+error message: org.jetbrains.kotlin.backend.common.BackendException: Backend Internal error: Exception during IR lowering
+File being compiled: C:/Users/vidpk/StudioProjects/capstone-project-2025-s1-team-7/app/src/main/java/com/example/compsci399testproject/GoogleSheetsManager.kt
+The root cause java.lang.RuntimeException was thrown at: org.jetbrains.kotlin.backend.jvm.codegen.FunctionCodegen.generate(FunctionCodegen.kt:47)
+	at org.jetbrains.kotlin.backend.common.CodegenUtil.reportBackendException(CodegenUtil.kt:253)
+	at org.jetbrains.kotlin.backend.common.CodegenUtil.reportBackendException$default(CodegenUtil.kt:236)
+	at org.jetbrains.kotlin.backend.common.phaser.PerformByIrFilePhase.invokeSequential(performByIrFile.kt:65)
+	at org.jetbrains.kotlin.backend.common.phaser.PerformByIrFilePhase.invoke(performByIrFile.kt:52)
+	at org.jetbrains.kotlin.backend.common.phaser.PerformByIrFilePhase.invoke(performByIrFile.kt:38)
+	at org.jetbrains.kotlin.backend.common.phaser.NamedCompilerPhase.phaseBody(CompilerPhase.kt:166)
+	at org.jetbrains.kotlin.backend.common.phaser.AbstractNamedCompilerPhase.invoke(CompilerPhase.kt:113)
+	at org.jetbrains.kotlin.backend.common.phaser.CompositePhase.invoke(PhaseBuilders.kt:27)
+	at org.jetbrains.kotlin.backend.common.phaser.CompositePhase.invoke(PhaseBuilders.kt:14)
+	at org.jetbrains.kotlin.backend.common.phaser.NamedCompilerPhase.phaseBody(CompilerPhase.kt:166)
+	at org.jetbrains.kotlin.backend.common.phaser.AbstractNamedCompilerPhase.invoke(CompilerPhase.kt:113)
+	at org.jetbrains.kotlin.backend.common.phaser.CompilerPhaseKt.invokeToplevel(CompilerPhase.kt:62)
+	at org.jetbrains.kotlin.backend.jvm.JvmIrCodegenFactory.invokeCodegen(JvmIrCodegenFactory.kt:371)
+	at org.jetbrains.kotlin.codegen.CodegenFactory.generateModule(CodegenFactory.kt:47)
+	at org.jetbrains.kotlin.backend.jvm.JvmIrCodegenFactory.generateModuleInFrontendIRMode(JvmIrCodegenFactory.kt:433)
+	at org.jetbrains.kotlin.cli.jvm.compiler.pipeline.JvmCompilerPipelineKt.generateCodeFromIr(jvmCompilerPipeline.kt:246)
+	at org.jetbrains.kotlin.cli.jvm.compiler.pipeline.JvmCompilerPipelineKt.compileModulesUsingFrontendIrAndLightTree(jvmCompilerPipeline.kt:142)
+	at org.jetbrains.kotlin.cli.jvm.K2JVMCompiler.doExecute(K2JVMCompiler.kt:148)
+	at org.jetbrains.kotlin.cli.jvm.K2JVMCompiler.doExecute(K2JVMCompiler.kt:43)
+	at org.jetbrains.kotlin.cli.common.CLICompiler.execImpl(CLICompiler.kt:103)
+	at org.jetbrains.kotlin.cli.common.CLICompiler.execImpl(CLICompiler.kt:49)
+	at org.jetbrains.kotlin.cli.common.CLITool.exec(CLITool.kt:101)
+	at org.jetbrains.kotlin.incremental.IncrementalJvmCompilerRunner.runCompiler(IncrementalJvmCompilerRunner.kt:464)
+	at org.jetbrains.kotlin.incremental.IncrementalJvmCompilerRunner.runCompiler(IncrementalJvmCompilerRunner.kt:73)
+	at org.jetbrains.kotlin.incremental.IncrementalCompilerRunner.doCompile(IncrementalCompilerRunner.kt:506)
+	at org.jetbrains.kotlin.incremental.IncrementalCompilerRunner.compileImpl(IncrementalCompilerRunner.kt:423)
+	at org.jetbrains.kotlin.incremental.IncrementalCompilerRunner.tryCompileIncrementally$lambda$9$compile(IncrementalCompilerRunner.kt:249)
+	at org.jetbrains.kotlin.incremental.IncrementalCompilerRunner.tryCompileIncrementally(IncrementalCompilerRunner.kt:267)
+	at org.jetbrains.kotlin.incremental.IncrementalCompilerRunner.compile(IncrementalCompilerRunner.kt:120)
+	at org.jetbrains.kotlin.daemon.CompileServiceImplBase.execIncrementalCompiler(CompileServiceImpl.kt:675)
+	at org.jetbrains.kotlin.daemon.CompileServiceImplBase.access$execIncrementalCompiler(CompileServiceImpl.kt:92)
+	at org.jetbrains.kotlin.daemon.CompileServiceImpl.compile(CompileServiceImpl.kt:1660)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(Unknown Source)
+	at java.base/java.lang.reflect.Method.invoke(Unknown Source)
+	at java.rmi/sun.rmi.server.UnicastServerRef.dispatch(Unknown Source)
+	at java.rmi/sun.rmi.transport.Transport$1.run(Unknown Source)
+	at java.rmi/sun.rmi.transport.Transport$1.run(Unknown Source)
+	at java.base/java.security.AccessController.doPrivileged(Unknown Source)
+	at java.rmi/sun.rmi.transport.Transport.serviceCall(Unknown Source)
+	at java.rmi/sun.rmi.transport.tcp.TCPTransport.handleMessages(Unknown Source)
+	at java.rmi/sun.rmi.transport.tcp.TCPTransport$ConnectionHandler.run0(Unknown Source)
+	at java.rmi/sun.rmi.transport.tcp.TCPTransport$ConnectionHandler.lambda$run$0(Unknown Source)
+	at java.base/java.security.AccessController.doPrivileged(Unknown Source)
+	at java.rmi/sun.rmi.transport.tcp.TCPTransport$ConnectionHandler.run(Unknown Source)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(Unknown Source)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(Unknown Source)
+	at java.base/java.lang.Thread.run(Unknown Source)
+Caused by: java.lang.RuntimeException: Exception while generating code for:
+FUN name:storePositionInformation visibility:public modality:FINAL <> (context:android.content.Context, account:com.google.android.libraries.identity.googleid.GoogleIdTokenCredential?, positionInfo:kotlin.collections.List<kotlin.String>) returnType:kotlin.Unit
+  VALUE_PARAMETER name:context index:0 type:android.content.Context
+  VALUE_PARAMETER name:account index:1 type:com.google.android.libraries.identity.googleid.GoogleIdTokenCredential?
+  VALUE_PARAMETER name:positionInfo index:2 type:kotlin.collections.List<kotlin.String>
+  BLOCK_BODY
+    CALL 'public final fun print (message: kotlin.Any?): kotlin.Unit [inline] declared in kotlin.io.ConsoleKt' type=kotlin.Unit origin=null
+      message: STRING_CONCATENATION type=kotlin.String
+        CONST String type=kotlin.String value="\n       \n            Store\n      \n            "
+        GET_VAR 'account: com.google.android.libraries.identity.googleid.GoogleIdTokenCredential? declared in com.example.compsci399testproject.GoogleSheetsManagerKt.storePositionInformation' type=com.google.android.libraries.identity.googleid.GoogleIdTokenCredential? origin=null
+        CONST String type=kotlin.String value="\n        \n    "
+    COMPOSITE type=kotlin.Unit origin=null
+      BLOCK type=kotlin.Any origin=FOLDED_ELVIS
+        WHEN type=kotlin.Any origin=FOLDED_ELVIS
+          BRANCH
+            if: COMPOSITE type=kotlin.Boolean origin=null
+              CALL 'public final fun not (): kotlin.Boolean [operator] declared in kotlin.Boolean' type=kotlin.Boolean origin=null
+                $this: CALL 'public final fun EQEQ (arg0: kotlin.Any?, arg1: kotlin.Any?): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=null
+                  arg0: GET_VAR 'account: com.google.android.libraries.identity.googleid.GoogleIdTokenCredential? declared in com.example.compsci399testproject.GoogleSheetsManagerKt.storePositionInformation' type=com.google.android.libraries.identity.googleid.GoogleIdTokenCredential? origin=null
+                  arg1: CONST Null type=kotlin.Nothing? value=null
+            then: GET_VAR 'account: com.google.android.libraries.identity.googleid.GoogleIdTokenCredential? declared in com.example.compsci399testproject.GoogleSheetsManagerKt.storePositionInformation' type=com.google.android.libraries.identity.googleid.GoogleIdTokenCredential? origin=null
+          BRANCH
+            if: CONST Boolean type=kotlin.Boolean value=true
+            then: CALL 'public final fun run <R> (block: kotlin.Function0<R of kotlin.StandardKt.run>): R of kotlin.StandardKt.run [inline] declared in kotlin.StandardKt' type=kotlinx.coroutines.Job origin=null
+              <R>: kotlinx.coroutines.Job
+              block: BLOCK type=kotlin.Function0<kotlinx.coroutines.Job> origin=LAMBDA
+                COMPOSITE type=kotlin.Unit origin=null
+                FUNCTION_REFERENCE 'private final fun storePositionInformation$lambda$0 ($account: com.google.android.libraries.identity.googleid.GoogleIdTokenCredential?, $positionInfo: kotlin.collections.List<kotlin.String>): kotlinx.coroutines.Job declared in com.example.compsci399testproject.GoogleSheetsManagerKt' type=kotlin.Function0<kotlinx.coroutines.Job> origin=INLINE_LAMBDA reflectionTarget=null
+                  $account: GET_VAR 'account: com.google.android.libraries.identity.googleid.GoogleIdTokenCredential? declared in com.example.compsci399testproject.GoogleSheetsManagerKt.storePositionInformation' type=com.google.android.libraries.identity.googleid.GoogleIdTokenCredential? origin=null
+                  $positionInfo: GET_VAR 'positionInfo: kotlin.collections.List<kotlin.String> declared in com.example.compsci399testproject.GoogleSheetsManagerKt.storePositionInformation' type=kotlin.collections.List<kotlin.String> origin=null
+      COMPOSITE type=kotlin.Unit origin=null
+
+	at org.jetbrains.kotlin.backend.jvm.codegen.FunctionCodegen.generate(FunctionCodegen.kt:47)
+	at org.jetbrains.kotlin.backend.jvm.codegen.FunctionCodegen.generate$default(FunctionCodegen.kt:40)
+	at org.jetbrains.kotlin.backend.jvm.codegen.ClassCodegen.generateMethodNode(ClassCodegen.kt:406)
+	at org.jetbrains.kotlin.backend.jvm.codegen.ClassCodegen.generateMethod(ClassCodegen.kt:423)
+	at org.jetbrains.kotlin.backend.jvm.codegen.ClassCodegen.generate(ClassCodegen.kt:168)
+	at org.jetbrains.kotlin.backend.jvm.FileCodegen.lower(JvmPhases.kt:39)
+	at org.jetbrains.kotlin.backend.common.phaser.PhaseFactoriesKt.createFilePhase$lambda$4(PhaseFactories.kt:71)
+	at org.jetbrains.kotlin.backend.common.phaser.PhaseBuildersKt$createSimpleNamedCompilerPhase$1.phaseBody(PhaseBuilders.kt:69)
+	at org.jetbrains.kotlin.backend.common.phaser.SimpleNamedCompilerPhase.phaseBody(CompilerPhase.kt:226)
+	at org.jetbrains.kotlin.backend.common.phaser.AbstractNamedCompilerPhase.invoke(CompilerPhase.kt:113)
+	at org.jetbrains.kotlin.backend.common.phaser.PerformByIrFilePhase.invokeSequential(performByIrFile.kt:62)
+	... 44 more
+Caused by: java.lang.RuntimeException: Exception while generating code for:
+FUN INLINE_LAMBDA name:storePositionInformation$lambda$0 visibility:private modality:FINAL <> ($account:com.google.android.libraries.identity.googleid.GoogleIdTokenCredential?, $positionInfo:kotlin.collections.List<kotlin.String>) returnType:kotlinx.coroutines.Job
+  VALUE_PARAMETER BOUND_VALUE_PARAMETER name:$account index:0 type:com.google.android.libraries.identity.googleid.GoogleIdTokenCredential?
+  VALUE_PARAMETER BOUND_VALUE_PARAMETER name:$positionInfo index:1 type:kotlin.collections.List<kotlin.String>
+  BLOCK_BODY
+    VAR name:$i$a$-run-GoogleSheetsManagerKt$storePositionInformation$1 type:kotlin.Int [val]
+      CONST Int type=kotlin.Int value=0
+    VAR name:acc type:com.google.android.libraries.identity.googleid.GoogleIdTokenCredential? [val]
+      GET_VAR '$account: com.google.android.libraries.identity.googleid.GoogleIdTokenCredential? declared in com.example.compsci399testproject.GoogleSheetsManagerKt.storePositionInformation$lambda$0' type=com.google.android.libraries.identity.googleid.GoogleIdTokenCredential? origin=null
+    VAR name:credential type:@[FlexibleNullability] com.google.auth.oauth2.GoogleCredentials? [val]
+      CALL 'public open fun create (p0: @[FlexibleNullability] com.google.auth.oauth2.AccessToken?): @[FlexibleNullability] com.google.auth.oauth2.GoogleCredentials? declared in com.google.auth.oauth2.GoogleCredentials' type=@[FlexibleNullability] com.google.auth.oauth2.GoogleCredentials? origin=null
+        p0: CONSTRUCTOR_CALL 'public constructor <init> (p0: @[FlexibleNullability] kotlin.String?, p1: @[FlexibleNullability] java.util.Date?) declared in com.google.auth.oauth2.AccessToken' type=com.google.auth.oauth2.AccessToken origin=null
+          p0: CALL 'public final fun <get-idToken> (): kotlin.String [fake_override] declared in kotlin.Nothing' type=kotlin.String origin=GET_PROPERTY
+            $this: BLOCK type=kotlin.Nothing origin=null
+              CALL 'public final fun CHECK_NOT_NULL <T0> (arg0: T0 of kotlin.internal.ir.CHECK_NOT_NULL?): {T0 of kotlin.internal.ir.CHECK_NOT_NULL & Any} declared in kotlin.internal.ir' type=kotlin.Nothing origin=EXCLEXCL
+                <T0>: kotlin.Nothing
+                arg0: GET_VAR 'val acc: com.google.android.libraries.identity.googleid.GoogleIdTokenCredential? [val] declared in com.example.compsci399testproject.GoogleSheetsManagerKt.storePositionInformation$lambda$0' type=com.google.android.libraries.identity.googleid.GoogleIdTokenCredential? origin=null
+              CALL 'public final fun throwKotlinNothingValueException (): kotlin.Nothing declared in kotlin.jvm.internal.Intrinsics' type=kotlin.Nothing origin=null
+          p1: CONST Null type=kotlin.Nothing? value=null
+    VAR name:jsonFactory type:@[FlexibleNullability] com.google.api.client.json.gson.GsonFactory? [val]
+      CALL 'public open fun getDefaultInstance (): @[FlexibleNullability] com.google.api.client.json.gson.GsonFactory? declared in com.google.api.client.json.gson.GsonFactory' type=@[FlexibleNullability] com.google.api.client.json.gson.GsonFactory? origin=null
+    VAR name:httpTransport type:@[FlexibleNullability] com.google.api.client.http.javanet.NetHttpTransport? [val]
+      CALL 'public open fun newTrustedTransport (): @[FlexibleNullability] com.google.api.client.http.javanet.NetHttpTransport? declared in com.google.api.client.googleapis.javanet.GoogleNetHttpTransport' type=@[FlexibleNullability] com.google.api.client.http.javanet.NetHttpTransport? origin=null
+    VAR name:requestInitializer type:com.google.auth.http.HttpCredentialsAdapter [val]
+      CONSTRUCTOR_CALL 'public constructor <init> (p0: @[FlexibleNullability] com.google.auth.Credentials?) declared in com.google.auth.http.HttpCredentialsAdapter' type=com.google.auth.http.HttpCredentialsAdapter origin=null
+        p0: GET_VAR 'val credential: @[FlexibleNullability] com.google.auth.oauth2.GoogleCredentials? [val] declared in com.example.compsci399testproject.GoogleSheetsManagerKt.storePositionInformation$lambda$0' type=@[FlexibleNullability] com.google.auth.oauth2.GoogleCredentials? origin=null
+    VAR name:sheetService type:@[FlexibleNullability] com.google.api.services.sheets.v4.Sheets? [val]
+      CALL 'public open fun build (): @[FlexibleNullability] com.google.api.services.sheets.v4.Sheets? declared in com.google.api.services.sheets.v4.Sheets.Builder' type=@[FlexibleNullability] com.google.api.services.sheets.v4.Sheets? origin=null
+        $this: CALL 'public open fun setApplicationName (p0: @[FlexibleNullability] kotlin.String?): @[FlexibleNullability] com.google.api.services.sheets.v4.Sheets.Builder? declared in com.google.api.services.sheets.v4.Sheets.Builder' type=@[FlexibleNullability] com.google.api.services.sheets.v4.Sheets.Builder? origin=null
+          $this: CONSTRUCTOR_CALL 'public constructor <init> (p0: @[FlexibleNullability] com.google.api.client.http.HttpTransport?, p1: @[FlexibleNullability] com.google.api.client.json.JsonFactory?, p2: @[FlexibleNullability] com.google.api.client.http.HttpRequestInitializer?) declared in com.google.api.services.sheets.v4.Sheets.Builder' type=com.google.api.services.sheets.v4.Sheets.Builder origin=null
+            p0: GET_VAR 'val httpTransport: @[FlexibleNullability] com.google.api.client.http.javanet.NetHttpTransport? [val] declared in com.example.compsci399testproject.GoogleSheetsManagerKt.storePositionInformation$lambda$0' type=@[FlexibleNullability] com.google.api.client.http.javanet.NetHttpTransport? origin=null
+            p1: GET_VAR 'val jsonFactory: @[FlexibleNullability] com.google.api.client.json.gson.GsonFactory? [val] declared in com.example.compsci399testproject.GoogleSheetsManagerKt.storePositionInformation$lambda$0' type=@[FlexibleNullability] com.google.api.client.json.gson.GsonFactory? origin=null
+            p2: GET_VAR 'val requestInitializer: com.google.auth.http.HttpCredentialsAdapter [val] declared in com.example.compsci399testproject.GoogleSheetsManagerKt.storePositionInformation$lambda$0' type=com.google.auth.http.HttpCredentialsAdapter origin=null
+          p0: CONST String type=kotlin.String value="WiFinder"
+    RETURN type=kotlin.Nothing from='private final fun storePositionInformation$lambda$0 ($account: com.google.android.libraries.identity.googleid.GoogleIdTokenCredential?, $positionInfo: kotlin.collections.List<kotlin.String>): kotlinx.coroutines.Job declared in com.example.compsci399testproject.GoogleSheetsManagerKt'
+      CALL 'public final fun launch$default (context: kotlin.coroutines.CoroutineContext?, start: kotlinx.coroutines.CoroutineStart?, block: @[ExtensionFunctionType] kotlin.coroutines.SuspendFunction1<kotlinx.coroutines.CoroutineScope, kotlin.Unit>, $mask0: kotlin.Int, $handler: kotlin.Any?): kotlinx.coroutines.Job declared in kotlinx.coroutines.BuildersKt' type=kotlinx.coroutines.Job origin=DEFAULT_DISPATCH_CALL
+        $receiver: CALL 'public final fun CoroutineScope (context: kotlin.coroutines.CoroutineContext): kotlinx.coroutines.CoroutineScope declared in kotlinx.coroutines.CoroutineScopeKt' type=kotlinx.coroutines.CoroutineScope origin=null
+          context: CALL 'public final fun <get-IO> (): kotlinx.coroutines.CoroutineDispatcher declared in kotlinx.coroutines.Dispatchers' type=kotlinx.coroutines.CoroutineDispatcher origin=GET_PROPERTY
+        context: COMPOSITE type=kotlin.coroutines.CoroutineContext? origin=DEFAULT_VALUE
+          CONST Null type=kotlin.coroutines.CoroutineContext? value=null
+        start: COMPOSITE type=kotlinx.coroutines.CoroutineStart? origin=DEFAULT_VALUE
+          CONST Null type=kotlinx.coroutines.CoroutineStart? value=null
+        block: BLOCK type=com.example.compsci399testproject.GoogleSheetsManagerKt.storePositionInformation$lambda$0.<no name provided> origin=null
+          CLASS SUSPEND_LAMBDA CLASS name:<no name provided> modality:FINAL visibility:public/*package*/ superTypes:[kotlin.coroutines.jvm.internal.SuspendLambda; kotlin.jvm.functions.Function2<kotlinx.coroutines.CoroutineScope, kotlin.coroutines.Continuation<kotlin.Unit>?, kotlin.Any?>]
+            $this: VALUE_PARAMETER INSTANCE_RECEIVER name:<this> type:com.example.compsci399testproject.GoogleSheetsManagerKt.storePositionInformation$lambda$0.<no name provided>
+            FIELD name:label type:kotlin.Int visibility:public/*package*/
+            CONSTRUCTOR SUSPEND_LAMBDA visibility:public/*package*/ <> ($sheetService:@[FlexibleNullability] com.google.api.services.sheets.v4.Sheets?, $positionInfo:kotlin.collections.List<kotlin.String>, $completion:kotlin.coroutines.Continuation<com.example.compsci399testproject.GoogleSheetsManagerKt.storePositionInformation$lambda$0.<no name provided>>?) returnType:com.example.compsci399testproject.GoogleSheetsManagerKt.storePositionInformation$lambda$0.<no name provided> [primary]
+              VALUE_PARAMETER BOUND_VALUE_PARAMETER name:$sheetService index:0 type:@[FlexibleNullability] com.google.api.services.sheets.v4.Sheets?
+              VALUE_PARAMETER BOUND_VALUE_PARAMETER name:$positionInfo index:1 type:kotlin.collections.List<kotlin.String>
+              VALUE_PARAMETER name:$completion index:2 type:kotlin.coroutines.Continuation<com.example.compsci399testproject.GoogleSheetsManagerKt.storePositionInformation$lambda$0.<no name provided>>?
+              BLOCK_BODY
+                SET_FIELD 'FIELD FIELD_FOR_CAPTURED_VALUE name:$sheetService type:@[FlexibleNullability] com.google.api.services.sheets.v4.Sheets? visibility:public/*package*/ [final] declared in com.example.compsci399testproject.GoogleSheetsManagerKt.storePositionInformation$lambda$0.<no name provided>' type=kotlin.Unit origin=INITIALIZER_OF_FIELD_FOR_CAPTURED_VALUE
+                  receiver: GET_VAR '<this>: com.example.compsci399testproject.GoogleSheetsManagerKt.storePositionInformation$lambda$0.<no name provided> declared in com.example.compsci399testproject.GoogleSheetsManagerKt.storePositionInformation$lambda$0.<no name provided>' type=com.example.compsci399testproject.GoogleSheetsManagerKt.storePositionInformation$lambda$0.<no name provided> origin=null
+                  value: GET_VAR '$sheetService: @[FlexibleNullability] com.google.api.services.sheets.v4.Sheets? declared in com.example.compsci399testproject.GoogleSheetsManagerKt.storePositionInformation$lambda$0.<no name provided>.<init>' type=@[FlexibleNullability] com.google.api.services.sheets.v4.Sheets? origin=null
+                SET_FIELD 'FIELD FIELD_FOR_CAPTURED_VALUE name:$positionInfo type:kotlin.collections.List<kotlin.String> visibility:public/*package*/ [final] declared in com.example.compsci399testproject.GoogleSheetsManagerKt.storePositionInformation$lambda$0.<no name provided>' type=kotlin.Unit origin=INITIALIZER_OF_FIELD_FOR_CAPTURED_VALUE
+                  receiver: GET_VAR '<this>: com.example.compsci399testproject.GoogleSheetsManagerKt.storePositionInformation$lambda$0.<no name provided> declared in com.example.compsci399testproject.GoogleSheetsManagerKt.storePositionInformation$lambda$0.<no name provided>' type=com.example.compsci399testproject.GoogleSheetsManagerKt.storePositionInformation$lambda$0.<no name provided> origin=null
+                  value: GET_VAR '$positionInfo: kotlin.collections.List<kotlin.String> declared in com.example.compsci399testproject.GoogleSheetsManagerKt.storePositionInformation$lambda$0.<no name provided>.<init>' type=kotlin.collections.List<kotlin.String> origin=null
+                DELEGATING_CONSTRUCTOR_CALL 'public constructor <init> (arity: kotlin.Int, $completion: kotlin.coroutines.Continuation<kotlin.Any?>?) declared in kotlin.coroutines.jvm.internal.SuspendLambda'
+                  arity: CONST Int type=kotlin.Int value=2
+                  $completion: GET_VAR '$completion: kotlin.coroutines.Continuation<com.example.compsci399testproject.GoogleSheetsManagerKt.storePositionInformation$lambda$0.<no name provided>>? declared in com.example.compsci399testproject.GoogleSheetsManagerKt.storePositionInformation$lambda$0.<no name provided>.<init>' type=kotlin.coroutines.Continuation<com.example.compsci399testproject.GoogleSheetsManagerKt.storePositionInformation$lambda$0.<no name provided>>? origin=null
+                BLOCK type=kotlin.Unit origin=null
+            FUN name:invokeSuspend visibility:public modality:FINAL <> ($this:com.example.compsci399testproject.GoogleSheetsManagerKt.storePositionInformation$lambda$0.<no name provided>, $result:kotlin.Result<kotlin.Any?>) returnType:kotlin.Any?
+              overridden:
+                protected abstract fun invokeSuspend ($result: kotlin.Result<kotlin.Any?>): kotlin.Any? declared in kotlin.coroutines.jvm.internal.SuspendLambda
+              $this: VALUE_PARAMETER INSTANCE_RECEIVER name:<this> type:com.example.compsci399testproject.GoogleSheetsManagerKt.storePositionInformation$lambda$0.<no name provided>
+              VALUE_PARAMETER name:$result index:0 type:kotlin.Result<kotlin.Any?>
+              BLOCK_BODY
+                VAR name:res type:kotlin.Any [val]
+                  CALL 'public final fun writeRow (sheetService: com.google.api.services.sheets.v4.Sheets, rowValues: kotlin.collections.List<kotlin.collections.List<kotlin.String>>, $completion: kotlin.coroutines.Continuation<kotlin.Any>): kotlin.Any? [suspend] declared in com.example.compsci399testproject.GoogleSheetsManagerKt' type=kotlin.Any origin=null
+                    sheetService: BLOCK type=com.google.api.services.sheets.v4.Sheets origin=null
+                      VAR IR_TEMPORARY_VARIABLE name:tmp0 type:kotlin.Any? [val]
+                        GET_FIELD 'FIELD FIELD_FOR_CAPTURED_VALUE name:$sheetService type:@[FlexibleNullability] com.google.api.services.sheets.v4.Sheets? visibility:public/*package*/ [final] declared in com.example.compsci399testproject.GoogleSheetsManagerKt.storePositionInformation$lambda$0.<no name provided>' type=@[FlexibleNullability] com.google.api.services.sheets.v4.Sheets? origin=null
+                          receiver: GET_VAR '<this>: com.example.compsci399testproject.GoogleSheetsManagerKt.storePositionInformation$lambda$0.<no name provided> declared in com.example.compsci399testproject.GoogleSheetsManagerKt.storePositionInformation$lambda$0.<no name provided>.invokeSuspend' type=com.example.compsci399testproject.GoogleSheetsManagerKt.storePositionInformation$lambda$0.<no name provided> origin=null
+                      CALL 'public final fun checkNotNull (object: kotlin.Any?): kotlin.Unit declared in kotlin.jvm.internal.Intrinsics' type=kotlin.Unit origin=null
+                        object: GET_VAR 'val tmp0: kotlin.Any? [val] declared in com.example.compsci399testproject.GoogleSheetsManagerKt.storePositionInformation$lambda$0.<no name provided>.invokeSuspend' type=kotlin.Any? origin=null
+                      GET_VAR 'val tmp0: kotlin.Any? [val] declared in com.example.compsci399testproject.GoogleSheetsManagerKt.storePositionInformation$lambda$0.<no name provided>.invokeSuspend' type=kotlin.Any? origin=null
+                    rowValues: CALL 'public final fun listOf <T> (element: T of kotlin.collections.CollectionsKt.listOf): kotlin.collections.List<T of kotlin.collections.CollectionsKt.listOf> declared in kotlin.collections.CollectionsKt' type=kotlin.collections.List<kotlin.collections.List<kotlin.String>> origin=null
+                      <T>: kotlin.collections.List<kotlin.String>
+                      element: GET_FIELD 'FIELD FIELD_FOR_CAPTURED_VALUE name:$positionInfo type:kotlin.collections.List<kotlin.String> visibility:public/*package*/ [final] declared in com.example.compsci399testproject.GoogleSheetsManagerKt.storePositionInformation$lambda$0.<no name provided>' type=kotlin.collections.List<kotlin.String> origin=null
+                        receiver: GET_VAR '<this>: com.example.compsci399testproject.GoogleSheetsManagerKt.storePositionInformation$lambda$0.<no name provided> declared in com.example.compsci399testproject.GoogleSheetsManagerKt.storePositionInformation$lambda$0.<no name provided>.invokeSuspend' type=com.example.compsci399testproject.GoogleSheetsManagerKt.storePositionInformation$lambda$0.<no name provided> origin=null
+                    $completion: GET_VAR '<this>: com.example.compsci399testproject.GoogleSheetsManagerKt.storePositionInformation$lambda$0.<no name provided> declared in com.example.compsci399testproject.GoogleSheetsManagerKt.storePositionInformation$lambda$0.<no name provided>.invokeSuspend' type=com.example.compsci399testproject.GoogleSheetsManagerKt.storePositionInformation$lambda$0.<no name provided> origin=null
+                CALL 'public final fun print (message: kotlin.Any?): kotlin.Unit [inline] declared in kotlin.io.ConsoleKt' type=kotlin.Unit origin=null
+                  message: GET_VAR 'val res: kotlin.Any [val] declared in com.example.compsci399testproject.GoogleSheetsManagerKt.storePositionInformation$lambda$0.<no name provided>.invokeSuspend' type=kotlin.Any origin=null
+            FUN name:create visibility:public modality:FINAL <> ($this:com.example.compsci399testproject.GoogleSheetsManagerKt.storePositionInformation$lambda$0.<no name provided>, value:kotlin.Any?, $completion:kotlin.coroutines.Continuation<kotlin.Nothing>) returnType:kotlin.coroutines.Continuation<kotlin.Unit>
+              overridden:
+                public open fun create (value: kotlin.Any?, $completion: kotlin.coroutines.Continuation<kotlin.Nothing>): kotlin.coroutines.Continuation<kotlin.Unit> declared in kotlin.coroutines.jvm.internal.SuspendLambda
+              $this: VALUE_PARAMETER INSTANCE_RECEIVER name:<this> type:com.example.compsci399testproject.GoogleSheetsManagerKt.storePositionInformation$lambda$0.<no name provided>
+              VALUE_PARAMETER name:value index:0 type:kotlin.Any?
+              VALUE_PARAMETER name:$completion index:1 type:kotlin.coroutines.Continuation<kotlin.Nothing>
+              BLOCK_BODY
+                RETURN type=kotlin.Nothing from='public final fun create (value: kotlin.Any?, $completion: kotlin.coroutines.Continuation<kotlin.Nothing>): kotlin.coroutines.Continuation<kotlin.Unit> declared in com.example.compsci399testproject.GoogleSheetsManagerKt.storePositionInformation$lambda$0.<no name provided>'
+                  CONSTRUCTOR_CALL 'public/*package*/ constructor <init> ($sheetService: @[FlexibleNullability] com.google.api.services.sheets.v4.Sheets?, $positionInfo: kotlin.collections.List<kotlin.String>, $completion: kotlin.coroutines.Continuation<com.example.compsci399testproject.GoogleSheetsManagerKt.storePositionInformation$lambda$0.<no name provided>>?) [primary] declared in com.example.compsci399testproject.GoogleSheetsManagerKt.storePositionInformation$lambda$0.<no name provided>' type=com.example.compsci399testproject.GoogleSheetsManagerKt.storePositionInformation$lambda$0.<no name provided> origin=null
+                    $sheetService: GET_FIELD 'FIELD FIELD_FOR_CAPTURED_VALUE name:$sheetService type:@[FlexibleNullability] com.google.api.services.sheets.v4.Sheets? visibility:public/*package*/ [final] declared in com.example.compsci399testproject.GoogleSheetsManagerKt.storePositionInformation$lambda$0.<no name provided>' type=@[FlexibleNullability] com.google.api.services.sheets.v4.Sheets? origin=null
+                      receiver: GET_VAR '<this>: com.example.compsci399testproject.GoogleSheetsManagerKt.storePositionInformation$lambda$0.<no name provided> declared in com.example.compsci399testproject.GoogleSheetsManagerKt.storePositionInformation$lambda$0.<no name provided>.create' type=com.example.compsci399testproject.GoogleSheetsManagerKt.storePositionInformation$lambda$0.<no name provided> origin=null
+                    $positionInfo: GET_FIELD 'FIELD FIELD_FOR_CAPTURED_VALUE name:$positionInfo type:kotlin.collections.List<kotlin.String> visibility:public/*package*/ [final] declared in com.example.compsci399testproject.GoogleSheetsManagerKt.storePositionInformation$lambda$0.<no name provided>' type=kotlin.collections.List<kotlin.String> origin=null
+                      receiver: GET_VAR '<this>: com.example.compsci399testproject.GoogleSheetsManagerKt.storePositionInformation$lambda$0.<no name provided> declared in com.example.compsci399testproject.GoogleSheetsManagerKt.storePositionInformation$lambda$0.<no name provided>.create' type=com.example.compsci399testproject.GoogleSheetsManagerKt.storePositionInformation$lambda$0.<no name provided> origin=null
+                    $completion: GET_VAR '$completion: kotlin.coroutines.Continuation<kotlin.Nothing> declared in com.example.compsci399testproject.GoogleSheetsManagerKt.storePositionInformation$lambda$0.<no name provided>.create' type=kotlin.coroutines.Continuation<kotlin.Nothing> origin=null
+            FUN name:invoke visibility:public modality:FINAL <> ($this:com.example.compsci399testproject.GoogleSheetsManagerKt.storePositionInformation$lambda$0.<no name provided>, p1:kotlinx.coroutines.CoroutineScope, p2:kotlin.coroutines.Continuation<kotlin.Unit>?) returnType:kotlin.Any?
+              overridden:
+                public abstract fun invoke (p1: P1 of kotlin.jvm.functions.Function2, p2: P2 of kotlin.jvm.functions.Function2): R of kotlin.jvm.functions.Function2 declared in kotlin.jvm.functions.Function2
+              $this: VALUE_PARAMETER INSTANCE_RECEIVER name:<this> type:com.example.compsci399testproject.GoogleSheetsManagerKt.storePositionInformation$lambda$0.<no name provided>
+              VALUE_PARAMETER name:p1 index:0 type:kotlinx.coroutines.CoroutineScope
+              VALUE_PARAMETER name:p2 index:1 type:kotlin.coroutines.Continuation<kotlin.Unit>?
+              BLOCK_BODY
+                RETURN type=kotlin.Nothing from='public final fun invoke (p1: kotlinx.coroutines.CoroutineScope, p2: kotlin.coroutines.Continuation<kotlin.Unit>?): kotlin.Any? declared in com.example.compsci399testproject.GoogleSheetsManagerKt.storePositionInformation$lambda$0.<no name provided>'
+                  CALL 'public final fun invokeSuspend ($result: kotlin.Result<kotlin.Any?>): kotlin.Any? declared in com.example.compsci399testproject.GoogleSheetsManagerKt.storePositionInformation$lambda$0.<no name provided>' type=kotlin.Any? origin=null
+                    $this: TYPE_OP type=com.example.compsci399testproject.GoogleSheetsManagerKt.storePositionInformation$lambda$0.<no name provided> origin=IMPLICIT_CAST typeOperand=com.example.compsci399testproject.GoogleSheetsManagerKt.storePositionInformation$lambda$0.<no name provided>
+                      CALL 'public final fun create (value: kotlin.Any?, $completion: kotlin.coroutines.Continuation<kotlin.Nothing>): kotlin.coroutines.Continuation<kotlin.Unit> declared in com.example.compsci399testproject.GoogleSheetsManagerKt.storePositionInformation$lambda$0.<no name provided>' type=kotlin.coroutines.Continuation<kotlin.Unit> origin=null
+                        $this: GET_VAR '<this>: com.example.compsci399testproject.GoogleSheetsManagerKt.storePositionInformation$lambda$0.<no name provided> declared in com.example.compsci399testproject.GoogleSheetsManagerKt.storePositionInformation$lambda$0.<no name provided>.invoke' type=com.example.compsci399testproject.GoogleSheetsManagerKt.storePositionInformation$lambda$0.<no name provided> origin=null
+                        value: GET_VAR 'p1: kotlinx.coroutines.CoroutineScope declared in com.example.compsci399testproject.GoogleSheetsManagerKt.storePositionInformation$lambda$0.<no name provided>.invoke' type=kotlinx.coroutines.CoroutineScope origin=null
+                        $completion: GET_VAR 'p2: kotlin.coroutines.Continuation<kotlin.Unit>? declared in com.example.compsci399testproject.GoogleSheetsManagerKt.storePositionInformation$lambda$0.<no name provided>.invoke' type=kotlin.coroutines.Continuation<kotlin.Unit>? origin=null
+                    $result: CALL 'public final fun <unsafe-coerce> <T, R> (v: T of kotlin.jvm.internal.<unsafe-coerce>): R of kotlin.jvm.internal.<unsafe-coerce> declared in kotlin.jvm.internal' type=kotlin.Result<kotlin.Any?> origin=null
+                      <T>: kotlin.Any?
+                      <R>: kotlin.Result<kotlin.Any?>
+                      v: GET_FIELD 'FIELD FIELD_FOR_OBJECT_INSTANCE name:INSTANCE type:kotlin.Unit visibility:public [final,static] declared in kotlin.Unit' type=kotlin.Unit origin=null
+            FIELD FIELD_FOR_CAPTURED_VALUE name:$sheetService type:@[FlexibleNullability] com.google.api.services.sheets.v4.Sheets? visibility:public/*package*/ [final]
+            FIELD FIELD_FOR_CAPTURED_VALUE name:$positionInfo type:kotlin.collections.List<kotlin.String> visibility:public/*package*/ [final]
+            FUN BRIDGE name:invoke visibility:public modality:OPEN <> ($this:com.example.compsci399testproject.GoogleSheetsManagerKt.storePositionInformation$lambda$0.<no name provided>, p1:kotlin.Any?, p2:kotlin.Any?) returnType:kotlin.Any?
+              $this: VALUE_PARAMETER INSTANCE_RECEIVER name:<this> type:com.example.compsci399testproject.GoogleSheetsManagerKt.storePositionInformation$lambda$0.<no name provided>
+              VALUE_PARAMETER BRIDGE name:p1 index:0 type:kotlin.Any?
+              VALUE_PARAMETER BRIDGE name:p2 index:1 type:kotlin.Any?
+              EXPRESSION_BODY
+                RETURN type=kotlin.Nothing from='public open fun invoke (p1: kotlin.Any?, p2: kotlin.Any?): kotlin.Any? declared in com.example.compsci399testproject.GoogleSheetsManagerKt.storePositionInformation$lambda$0.<no name provided>'
+                  CALL 'public final fun invoke (p1: kotlinx.coroutines.CoroutineScope, p2: kotlin.coroutines.Continuation<kotlin.Unit>?): kotlin.Any? declared in com.example.compsci399testproject.GoogleSheetsManagerKt.storePositionInformation$lambda$0.<no name provided>' type=kotlin.Any? origin=BRIDGE_DELEGATION
+                    $this: GET_VAR '<this>: com.example.compsci399testproject.GoogleSheetsManagerKt.storePositionInformation$lambda$0.<no name provided> declared in com.example.compsci399testproject.GoogleSheetsManagerKt.storePositionInformation$lambda$0.<no name provided>.invoke' type=com.example.compsci399testproject.GoogleSheetsManagerKt.storePositionInformation$lambda$0.<no name provided> origin=null
+                    p1: TYPE_OP type=kotlinx.coroutines.CoroutineScope origin=IMPLICIT_CAST typeOperand=kotlinx.coroutines.CoroutineScope
+                      GET_VAR 'p1: kotlin.Any? declared in com.example.compsci399testproject.GoogleSheetsManagerKt.storePositionInformation$lambda$0.<no name provided>.invoke' type=kotlin.Any? origin=null
+                    p2: TYPE_OP type=kotlin.coroutines.Continuation<*> origin=IMPLICIT_CAST typeOperand=kotlin.coroutines.Continuation<*>
+                      GET_VAR 'p2: kotlin.Any? declared in com.example.compsci399testproject.GoogleSheetsManagerKt.storePositionInformation$lambda$0.<no name provided>.invoke' type=kotlin.Any? origin=null
+          CONSTRUCTOR_CALL 'public/*package*/ constructor <init> ($sheetService: @[FlexibleNullability] com.google.api.services.sheets.v4.Sheets?, $positionInfo: kotlin.collections.List<kotlin.String>, $completion: kotlin.coroutines.Continuation<com.example.compsci399testproject.GoogleSheetsManagerKt.storePositionInformation$lambda$0.<no name provided>>?) [primary] declared in com.example.compsci399testproject.GoogleSheetsManagerKt.storePositionInformation$lambda$0.<no name provided>' type=com.example.compsci399testproject.GoogleSheetsManagerKt.storePositionInformation$lambda$0.<no name provided> origin=null
+            $sheetService: GET_VAR 'val sheetService: @[FlexibleNullability] com.google.api.services.sheets.v4.Sheets? [val] declared in com.example.compsci399testproject.GoogleSheetsManagerKt.storePositionInformation$lambda$0' type=@[FlexibleNullability] com.google.api.services.sheets.v4.Sheets? origin=null
+            $positionInfo: GET_VAR '$positionInfo: kotlin.collections.List<kotlin.String> declared in com.example.compsci399testproject.GoogleSheetsManagerKt.storePositionInformation$lambda$0' type=kotlin.collections.List<kotlin.String> origin=null
+            $completion: CONST Null type=kotlin.Nothing? value=null
+        $mask0: CONST Int type=kotlin.Int value=3
+        $handler: CONST Null type=kotlin.Any? value=null
+
+	at org.jetbrains.kotlin.backend.jvm.codegen.FunctionCodegen.generate(FunctionCodegen.kt:47)
+	at org.jetbrains.kotlin.backend.jvm.codegen.IrSourceCompilerForInline.generateLambdaBody(IrSourceCompilerForInline.kt:67)
+	at org.jetbrains.kotlin.codegen.inline.ExpressionLambda.generateLambdaBody(LambdaInfo.kt:72)
+	at org.jetbrains.kotlin.backend.jvm.codegen.IrInlineCodegen.genValueAndPut(IrInlineCodegen.kt:100)
+	at org.jetbrains.kotlin.backend.jvm.codegen.ExpressionCodegen.visitCall$handleParameter(ExpressionCodegen.kt:616)
+	at org.jetbrains.kotlin.backend.jvm.codegen.ExpressionCodegen.visitCall(ExpressionCodegen.kt:644)
+	at org.jetbrains.kotlin.backend.jvm.codegen.ExpressionCodegen.visitCall(ExpressionCodegen.kt:138)
+	at org.jetbrains.kotlin.ir.expressions.IrCall.accept(IrCall.kt:24)
+	at org.jetbrains.kotlin.backend.jvm.codegen.ExpressionCodegen.visitWhen(ExpressionCodegen.kt:1101)
+	at org.jetbrains.kotlin.backend.jvm.codegen.ExpressionCodegen.visitWhen(ExpressionCodegen.kt:138)
+	at org.jetbrains.kotlin.ir.expressions.IrWhen.accept(IrWhen.kt:24)
+	at org.jetbrains.kotlin.backend.jvm.codegen.ExpressionCodegen.visitStatementContainer(ExpressionCodegen.kt:579)
+	at org.jetbrains.kotlin.backend.jvm.codegen.ExpressionCodegen.visitContainerExpression(ExpressionCodegen.kt:593)
+	at org.jetbrains.kotlin.backend.jvm.codegen.ExpressionCodegen.visitContainerExpression(ExpressionCodegen.kt:138)
+	at org.jetbrains.kotlin.ir.visitors.IrElementVisitor$DefaultImpls.visitBlock(IrElementVisitor.kt:122)
+	at org.jetbrains.kotlin.backend.jvm.codegen.ExpressionCodegen.visitBlock(ExpressionCodegen.kt:413)
+	at org.jetbrains.kotlin.backend.jvm.codegen.ExpressionCodegen.visitBlock(ExpressionCodegen.kt:138)
+	at org.jetbrains.kotlin.ir.expressions.IrBlock.accept(IrBlock.kt:18)
+	at org.jetbrains.kotlin.backend.jvm.codegen.ExpressionCodegen.visitStatementContainer(ExpressionCodegen.kt:579)
+	at org.jetbrains.kotlin.backend.jvm.codegen.ExpressionCodegen.visitContainerExpression(ExpressionCodegen.kt:593)
+	at org.jetbrains.kotlin.backend.jvm.codegen.ExpressionCodegen.visitContainerExpression(ExpressionCodegen.kt:138)
+	at org.jetbrains.kotlin.ir.visitors.IrElementVisitor$DefaultImpls.visitComposite(IrElementVisitor.kt:125)
+	at org.jetbrains.kotlin.backend.jvm.codegen.ExpressionCodegen.visitComposite(ExpressionCodegen.kt:138)
+	at org.jetbrains.kotlin.backend.jvm.codegen.ExpressionCodegen.visitComposite(ExpressionCodegen.kt:138)
+	at org.jetbrains.kotlin.ir.expressions.IrComposite.accept(IrComposite.kt:18)
+	at org.jetbrains.kotlin.backend.jvm.codegen.ExpressionCodegen.visitStatementContainer(ExpressionCodegen.kt:579)
+	at org.jetbrains.kotlin.backend.jvm.codegen.ExpressionCodegen.visitBlockBody(ExpressionCodegen.kt:584)
+	at org.jetbrains.kotlin.backend.jvm.codegen.ExpressionCodegen.visitBlockBody(ExpressionCodegen.kt:138)
+	at org.jetbrains.kotlin.ir.expressions.IrBlockBody.accept(IrBlockBody.kt:20)
+	at org.jetbrains.kotlin.backend.jvm.codegen.ExpressionCodegen.generate(ExpressionCodegen.kt:240)
+	at org.jetbrains.kotlin.backend.jvm.codegen.FunctionCodegen.doGenerate(FunctionCodegen.kt:123)
+	at org.jetbrains.kotlin.backend.jvm.codegen.FunctionCodegen.generate(FunctionCodegen.kt:44)
+	... 54 more
+Caused by: java.lang.IllegalStateException: Fake override should have at least one overridden descriptor: FUN FAKE_OVERRIDE name:<get-idToken> visibility:public modality:FINAL <> ($this:kotlin.Nothing) returnType:kotlin.String [fake_override]
+	at org.jetbrains.kotlin.backend.jvm.ir.JvmIrUtilsKt.findSuperDeclaration(JvmIrUtils.kt:408)
+	at org.jetbrains.kotlin.backend.jvm.mapping.MethodSignatureMapper.findSuperDeclaration(MethodSignatureMapper.kt:443)
+	at org.jetbrains.kotlin.backend.jvm.mapping.MethodSignatureMapper.mapToCallableMethod(MethodSignatureMapper.kt:412)
+	at org.jetbrains.kotlin.backend.jvm.codegen.ExpressionCodegen.visitCall(ExpressionCodegen.kt:605)
+	at org.jetbrains.kotlin.backend.jvm.codegen.ExpressionCodegen.visitCall(ExpressionCodegen.kt:138)
+	at org.jetbrains.kotlin.ir.expressions.IrCall.accept(IrCall.kt:24)
+	at org.jetbrains.kotlin.backend.jvm.codegen.ExpressionCodegen.gen(ExpressionCodegen.kt:217)
+	at org.jetbrains.kotlin.backend.jvm.codegen.ExpressionCodegen.generateConstructorArguments(ExpressionCodegen.kt:771)
+	at org.jetbrains.kotlin.backend.jvm.codegen.ExpressionCodegen.visitConstructorCall(ExpressionCodegen.kt:759)
+	at org.jetbrains.kotlin.backend.jvm.codegen.ExpressionCodegen.visitConstructorCall(ExpressionCodegen.kt:138)
+	at org.jetbrains.kotlin.ir.expressions.IrConstructorCall.accept(IrConstructorCall.kt:27)
+	at org.jetbrains.kotlin.backend.jvm.codegen.ExpressionCodegen.gen(ExpressionCodegen.kt:217)
+	at org.jetbrains.kotlin.backend.jvm.codegen.IrCallGenerator.genValueAndPut(IrCallGenerator.kt:48)
+	at org.jetbrains.kotlin.backend.jvm.codegen.ExpressionCodegen.visitCall$handleParameter(ExpressionCodegen.kt:616)
+	at org.jetbrains.kotlin.backend.jvm.codegen.ExpressionCodegen.visitCall(ExpressionCodegen.kt:644)
+	at org.jetbrains.kotlin.backend.jvm.codegen.ExpressionCodegen.visitCall(ExpressionCodegen.kt:138)
+	at org.jetbrains.kotlin.ir.expressions.IrCall.accept(IrCall.kt:24)
+	at org.jetbrains.kotlin.backend.jvm.codegen.ExpressionCodegen.visitVariable(ExpressionCodegen.kt:790)
+	at org.jetbrains.kotlin.backend.jvm.codegen.ExpressionCodegen.visitVariable(ExpressionCodegen.kt:138)
+	at org.jetbrains.kotlin.ir.declarations.IrVariable.accept(IrVariable.kt:36)
+	at org.jetbrains.kotlin.backend.jvm.codegen.ExpressionCodegen.visitStatementContainer(ExpressionCodegen.kt:579)
+	at org.jetbrains.kotlin.backend.jvm.codegen.ExpressionCodegen.visitBlockBody(ExpressionCodegen.kt:584)
+	at org.jetbrains.kotlin.backend.jvm.codegen.ExpressionCodegen.visitBlockBody(ExpressionCodegen.kt:138)
+	at org.jetbrains.kotlin.ir.expressions.IrBlockBody.accept(IrBlockBody.kt:20)
+	at org.jetbrains.kotlin.backend.jvm.codegen.ExpressionCodegen.generate(ExpressionCodegen.kt:240)
+	at org.jetbrains.kotlin.backend.jvm.codegen.FunctionCodegen.doGenerate(FunctionCodegen.kt:123)
+	at org.jetbrains.kotlin.backend.jvm.codegen.FunctionCodegen.generate(FunctionCodegen.kt:44)
+	... 85 more
+
+

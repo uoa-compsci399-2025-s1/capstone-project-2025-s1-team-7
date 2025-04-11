@@ -1,7 +1,10 @@
 package com.example.compsci399testproject
 
 import android.content.Context
+import androidx.credentials.Credential
+import android.os.Build
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
@@ -13,26 +16,39 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontWeight
+import androidx.credentials.CredentialManager
+import androidx.credentials.GetCredentialRequest
+import com.google.android.libraries.identity.googleid.*
 
 
+@RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
 @Composable
-fun ScanTool() {
+fun ScanTool(account: GoogleIdTokenCredential?) {
+
+
+    print("""
+       
+            Scan
+      
+            $account
+        
+    """)
+
+
+    val context = LocalContext.current
 
     var latitude by remember { mutableStateOf("") }
     var longitude by remember { mutableStateOf("") }
     var floorNumber by remember { mutableStateOf("") }
 
     //Fun.
-    val introMessage = if ((0..10).random() == 10){
-        "Hey, you. Finally awake. You were trying to cross the border, right? Walked into that Imperial ambush, same as us."
-    } else {
-        "Where are you?"
-    }
+//    val introMessage = if ((0..10).random() == 10){
+//        "Hey, you. Finally awake. You were trying to cross the border, right? Walked into that Imperial ambush, same as us."
+//    } else {
+//        "Where are you?"
+//    }
 
     //Error handling.
-    val context = LocalContext.current
     val showToast: (String) -> Unit = { msg ->
         Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
     }
@@ -43,16 +59,16 @@ fun ScanTool() {
         .padding(0.dp, 200.dp, 0.dp, 0.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        Text(
-            text = introMessage,
-            color = colorResource(id = R.color.dark_blue),
-            fontWeight = FontWeight(600),
-            fontFamily = FontFamily.SansSerif,
-            style = TextStyle(
-                fontSize = 24.sp
-            ),
-            modifier = Modifier.padding(0.dp, 50.dp, 0.dp, 0.dp)
-        )
+//        Text(
+//            text = introMessage,
+//            color = colorResource(id = R.color.dark_blue),
+//            fontWeight = FontWeight(600),
+//            fontFamily = FontFamily.SansSerif,
+//            style = TextStyle(
+//                fontSize = 24.sp
+//            ),
+//            modifier = Modifier.padding(0.dp, 50.dp, 0.dp, 0.dp)
+//        )
 
         Spacer(modifier = Modifier.height(100.dp))
 
@@ -86,12 +102,14 @@ fun ScanTool() {
         Spacer(modifier = Modifier.height(25.dp))
 
         Button(
-            onClick = { captureData(context, latitude, longitude, floorNumber, showToast) },
+            onClick = { captureData(context, account, latitude, longitude, floorNumber, showToast) },
             colors = ButtonDefaults.buttonColors(
                 containerColor = colorResource(id = R.color.dark_blue),
                 contentColor = colorResource(id = R.color.darker_white)
             ),
-            modifier = Modifier.height(50.dp).width(250.dp)
+            modifier = Modifier
+                .height(50.dp)
+                .width(250.dp)
         ) {
             Text(text = "Capture",
                 style = TextStyle(fontSize = 24.sp)
@@ -102,6 +120,7 @@ fun ScanTool() {
 
 fun captureData(
     context: Context,
+    account: GoogleIdTokenCredential?,
     latitudeInput: String,
     longitudeInput: String,
     floorNumberInput: String,
@@ -124,5 +143,8 @@ fun captureData(
 
     // val wifiSignals = getWifiSignals() - Connor to implement.
 
-    //storePositionInformation() - Renesh to implement.
+    // Renesh
+    // The API requires all values to be a string
+    val positionInfoToList = listOf<String>(latitudeInput, longitudeInput, floorNumberInput, "wifiSignals")
+    storePositionInformation(context, account, positionInfoToList)
 }
