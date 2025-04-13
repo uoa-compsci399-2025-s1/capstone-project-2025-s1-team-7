@@ -13,3 +13,6 @@
 .externalNativeBuild
 .cxx
 local.properties
+
+# IGNORE ZSH HISTORY FILES (FOR RENESH)
+1000
