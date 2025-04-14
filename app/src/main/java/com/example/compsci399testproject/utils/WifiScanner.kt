@@ -1,8 +1,6 @@
 package com.example.compsci399testproject.utils
 
 import android.Manifest
-import android.app.Activity
-import android.app.Activity.WIFI_SERVICE
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -14,10 +12,11 @@ import android.os.Build
 import android.util.Log
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
+import com.example.compsci399testproject.viewmodel.WifiViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
-class WifiScanner(private val context: Context) {
+class WifiScanner(private val context: Context, wifiViewModel: WifiViewModel) {
     private val wifiManager: WifiManager = context.getSystemService(WifiManager::class.java)
 
     private val _scanResults = MutableStateFlow<List<ScanResult>>(emptyList())
@@ -35,7 +34,11 @@ class WifiScanner(private val context: Context) {
                             Manifest.permission.ACCESS_FINE_LOCATION
                         ) == PackageManager.PERMISSION_GRANTED
                     ) {
-                        _scanResults.value = wifiManager.scanResults
+                        val results =  wifiManager.scanResults
+
+                        _scanResults.value = results
+                        wifiViewModel.updateScanResults()
+
                     }
                 }
             }
@@ -61,7 +64,10 @@ class WifiScanner(private val context: Context) {
                         }
 
                         val results = wifiManager.scanResults
+
                         _scanResults.value = results
+                        wifiViewModel.updateScanResults()
+
 
                         Log.d("wifiScan", "Found ${results.size} networks.")
                         Toast.makeText(context, "Scan success: ${results.size} networks found", Toast.LENGTH_SHORT).show()
@@ -110,10 +116,5 @@ class WifiScanner(private val context: Context) {
                 context.unregisterReceiver(it)
             }
         }
-    }
-
-    fun updateScanResults(newResults: List<ScanResult>) {
-        _scanResults.value = newResults
-        Log.d("wifiScan", "Scan results updated.")
     }
 }
