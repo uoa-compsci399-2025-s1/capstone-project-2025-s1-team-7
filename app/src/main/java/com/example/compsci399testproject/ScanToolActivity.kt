@@ -252,7 +252,8 @@ fun sendResultsToWebApp(
 //        if (it.SSID in listOf("eduroam", "Guest", "CS399")) {
 //            signals.put(it.BSSID, it.level)
 //        }
-        signals.put(it.BSSID, it.level)
+        val signalName = it.BSSID + "(${it.SSID})"
+        signals.put(signalName, it.level)
     }
 
 
