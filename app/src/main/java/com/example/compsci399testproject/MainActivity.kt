@@ -88,7 +88,7 @@ class MainActivity : ComponentActivity() {
                 }
 
                 composable("WifiSignals") {
-                    WifiSignalList()
+                    WifiSignalList(wifiViewModel)
                 }
 
                 composable("MapLocation") {
