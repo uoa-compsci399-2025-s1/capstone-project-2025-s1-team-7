@@ -13,6 +13,7 @@ class WifiViewModel(application: Context) : AndroidViewModel(application as Appl
 
     private val _lastScanTime = mutableStateOf<Long?>(null)
     val lastScanTime: State<Long?> = _lastScanTime
+    val scanResults = scanner.scanResults
 
     fun updateScanResults(results: List<ScanResult>) {
         _lastScanTime.value = System.currentTimeMillis()

@@ -33,14 +33,11 @@ import android.net.wifi.WifiManager
 import android.util.Log
 import androidx.annotation.RequiresPermission
 import androidx.core.content.ContextCompat
-import com.example.compsci399testproject.utils.GoogleSheetsService
 
 class MainActivity : ComponentActivity() {
     private var LOCATION_PERMISSION_REQUEST_CODE = 1
 
     private lateinit var wifiViewModel: WifiViewModel
-
-    private lateinit var googleSheetsService: GoogleSheetsService
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -82,8 +79,6 @@ class MainActivity : ComponentActivity() {
         val factory = WifiScannerViewModelFactory(applicationContext)
         wifiViewModel = ViewModelProvider(this, factory)[WifiViewModel::class.java]
 
-        googleSheetsService = GoogleSheetsService(this)
-
         setContent {
             val navController = rememberNavController()
 
@@ -101,7 +96,7 @@ class MainActivity : ComponentActivity() {
                 }
 
                 composable("ScanTool") {
-                    ScanTool(wifiViewModel, googleSheetsService)
+                    ScanTool(wifiViewModel)
                 }
             })
         }

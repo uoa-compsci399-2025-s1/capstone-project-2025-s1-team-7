@@ -61,6 +61,9 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 
+    // Henry plugins.
+    implementation("com.squareup.okhttp3:okhttp:4.12.0")
+
     implementation(libs.androidx.credentials)
     implementation(libs.androidx.credentials.play.services.auth)
     implementation(libs.google.api.services.sheets)

@@ -3,15 +3,17 @@ package com.example.compsci399testproject
 import android.content.Context
 import android.os.Handler
 import android.os.Looper
-import android.util.Log
+import android.util.Log // Used for testing/bugfixes.
 import android.widget.Toast
+import android.net.wifi.ScanResult
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -19,13 +21,21 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
-import com.example.compsci399testproject.utils.GoogleSheetsService
+
 import com.example.compsci399testproject.viewmodel.WifiViewModel
-import kotlinx.coroutines.delay
+
+import kotlinx.coroutines.*
+
+import okhttp3.*
+import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.RequestBody.Companion.toRequestBody
+
+import org.json.JSONObject
+import java.io.IOException
 
 
 @Composable
-fun ScanTool(wifiViewModel: WifiViewModel, googleSheetsService: GoogleSheetsService) {
+fun ScanTool(wifiViewModel: WifiViewModel) {
 
     var latitude by remember { mutableStateOf("") }
     var longitude by remember { mutableStateOf("") }
@@ -55,7 +65,7 @@ fun ScanTool(wifiViewModel: WifiViewModel, googleSheetsService: GoogleSheetsServ
     //Fun and improved.
     val introMessage =
         if (timeSeconds > 60) {
-            "Hey, you. Finally awake. You were trying to cross the border, right? Walked into that Imperial ambush, same as us."
+            "Hey, you. Finally awake. You were trying to cross the border, right? Walked right into that Imperial ambush, same as us."
         } else {
             "Where are you?"
         }
@@ -89,7 +99,7 @@ fun ScanTool(wifiViewModel: WifiViewModel, googleSheetsService: GoogleSheetsServ
         bestSignal = if (strongestSignal != null) {
             """Best:
                 SSID: ${strongestSignal.SSID}
-                Signal Strength: ${strongestSignal.level} dBm
+                Signal Strength: ${strongestSignal.level} dbm
             """.trimIndent()
         } else {
             "No WiFi signals found."
@@ -135,7 +145,7 @@ fun ScanTool(wifiViewModel: WifiViewModel, googleSheetsService: GoogleSheetsServ
             OutlinedTextField(
                 value = floorNumber,
                 onValueChange = { floorNumber = it },
-                label = { Text("Room Number") },
+                label = { Text("Floor Number") },
                 modifier = Modifier.fillMaxWidth()
             )
         }
@@ -152,7 +162,7 @@ fun ScanTool(wifiViewModel: WifiViewModel, googleSheetsService: GoogleSheetsServ
                     floorNumber,
                     showToast,
                     wifiViewModel,
-                    googleSheetsService
+                    "https://script.google.com/macros/s/AKfycbzsISU5WpqTe8rH3aYgHk3eEhRKhTZlJvRnFfvyFtMVk1dZMel-hCdfJRVCtco8_JSa/exec"
                 )
             },
             colors = ButtonDefaults.buttonColors(
@@ -169,33 +179,6 @@ fun ScanTool(wifiViewModel: WifiViewModel, googleSheetsService: GoogleSheetsServ
         }
 
         Spacer(modifier = Modifier.height(60.dp))
-
-        when (googleSheetsService.successOrFail) {
-            "Success" -> {
-                Text(
-                    text = googleSheetsService.successOrFail!!,
-                    color = Color.Green,
-                    fontWeight = FontWeight(600),
-                    fontFamily = FontFamily.SansSerif,
-                    style = TextStyle(
-                        fontSize = 30.sp
-                    ),
-                    modifier = Modifier.padding(0.dp, 10.dp, 0.dp, 0.dp)
-                )
-            }
-            "Fail" -> {
-                Text(
-                    text = googleSheetsService.successOrFail!!,
-                    color = Color.Red,
-                    fontWeight = FontWeight(600),
-                    fontFamily = FontFamily.SansSerif,
-                    style = TextStyle(
-                        fontSize = 30.sp
-                    ),
-                    modifier = Modifier.padding(0.dp, 10.dp, 0.dp, 0.dp)
-                )
-            }
-        }
     }
 
 
@@ -208,53 +191,98 @@ fun captureData(
     floorNumberInput: String,
     onError: (String) -> Unit,
     wifiViewModel: WifiViewModel,
-    googleSheetsService: GoogleSheetsService
+    webAppUrl: String
 ) {
-    val longitude: Float = longitudeInput.toFloatOrNull() ?: run {
-        onError("Invalid Longitude. Please enter a number.")
+    val latitude = latitudeInput.toFloatOrNull() ?: run {
+        onError("Invalid Latitude.")
         return
     }
 
-    val latitude: Float = latitudeInput.toFloatOrNull() ?: run {
-        onError("Invalid Latitude. Please enter a number.")
+    val longitude = longitudeInput.toFloatOrNull() ?: run {
+        onError("Invalid Longitude.")
         return
     }
 
-    val floor = floorNumberInput.toIntOrNull() ?: run {
-        onError("Please enter a floor number.")
+    val floor = floorNumberInput.trim().ifEmpty {
+        onError("Please enter a floor.")
         return
     }
 
     wifiViewModel.scan()
 
-    Handler(Looper.getMainLooper()).postDelayed({
-        val wifiSignals = wifiViewModel.getResults()
-        wifiViewModel.updateScanResults(wifiSignals)
-
-        Log.d("wifiScan", "Scan results: $wifiSignals")
-
-        if (wifiSignals.isNotEmpty()) {
-            val strongestSignal = wifiSignals.maxByOrNull { it.level }
-            val scanTime = System.currentTimeMillis()
-
-            val signalDetails = """
-                Best:
-                SSID: ${strongestSignal?.SSID}
-                Signal Strength: ${strongestSignal?.level} dBm
-                Last Scan Time: $scanTime
-            """.trimIndent()
-
-            Toast.makeText(context, signalDetails, Toast.LENGTH_LONG).show()
-        } else {
-            Toast.makeText(context, "No WiFi signals found.", Toast.LENGTH_SHORT).show()
+    // Observe scan results until we get some (max 10 seconds)
+    CoroutineScope(Dispatchers.Main).launch {
+        val timeout = withTimeoutOrNull(10000) {
+            wifiViewModel.scanResults.collect { results ->
+                if (results.isNotEmpty()) {
+                    sendResultsToWebApp(
+                        context = context,
+                        latitude = latitude,
+                        longitude = longitude,
+                        floor = floor,
+                        results = results,
+                        webAppUrl = webAppUrl,
+                        onError = onError
+                    )
+                    cancel() // Stop collecting
+                }
+            }
         }
-    }, 8000)
 
+        if (timeout == null) {
+            onError("WiFi scan timed out.")
+        }
+    }
+}
 
-    // API takes a list of strings -> values: [ ["latitude", "longitude", "floorNumberInput",...] ]
-    // Google Sheets should differentiate between value types when input
+fun sendResultsToWebApp(
+    context: Context,
+    latitude: Float,
+    longitude: Float,
+    floor: String,
+    results: List<ScanResult>,
+    webAppUrl: String,
+    onError: (String) -> Unit
+) {
+    val signals = JSONObject()
+    results.forEach {
+        signals.put(it.BSSID, it.level)
+    }
 
-    val positionInfoToList = listOf<String>(latitudeInput, longitudeInput, floorNumberInput, "wifiSignals")
-    googleSheetsService.storePositionInformation(positionInfoToList)
+    val payload = JSONObject().apply {
+        put("latitude", latitude)
+        put("longitude", longitude)
+        put("floor", floor)
+        put("timestamp", System.currentTimeMillis())
+        put("signals", signals)
+    }
 
+    Log.d("captureData", "Sending payload: $payload")
+
+    val body = payload.toString().toRequestBody("application/json".toMediaType())
+
+    val request = Request.Builder()
+        .url(webAppUrl)
+        .post(body)
+        .build()
+
+    Log.d("request", "Sending request: $request")
+
+    OkHttpClient().newCall(request).enqueue(object : Callback {
+        override fun onFailure(call: Call, e: IOException) {
+            Handler(Looper.getMainLooper()).post {
+                onError("Upload failed: ${e.message}")
+            }
+        }
+
+        override fun onResponse(call: Call, response: Response) {
+            Handler(Looper.getMainLooper()).post {
+                if (response.isSuccessful) {
+                    Toast.makeText(context, "Data uploaded!", Toast.LENGTH_SHORT).show()
+                } else {
+                    onError("Upload failed: ${response.code}")
+                }
+            }
+        }
+    })
 }
