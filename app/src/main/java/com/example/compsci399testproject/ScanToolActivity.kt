@@ -36,7 +36,6 @@ import java.io.IOException
 
 @Composable
 fun ScanTool(wifiViewModel: WifiViewModel) {
-
     var latitude by remember { mutableStateOf("") }
     var longitude by remember { mutableStateOf("") }
     var floorNumber by remember { mutableStateOf("") }
@@ -215,16 +214,20 @@ fun captureData(
         val timeout = withTimeoutOrNull(10000) {
             wifiViewModel.scanResults.collect { results ->
                 if (results.isNotEmpty()) {
-                    sendResultsToWebApp(
-                        context = context,
-                        latitude = latitude,
-                        longitude = longitude,
-                        floor = floor,
-                        results = results,
-                        webAppUrl = webAppUrl,
-                        onError = onError
-                    )
-                    cancel() // Stop collecting
+                    if (wifiViewModel.hasScanChanged(results)) {
+                        sendResultsToWebApp(
+                            context = context,
+                            latitude = latitude,
+                            longitude = longitude,
+                            floor = floor,
+                            results = results,
+                            webAppUrl = webAppUrl,
+                            onError = onError
+                        )
+                        cancel() // Stop collecting
+                    } else {
+                        Toast.makeText(context, "No new results.", Toast.LENGTH_SHORT).show()
+                    }
                 }
             }
         }
@@ -246,14 +249,22 @@ fun sendResultsToWebApp(
 ) {
     val signals = JSONObject()
     results.forEach {
+//        if (it.SSID in listOf("eduroam", "Guest", "CS399")) {
+//            signals.put(it.BSSID, it.level)
+//        }
         signals.put(it.BSSID, it.level)
     }
+
+
+    // convert system millis to time
+    val currentTime = System.currentTimeMillis()
+    val time = java.text.SimpleDateFormat("HH:mm:ss").format(currentTime)
 
     val payload = JSONObject().apply {
         put("latitude", latitude)
         put("longitude", longitude)
         put("floor", floor)
-        put("timestamp", System.currentTimeMillis())
+        put("timestamp", time)
         put("signals", signals)
     }
 
