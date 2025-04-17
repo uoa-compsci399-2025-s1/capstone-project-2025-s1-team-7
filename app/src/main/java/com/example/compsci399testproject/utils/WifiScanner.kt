@@ -67,10 +67,6 @@ class WifiScanner(private val context: Context, wifiViewModel: WifiViewModel) {
 
                         _scanResults.value = results
                         wifiViewModel.updateScanResults()
-
-
-                        Log.d("wifiScan", "Found ${results.size} networks.")
-                        Toast.makeText(context, "Scan success: ${results.size} networks found", Toast.LENGTH_SHORT).show()
                     } else {
                         Log.d("wifiScan", "WiFi scan failed or returned no results.")
                         Toast.makeText(context, "WiFi scan failed or empty", Toast.LENGTH_SHORT).show()
