@@ -39,6 +39,7 @@ fun ScanTool(wifiViewModel: WifiViewModel) {
     var latitude by remember { mutableStateOf("") }
     var longitude by remember { mutableStateOf("") }
     var floorNumber by remember { mutableStateOf("") }
+    var phoneId by remember { mutableStateOf("") }
 
     val lastScanTime by wifiViewModel.lastScanTime
 
@@ -147,6 +148,13 @@ fun ScanTool(wifiViewModel: WifiViewModel) {
                 label = { Text("Floor Number") },
                 modifier = Modifier.fillMaxWidth()
             )
+
+            OutlinedTextField(
+                value = phoneId,
+                onValueChange = { phoneId = it },
+                label = { Text("Phone ID") },
+                modifier = Modifier.fillMaxWidth()
+            )
         }
 
 
@@ -159,6 +167,7 @@ fun ScanTool(wifiViewModel: WifiViewModel) {
                     latitude,
                     longitude,
                     floorNumber,
+                    phoneId,
                     showToast,
                     wifiViewModel,
                     "https://script.google.com/macros/s/AKfycbzsISU5WpqTe8rH3aYgHk3eEhRKhTZlJvRnFfvyFtMVk1dZMel-hCdfJRVCtco8_JSa/exec"
@@ -188,6 +197,7 @@ fun captureData(
     latitudeInput: String,
     longitudeInput: String,
     floorNumberInput: String,
+    phoneIdInput: String,
     onError: (String) -> Unit,
     wifiViewModel: WifiViewModel,
     webAppUrl: String
@@ -207,6 +217,11 @@ fun captureData(
         return
     }
 
+    val phoneId = phoneIdInput.trim().ifEmpty {
+        onError("Please enter a phone ID.")
+        return
+    }
+
     wifiViewModel.scan()
 
     // Observe scan results until we get some (max 10 seconds)
@@ -220,6 +235,7 @@ fun captureData(
                             latitude = latitude,
                             longitude = longitude,
                             floor = floor,
+                            phoneId = phoneId,
                             results = results,
                             webAppUrl = webAppUrl,
                             onError = onError
@@ -243,17 +259,18 @@ fun sendResultsToWebApp(
     latitude: Float,
     longitude: Float,
     floor: String,
+    phoneId: String,
     results: List<ScanResult>,
     webAppUrl: String,
     onError: (String) -> Unit
 ) {
     val signals = JSONObject()
     results.forEach {
-//        if (it.SSID in listOf("eduroam", "Guest", "CS399")) {
-//            signals.put(it.BSSID, it.level)
-//        }
-        val signalName = it.BSSID + "(${it.SSID})"
-        signals.put(signalName, it.level)
+        if (it.SSID in listOf("eduroam", "UoA-Guest-WiFi", "UoA-WiFi")) {
+            val signalName = it.BSSID + "(${it.SSID})"
+            signals.put(signalName, it.level)
+        }
+//        signals.put(signalName, it.level)
     }
 
 
@@ -265,6 +282,7 @@ fun sendResultsToWebApp(
         put("latitude", latitude)
         put("longitude", longitude)
         put("floor", floor)
+        put("phoneId", phoneId)
         put("timestamp", time)
         put("signals", signals)
     }
