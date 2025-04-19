@@ -1,10 +1,10 @@
 package com.example.compsci399testproject.viewmodel
 
-import androidx.lifecycle.ViewModel
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.geometry.Offset
+import androidx.lifecycle.ViewModel
 
 class MapViewModel : ViewModel() {
 

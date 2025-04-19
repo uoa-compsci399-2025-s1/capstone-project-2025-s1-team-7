@@ -11,6 +11,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
+import com.example.compsci399testproject.viewmodel.MapViewModel
+
 @Composable
 fun MainAppEntry() {
     Text(
