@@ -24,3 +24,8 @@ fun MainAppEntry() {
         modifier = Modifier.padding(0.dp, 50.dp, 0.dp, 0.dp)
     )
 }
+
+@Composable
+fun MapView(viewModel: MapViewModel){
+
+}
