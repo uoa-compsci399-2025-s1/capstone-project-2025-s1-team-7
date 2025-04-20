@@ -33,11 +33,16 @@ import android.net.wifi.WifiManager
 import android.util.Log
 import androidx.annotation.RequiresPermission
 import androidx.core.content.ContextCompat
+import androidx.compose.ui.geometry.Offset
+import com.example.compsci399testproject.viewmodel.MapViewModel
+import com.example.compsci399testproject.viewmodel.MapViewModelFactory
 
 class MainActivity : ComponentActivity() {
     private var LOCATION_PERMISSION_REQUEST_CODE = 1
 
     private lateinit var wifiViewModel: WifiViewModel
+
+    private lateinit var mapViewModel: MapViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -79,6 +84,9 @@ class MainActivity : ComponentActivity() {
         val factory = WifiScannerViewModelFactory(applicationContext)
         wifiViewModel = ViewModelProvider(this, factory)[WifiViewModel::class.java]
 
+        val mapFactory = MapViewModelFactory()
+        mapViewModel = ViewModelProvider(this, mapFactory)[MapViewModel::class.java]
+
         setContent {
             val navController = rememberNavController()
 
@@ -100,7 +108,7 @@ class MainActivity : ComponentActivity() {
                 }
 
                 composable("MainApp") {
-                    MainAppEntry()
+                    MapView(mapViewModel)
                 }
             })
         }

@@ -23,7 +23,7 @@ class MapViewModel : ViewModel() {
         return currentFloor
     }
 
-    fun setOffset(newOffset: Offset) {
+    fun updateOffset(newOffset : Offset){
         offset = newOffset
     }
 }
