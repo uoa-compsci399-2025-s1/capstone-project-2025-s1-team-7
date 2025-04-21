@@ -1,7 +1,5 @@
 package com.example.compsci399testproject
 
-import androidx.annotation.Nullable
-
 data class Node(
     val id: String,
     // val latitude: Double,
@@ -9,12 +7,40 @@ data class Node(
     // val floor: Int,
     var edges: MutableList<Edge>
     // val type: NodeType // ROOM, HALLWAY, STAIRS, ELEVATOR                    Add later
-)
+) {
+    override fun toString(): String {
+        return "Node(id='$id', edges=${edges.map { it.to.id }})"
+    }
+
+    override fun hashCode(): Int {
+        return id.hashCode()
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is Node) return false
+        return id == other.id
+    }
+}
 
 data class Edge(
     val to: Node,
-    val weight: Double
-)
+    val weight: Float
+) {
+    override fun toString(): String {
+        return "Edge(to=${to.id}, weight=$weight)"
+    }
+
+    override fun hashCode(): Int {
+        return to.id.hashCode() * 31 + weight.hashCode()
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is Edge) return false
+        return to.id == other.to.id && weight == other.weight
+    }
+}
 
 class NavigationGraph {
     internal val graph = mutableMapOf<String, Node>()
@@ -35,7 +61,7 @@ class NavigationGraph {
         return retNode ?: throw NoSuchElementException("Node with id $id not found")
     }
 
-    fun addEdge(from: String, to: String, weight: Double) {
+    fun addEdge(from: String, to: String, weight: Float) {
         val toNode = findNode(to)
         val edge = Edge(toNode, weight)
         findNode(from).edges.add(edge)
@@ -86,19 +112,14 @@ fun dijkstra(graph: MutableMap<String, Node>, start: Node, goal: Node): MutableL
     }
 
     path.add(start)
+    path.reverse()
+
     if (shortestDistance[goal] != Int.MAX_VALUE) {
         println("Shortest path from ${start.id} to ${goal.id} is ${shortestDistance[goal]} with path: $path")
     }
     return (path)
 }
 
-val graph = mutableMapOf(
-    'a' to mapOf('b' to 10, 'c' to 3),
-    'b' to mapOf('c' to 1, 'd' to 2),
-    'c' to mapOf('b' to 4, 'd' to 8, 'e' to 2),
-    'd' to mapOf('e' to 7),
-    'e' to mapOf('d' to 9)
-)
 fun main() {
     // Create an instance of NavigationGraph
     val navigationGraph = NavigationGraph()
@@ -110,18 +131,6 @@ fun main() {
     val nodeD = Node("d", mutableListOf())
     val nodeE = Node("e", mutableListOf())
 
-    // Add edges to the nodes
-    navigationGraph.addEdge("a", "b", 10.0)
-    navigationGraph.addEdge("a", "c", 3.0)
-    navigationGraph.addEdge("b", "c", 1.0)
-    navigationGraph.addEdge("b", "d", 2.0)
-    navigationGraph.addEdge("c", "b", 4.0)
-    navigationGraph.addEdge("c", "d", 8.0)
-    navigationGraph.addEdge("c", "e", 2.0)
-    navigationGraph.addEdge("d", "e", 7.0)
-    navigationGraph.addEdge("e", "d", 9.0)
-
-
     // Add nodes to the graph
     navigationGraph.addNodeToGraph(nodeA)
     navigationGraph.addNodeToGraph(nodeB)
@@ -129,8 +138,23 @@ fun main() {
     navigationGraph.addNodeToGraph(nodeD)
     navigationGraph.addNodeToGraph(nodeE)
 
+    // Add edges to the nodes
+    navigationGraph.addEdge("a", "b", 10.0f)
+    navigationGraph.addEdge("a", "c", 3.0f)
+    navigationGraph.addEdge("b", "c", 1.0f)
+    navigationGraph.addEdge("b", "d", 2.0f)
+    navigationGraph.addEdge("c", "b", 4.0f)
+    navigationGraph.addEdge("c", "d", 8.0f)
+    navigationGraph.addEdge("c", "e", 2.0f)
+    navigationGraph.addEdge("d", "e", 7.0f)
+    navigationGraph.addEdge("e", "d", 9.0f)
+
+
+
+
     // Print the graph to verify
     println("Nodes added to the graph successfully!")
+    println(navigationGraph.graph)
 
     // Find a node
     val startNode = navigationGraph.findNode("a")
@@ -138,4 +162,5 @@ fun main() {
 
     // Perform Dijkstra's algorithm
     val shortestPath = dijkstra(navigationGraph.graph, startNode, goalNode)
+    println(shortestPath)
 }
