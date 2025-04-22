@@ -24,17 +24,22 @@ import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.graphics.asImageBitmap
 import android.graphics.BitmapFactory
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.gestures.detectTransformGestures
+import androidx.compose.foundation.gestures.rememberTransformableState
 import androidx.compose.foundation.gestures.scrollBy
 import androidx.compose.foundation.gestures.scrollable
+import androidx.compose.foundation.gestures.transformable
 import androidx.compose.foundation.relocation.BringIntoViewRequester
 import androidx.compose.foundation.relocation.bringIntoViewRequester
 import androidx.compose.foundation.rememberScrollState
@@ -49,7 +54,11 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.TransformOrigin
+import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.painter.BitmapPainter
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -58,7 +67,10 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 
 import com.example.compsci399testproject.viewmodel.MapViewModel
 import kotlinx.coroutines.launch
+import kotlin.math.PI
+import kotlin.math.cos
 import kotlin.math.floor
+import kotlin.math.sin
 
 
 @Composable
@@ -69,27 +81,70 @@ fun MapImageView(
 ) {
     val context = LocalContext.current
     val imageBitmap = remember(floor) {
-        val assetManager = context.assets
-        val path = "Building 302/Tiles/Floor ${floor}/Floor${floor}.png"
-        val inputStream = assetManager.open(path)
-        val bitmap = BitmapFactory.decodeStream(inputStream)
-        bitmap.asImageBitmap()
+        try {
+            val assetManager = context.assets
+            val path = "Building 302/Tiles/Floor ${floor}/Floor${floor}.png"
+            val inputStream = assetManager.open(path)
+            val bitmap = BitmapFactory.decodeStream(inputStream)
+            bitmap.asImageBitmap()
+        } catch (e: Exception) {
+            Toast.makeText(context, "Could not find floor image", Toast.LENGTH_SHORT).show()
+            val assetManager = context.assets
+            val path = "Building 302/Tiles/Floor ${0}/Floor${0}.png"
+            val inputStream = assetManager.open(path)
+            val bitmap = BitmapFactory.decodeStream(inputStream)
+            bitmap.asImageBitmap()
+        }
     }
 
-    val gestureModifier = Modifier
-        .fillMaxSize()
-        .pointerInput(Unit) {
-            detectDragGestures { change, dragAmount ->
-                change.consume()
-                onOffsetChange(offset + dragAmount)
-            }
-        }
+    fun Offset.rotateBy(angle: Float): Offset {
+        val angleInRadians = angle * (PI / 180)
+        val cos = cos(angleInRadians)
+        val sin = sin(angleInRadians)
+        return Offset((x * cos - y * sin).toFloat(), (x * sin + y * cos).toFloat())
+    }
 
-    Canvas(modifier = gestureModifier) {
-        drawImage(
-            image = imageBitmap,
-            topLeft = offset
+    var offset by remember { mutableStateOf(Offset.Zero) }
+    var zoom by remember { mutableStateOf(1f) }
+    var angle by remember { mutableStateOf(0f) }
+
+    Log.d("MAP", "Zoom ${zoom} | Rotation ${angle} | Offset ${offset} ")
+
+    Box(modifier = Modifier.pointerInput(Unit) {
+        detectTransformGestures(
+            onGesture = { centroid, pan, gestureZoom, gestureRotate ->
+                val oldScale = zoom
+                val newScale = Math.max(zoom * gestureZoom, 1.5f)
+
+                // For natural zooming and rotating, the centroid of the gesture should
+                // be the fixed point where zooming and rotating occurs.
+                // We compute where the centroid was (in the pre-transformed coordinate
+                // space), and then compute where it will be after this delta.
+                // We then compute what the new offset should be to keep the centroid
+                // visually stationary for rotating and zooming, and also apply the pan.
+                offset =
+                    (offset + centroid / oldScale).rotateBy(gestureRotate) -
+                            (centroid / newScale + pan / oldScale)
+                zoom = newScale
+                angle += gestureRotate
+            }
         )
+    }
+        .graphicsLayer {
+            translationX = -offset.x * zoom
+            translationY = -offset.y * zoom
+            scaleX = zoom
+            scaleY = zoom
+            rotationZ = angle
+            transformOrigin = TransformOrigin(0f, 0f)
+        }
+        .fillMaxSize()) {
+
+        Image(bitmap = imageBitmap,
+            contentDescription = "${floor} image")
+
+        Image(painter = painterResource(id = R.drawable.position_icon),
+            contentDescription = "${floor} image")
     }
 }
 
