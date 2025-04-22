@@ -140,13 +140,13 @@ fun FloorSelectorButton(selectedFloor : Int, visible: Boolean, changeFloorVisibi
             .offset(x = -20.dp, y = -260.dp)
             .border(width = 2.dp, color = colorResource(id = R.color.light_blue), shape = RoundedCornerShape(6.dp)),
         colors = ButtonDefaults.buttonColors(
-            containerColor = colorResource(id = R.color.darker_white)
+            containerColor = if (visible) colorResource(id = R.color.light_blue) else colorResource(id = R.color.darker_white)
         ),
         shape = RoundedCornerShape(6.dp)
 
     ) {
         Text("$selectedFloor",
-            color = colorResource(id = R.color.light_blue),
+            color = if (visible) colorResource(id = R.color.darker_white) else colorResource(id = R.color.light_blue),
             modifier = Modifier.fillMaxSize().wrapContentHeight(align = Alignment.CenterVertically),
             textAlign = TextAlign.Center
         )
