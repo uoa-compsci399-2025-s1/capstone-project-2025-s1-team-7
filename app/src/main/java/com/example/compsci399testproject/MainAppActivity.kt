@@ -26,6 +26,7 @@ import android.graphics.BitmapFactory
 import android.util.Log
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -34,6 +35,8 @@ import androidx.compose.foundation.focusable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.scrollBy
 import androidx.compose.foundation.gestures.scrollable
+import androidx.compose.foundation.relocation.BringIntoViewRequester
+import androidx.compose.foundation.relocation.bringIntoViewRequester
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -44,6 +47,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.style.LineHeightStyle
@@ -53,6 +57,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewmodel.compose.viewModel
 
 import com.example.compsci399testproject.viewmodel.MapViewModel
+import kotlinx.coroutines.launch
 import kotlin.math.floor
 
 
@@ -88,75 +93,63 @@ fun MapImageView(
     }
 }
 
-@Composable
-fun ChangeFloorScrollPosition(state : ScrollState, amount : Int) {
-    LaunchedEffect(Unit) { state.animateScrollTo(amount) }
-}
-
 // For Eric - this is a placeholder, feel free to overwrite however you see fit.
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun FloorSelectorList(selectedFloor : Int, onSelect: (Int) -> Unit, visible: Boolean, changeFloorVisibility: (Boolean) -> Unit){
+fun FloorSelectorList(selectedFloor : Int, onSelect: (Int) -> Unit, visible: Boolean, changeFloorVisibility: (Boolean) -> Unit, modifier: Modifier){
     val state : ScrollState = rememberScrollState()
-    ChangeFloorScrollPosition(state, 900)
 
-    Box(modifier = Modifier.fillMaxSize()
-        .pointerInput(Unit) {
-            detectTapGestures(onTap = {
-                changeFloorVisibility(false)
-                Log.d("FLOOR SELECTOR", "Tapped outside area")
-            })
-        }) {
-        Column(modifier = Modifier.align(Alignment.BottomEnd)
-            .offset(x = -20.dp, y = if (visible) -200.dp else -260.dp)
-            .animateContentSize()
-            .background(color = colorResource(id = R.color.darker_white), shape = RoundedCornerShape(6.dp))
-            .border(width = 2.dp, color = colorResource(id = R.color.light_blue), shape = RoundedCornerShape(6.dp))
-            .width(60.dp)
-            .height(if (visible) 180.dp else 60.dp)
-            .clip(shape = RoundedCornerShape(6.dp))
-            .verticalScroll(state, visible),
-            verticalArrangement = Arrangement.spacedBy(0.dp)) {
-            for (floor in 5 downTo 0) {
-                Button(
-                    onClick = { if (visible) {onSelect(floor)} else {changeFloorVisibility(true); }},
-                    modifier = Modifier.padding(0.dp).fillMaxWidth().height(60.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = if (selectedFloor == floor && visible) colorResource(id = R.color.dark_grey) else colorResource(id = R.color.darker_white)
-                    ),
-                    shape = RoundedCornerShape(6.dp)
-                ) {
-                    Text("$floor",
-                        color = if (selectedFloor != floor || !visible) colorResource(id = R.color.light_blue) else colorResource(R.color.darker_white),
-                        modifier = Modifier.fillMaxSize().wrapContentHeight(align = Alignment.CenterVertically),
-                        textAlign = TextAlign.Center
-                    )
-                }
+    LaunchedEffect(Unit) {
+        if (!visible) state.animateScrollTo(900); Log.d("FLOOR SELECTOR", "Scroll function")
+    }
+
+    Column(modifier = modifier
+        .offset(x = -90.dp, y = -200.dp)
+        .animateContentSize()
+        .background(color = colorResource(id = R.color.darker_white), shape = RoundedCornerShape(6.dp))
+        .border(width = 2.dp, color = colorResource(id = R.color.light_blue), shape = RoundedCornerShape(6.dp))
+        .width(60.dp)
+        .height(if (visible) 180.dp else 0.dp)
+        .clip(shape = RoundedCornerShape(6.dp))
+        .verticalScroll(state, visible),
+        verticalArrangement = Arrangement.spacedBy(0.dp)) {
+        for (floor in 5 downTo 0) {
+            Button(
+                onClick = { onSelect(floor) },
+                modifier = Modifier.padding(0.dp).fillMaxWidth().height(60.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = if (selectedFloor == floor && visible) colorResource(id = R.color.dark_grey) else colorResource(id = R.color.darker_white)
+                ),
+                shape = RoundedCornerShape(6.dp)
+            ) {
+                Text("$floor",
+                    color = if (selectedFloor != floor || !visible) colorResource(id = R.color.light_blue) else colorResource(R.color.darker_white),
+                    modifier = Modifier.fillMaxSize().wrapContentHeight(align = Alignment.CenterVertically),
+                    textAlign = TextAlign.Center
+                )
             }
         }
     }
 }
 
 @Composable
-fun FloorSelectorButton(selectedFloor : Int, visible: Boolean, onFloorVisibilityChange: () -> Unit) {
-    Box(modifier = Modifier.fillMaxSize()) {
-        Button(
-            onClick = onFloorVisibilityChange,
-            modifier = Modifier.width(60.dp).height(60.dp)
-                .align(Alignment.BottomEnd)
-                .offset(x = -20.dp, y = -260.dp)
-                .border(width = 2.dp, color = colorResource(id = R.color.light_blue), shape = RoundedCornerShape(6.dp)),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = colorResource(id = R.color.darker_white)
-            ),
-            shape = RoundedCornerShape(6.dp)
+fun FloorSelectorButton(selectedFloor : Int, visible: Boolean, changeFloorVisibility: (Boolean) -> Unit, modifier: Modifier) {
+    Button(
+        onClick = {changeFloorVisibility(!visible)},
+        modifier = modifier.width(60.dp).height(60.dp)
+            .offset(x = -20.dp, y = -260.dp)
+            .border(width = 2.dp, color = colorResource(id = R.color.light_blue), shape = RoundedCornerShape(6.dp)),
+        colors = ButtonDefaults.buttonColors(
+            containerColor = colorResource(id = R.color.darker_white)
+        ),
+        shape = RoundedCornerShape(6.dp)
 
-        ) {
-            Text("$selectedFloor",
-                color = colorResource(id = R.color.light_blue),
-                modifier = Modifier.fillMaxSize().wrapContentHeight(align = Alignment.CenterVertically),
-                textAlign = TextAlign.Center
-            )
-        }
+    ) {
+        Text("$selectedFloor",
+            color = colorResource(id = R.color.light_blue),
+            modifier = Modifier.fillMaxSize().wrapContentHeight(align = Alignment.CenterVertically),
+            textAlign = TextAlign.Center
+        )
     }
 }
 
@@ -167,20 +160,34 @@ fun MapView(viewModel: MapViewModel = viewModel()) {
     var floorSelectorVisible:Boolean by remember { mutableStateOf(false) }
 
     Column {
-        Box(modifier = Modifier.fillMaxSize()) {
+        Box(modifier = Modifier.fillMaxSize()
+            .pointerInput(Unit) {
+                detectTapGestures(onTap = {
+                    floorSelectorVisible = false
+                })
+            }) {
+
             MapImageView(
                 floor = viewModel.currentFloor,
                 offset = viewModel.offset,
                 onOffsetChange = viewModel::updateOffset
             )
+
+            FloorSelectorButton(
+                selectedFloor = viewModel.currentFloor,
+                visible = floorSelectorVisible,
+                changeFloorVisibility = {floorSelectorVisible = it},
+                modifier = Modifier.align(Alignment.BottomEnd)
+            )
+
+            FloorSelectorList(
+                selectedFloor = viewModel.currentFloor,
+                onSelect = { viewModel.setFloor(it)},
+                visible = floorSelectorVisible,
+                changeFloorVisibility = {floorSelectorVisible = it},
+                modifier = Modifier.align(Alignment.BottomEnd)
+            )
         }
     }
-    //FloorSelectorButton(selectedFloor = viewModel.currentFloor, visible = floorSelectorVisible, onFloorVisibilityChange = {floorSelectorVisible = !floorSelectorVisible})
-    FloorSelectorList(
-        selectedFloor = viewModel.currentFloor,
-        onSelect = { viewModel.setFloor(it)},
-        visible = floorSelectorVisible,
-        changeFloorVisibility = {floorSelectorVisible = it}
-    )
 }
 
