@@ -77,7 +77,10 @@ import kotlin.math.sin
 fun MapImageView(
     floor: Int,
     offset: Offset,
-    onOffsetChange: (Offset) -> Unit
+    onOffsetChange: (Offset) -> Unit,
+    positionX: Float,
+    positionY: Float,
+    rotation: Float
 ) {
     val context = LocalContext.current
     val imageBitmap = remember(floor) {
@@ -105,7 +108,7 @@ fun MapImageView(
     }
 
     var offset by remember { mutableStateOf(Offset.Zero) }
-    var zoom by remember { mutableStateOf(1f) }
+    var zoom by remember { mutableStateOf(3f) }
     var angle by remember { mutableStateOf(0f) }
 
     Log.d("MAP", "Zoom ${zoom} | Rotation ${angle} | Offset ${offset} ")
@@ -129,7 +132,7 @@ fun MapImageView(
                 angle += gestureRotate
             }
         )
-    }
+        }
         .graphicsLayer {
             translationX = -offset.x * zoom
             translationY = -offset.y * zoom
@@ -144,7 +147,14 @@ fun MapImageView(
             contentDescription = "${floor} image")
 
         Image(painter = painterResource(id = R.drawable.position_icon),
-            contentDescription = "${floor} image")
+            contentDescription = "${floor} image",
+            modifier = Modifier.graphicsLayer {
+                translationX = positionX
+                translationY = positionY
+                rotationZ = rotation
+                scaleX = 0.2f
+                scaleY = 0.2f
+            })
     }
 }
 
@@ -214,6 +224,10 @@ fun FloorSelectorButton(selectedFloor : Int, visible: Boolean, changeFloorVisibi
 fun MapView(viewModel: MapViewModel = viewModel()) {
     var floorSelectorVisible:Boolean by remember { mutableStateOf(false) }
 
+    var positionX:Float by remember { mutableFloatStateOf(300f) }
+    var positionY:Float by remember { mutableFloatStateOf(960f) }
+    var rotation:Float by remember { mutableFloatStateOf(180f) }
+
     Column {
         Box(modifier = Modifier.fillMaxSize()
             .pointerInput(Unit) {
@@ -225,7 +239,10 @@ fun MapView(viewModel: MapViewModel = viewModel()) {
             MapImageView(
                 floor = viewModel.currentFloor,
                 offset = viewModel.offset,
-                onOffsetChange = viewModel::updateOffset
+                onOffsetChange = viewModel::updateOffset,
+                positionX = positionX,
+                positionY = positionY,
+                rotation = rotation
             )
 
             FloorSelectorButton(
