@@ -114,7 +114,7 @@ fun MapImageView(
     Log.d("MAP", "Zoom ${zoom} | Rotation ${angle} | Offset ${offset} ")
 
     Box(modifier = Modifier.pointerInput(Unit) {
-        detectTransformGestures(
+        detectTransformGestures(panZoomLock = true,
             onGesture = { centroid, pan, gestureZoom, gestureRotate ->
                 val oldScale = zoom
                 val newScale = Math.max(zoom * gestureZoom, 1.5f)
