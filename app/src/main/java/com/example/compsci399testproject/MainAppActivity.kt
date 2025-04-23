@@ -48,6 +48,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
@@ -81,6 +82,7 @@ fun MapImageView(
     onOffsetChange: (Offset) -> Unit,
     positionX: Float,
     positionY: Float,
+    positionFloor: Int,
     rotation: Float
 ) {
     val context = LocalContext.current
@@ -161,6 +163,7 @@ fun MapImageView(
         Image(painter = painterResource(id = R.drawable.position_icon),
             contentDescription = "${floor} image",
             modifier = Modifier
+                .alpha(if (floor != positionFloor) 0f else 1f)
                 .size(size_x, size_y)
                 .offset(position_x, position_y)
                 .graphicsLayer {
@@ -238,6 +241,7 @@ fun MapView(viewModel: MapViewModel = viewModel()) {
     // This is because the image scaling is different and can't use the raw pixel values
     var positionX:Float by remember { mutableFloatStateOf(754f / 1536f) }
     var positionY:Float by remember { mutableFloatStateOf(1330f / 1536f) }
+    var positionFloor: Int by remember { mutableIntStateOf(0) }
     var rotation:Float by remember { mutableFloatStateOf(180f) }
 
     Column {
@@ -254,6 +258,7 @@ fun MapView(viewModel: MapViewModel = viewModel()) {
                 onOffsetChange = viewModel::updateOffset,
                 positionX = positionX,
                 positionY = positionY,
+                positionFloor = positionFloor,
                 rotation = rotation
             )
 
