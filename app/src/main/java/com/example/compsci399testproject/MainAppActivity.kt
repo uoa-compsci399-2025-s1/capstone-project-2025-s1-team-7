@@ -62,6 +62,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 
 import androidx.lifecycle.viewmodel.compose.viewModel
 
@@ -111,7 +112,14 @@ fun MapImageView(
     var zoom by remember { mutableStateOf(3f) }
     var angle by remember { mutableStateOf(0f) }
 
-    Log.d("MAP", "Zoom ${zoom} | Rotation ${angle} | Offset ${offset} ")
+    val floor_image_size_width : Dp  = 300.dp
+    val floor_image_size_height : Dp = 300.dp
+
+    val size_x : Dp  = 4.dp
+    val size_y : Dp = 4.dp
+    val position_x : Dp = (floor_image_size_width * positionX) - (size_x / 2)
+    val position_y : Dp = (floor_image_size_height * positionY) - (size_y / 2)
+
 
     Box(modifier = Modifier.pointerInput(Unit) {
         detectTransformGestures(panZoomLock = true,
@@ -143,18 +151,20 @@ fun MapImageView(
         }
         .fillMaxSize()) {
 
+        Log.d("MAP", "Zoom ${zoom} | Rotation ${angle} | Offset ${offset} ")
+
         Image(bitmap = imageBitmap,
-            contentDescription = "${floor} image")
+            contentDescription = "${floor} image",
+            modifier = Modifier
+                .size(width = floor_image_size_width, height = floor_image_size_height))
 
         Image(painter = painterResource(id = R.drawable.position_icon),
             contentDescription = "${floor} image",
-            modifier = Modifier.graphicsLayer {
-                translationX = positionX
-                translationY = positionY
-                rotationZ = rotation
-                scaleX = 0.2f
-                scaleY = 0.2f
-            })
+            modifier = Modifier
+                .size(size_x, size_y)
+                .offset(position_x, position_y)
+                .graphicsLayer {
+                    rotationZ = rotation })
     }
 }
 
@@ -224,8 +234,10 @@ fun FloorSelectorButton(selectedFloor : Int, visible: Boolean, changeFloorVisibi
 fun MapView(viewModel: MapViewModel = viewModel()) {
     var floorSelectorVisible:Boolean by remember { mutableStateOf(false) }
 
-    var positionX:Float by remember { mutableFloatStateOf(300f) }
-    var positionY:Float by remember { mutableFloatStateOf(960f) }
+    // Position X and Y take percentage values
+    // This is because the image scaling is different and can't use the raw pixel values
+    var positionX:Float by remember { mutableFloatStateOf(754f / 1536f) }
+    var positionY:Float by remember { mutableFloatStateOf(1330f / 1536f) }
     var rotation:Float by remember { mutableFloatStateOf(180f) }
 
     Column {
