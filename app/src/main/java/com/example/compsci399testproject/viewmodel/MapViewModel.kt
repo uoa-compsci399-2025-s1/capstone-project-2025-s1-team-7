@@ -1,5 +1,6 @@
 package com.example.compsci399testproject.viewmodel
 
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -14,9 +15,16 @@ class MapViewModel : ViewModel() {
     var offset by mutableStateOf(Offset.Zero)
         private set
 
+    var zoom by mutableStateOf(3.5f)
+        private set
+
+    var angle by mutableStateOf(0f)
+        private set
+
     fun setFloor(floor: Int){
         currentFloor = floor
         offset = Offset.Zero
+        Log.d("MAP VIEW MODEL", "setFloor called")
     }
 
     fun getFloor(): Int {
@@ -25,5 +33,13 @@ class MapViewModel : ViewModel() {
 
     fun updateOffset(newOffset : Offset){
         offset = newOffset
+    }
+
+    fun updateZoom(newZoom : Float){
+        zoom = newZoom
+    }
+
+    fun updateAngle(newAngle : Float){
+        angle = newAngle
     }
 }

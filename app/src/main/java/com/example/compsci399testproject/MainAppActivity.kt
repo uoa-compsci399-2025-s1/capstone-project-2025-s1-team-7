@@ -52,7 +52,11 @@ import kotlin.math.sin
 fun MapImageView(
     floor: Int,
     offset: Offset,
-    onOffsetChange: (Offset) -> Unit,
+    zoom: Float,
+    angle: Float,
+    updateOffset: (Offset) -> Unit,
+    updateZoom: (Float) -> Unit,
+    updateAngle: (Float) -> Unit,
     positionXPercentage: Float,
     positionYPercentage: Float,
     positionFloor: Int,
@@ -83,9 +87,11 @@ fun MapImageView(
         return Offset((x * cos - y * sin).toFloat(), (x * sin + y * cos).toFloat())
     }
 
-    var offset by remember { mutableStateOf(Offset.Zero) }
-    var zoom by remember { mutableStateOf(3f) }
-    var angle by remember { mutableStateOf(0f) }
+    // Had to create local variables as there was some weird cache issue with the gesture code using old values
+    // This meant that the variables were never updated and always used the default values below
+    var localOffset:Offset by remember { mutableStateOf(Offset.Zero) }
+    var localZoom:Float by remember { mutableFloatStateOf(3f) }
+    var localAngle:Float by remember { mutableFloatStateOf(0f) }
 
     val floorImageSizeWidth : Dp  = 300.dp
     val floorImageSizeHeight : Dp = 300.dp
@@ -96,25 +102,31 @@ fun MapImageView(
     val positionY : Dp = (floorImageSizeHeight * positionYPercentage) - (sizeY / 2)
 
 
-    Box(modifier = Modifier.pointerInput(Unit) {
-        detectTransformGestures(panZoomLock = true,
-            onGesture = { centroid, pan, gestureZoom, gestureRotate ->
-                val oldScale = zoom
-                val newScale = Math.max(zoom * gestureZoom, 1.5f)
+    Box(modifier = Modifier
+        .pointerInput(Unit) {
+            detectTransformGestures(
+                panZoomLock = true,
+                onGesture = { centroid, pan, gestureZoom, gestureRotate ->
+                    val oldScale = localZoom
+                    val newScale = Math.max(localZoom * gestureZoom, 1.5f)
 
-                // For natural zooming and rotating, the centroid of the gesture should
-                // be the fixed point where zooming and rotating occurs.
-                // We compute where the centroid was (in the pre-transformed coordinate
-                // space), and then compute where it will be after this delta.
-                // We then compute what the new offset should be to keep the centroid
-                // visually stationary for rotating and zooming, and also apply the pan.
-                offset =
-                    (offset + centroid / oldScale).rotateBy(gestureRotate) -
-                            (centroid / newScale + pan / oldScale)
-                zoom = newScale
-                angle += gestureRotate
-            }
-        )
+                    // For natural zooming and rotating, the centroid of the gesture should
+                    // be the fixed point where zooming and rotating occurs.
+                    // We compute where the centroid was (in the pre-transformed coordinate
+                    // space), and then compute where it will be after this delta.
+                    // We then compute what the new offset should be to keep the centroid
+                    // visually stationary for rotating and zooming, and also apply the pan.
+                    localOffset =
+                        (localOffset + centroid / oldScale).rotateBy(gestureRotate) -
+                                (centroid / newScale + pan / oldScale)
+                    localZoom = newScale
+                    localAngle += gestureRotate
+
+                    updateOffset(localOffset)
+                    updateZoom(localZoom)
+                    updateAngle(localAngle)
+                }
+            )
         }
         .graphicsLayer {
             translationX = -offset.x * zoom
@@ -126,7 +138,7 @@ fun MapImageView(
         }
         .fillMaxSize()) {
 
-        Log.d("MAP", "Zoom ${zoom} | Rotation ${angle} | Offset ${offset} ")
+        //Log.d("MAP", "Zoom ${zoom} | Rotation ${angle} | Offset ${offset} ")
 
         Image(bitmap = imageBitmap,
             contentDescription = "${floor} image",
@@ -140,7 +152,8 @@ fun MapImageView(
                 .size(sizeX, sizeY)
                 .offset(positionX, positionY)
                 .graphicsLayer {
-                    rotationZ = rotation })
+                    rotationZ = rotation
+                })
     }
 }
 
@@ -157,8 +170,15 @@ fun FloorSelectorList(selectedFloor : Int, onSelect: (Int) -> Unit, visible: Boo
     Column(modifier = modifier
         .offset(x = -90.dp, y = -200.dp)
         .animateContentSize()
-        .background(color = colorResource(id = R.color.darker_white), shape = RoundedCornerShape(6.dp))
-        .border(width = 2.dp, color = colorResource(id = R.color.light_blue), shape = RoundedCornerShape(6.dp))
+        .background(
+            color = colorResource(id = R.color.darker_white),
+            shape = RoundedCornerShape(6.dp)
+        )
+        .border(
+            width = 2.dp,
+            color = colorResource(id = R.color.light_blue),
+            shape = RoundedCornerShape(6.dp)
+        )
         .width(60.dp)
         .height(if (visible) 180.dp else 0.dp)
         .clip(shape = RoundedCornerShape(6.dp))
@@ -167,7 +187,10 @@ fun FloorSelectorList(selectedFloor : Int, onSelect: (Int) -> Unit, visible: Boo
         for (floor in 5 downTo 0) {
             Button(
                 onClick = { onSelect(floor) },
-                modifier = Modifier.padding(0.dp).fillMaxWidth().height(60.dp),
+                modifier = Modifier
+                    .padding(0.dp)
+                    .fillMaxWidth()
+                    .height(60.dp),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = if (selectedFloor == floor && visible) colorResource(id = R.color.dark_grey) else colorResource(id = R.color.darker_white)
                 ),
@@ -175,7 +198,9 @@ fun FloorSelectorList(selectedFloor : Int, onSelect: (Int) -> Unit, visible: Boo
             ) {
                 Text("$floor",
                     color = if (selectedFloor != floor || !visible) colorResource(id = R.color.light_blue) else colorResource(R.color.darker_white),
-                    modifier = Modifier.fillMaxSize().wrapContentHeight(align = Alignment.CenterVertically),
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .wrapContentHeight(align = Alignment.CenterVertically),
                     textAlign = TextAlign.Center
                 )
             }
@@ -187,9 +212,15 @@ fun FloorSelectorList(selectedFloor : Int, onSelect: (Int) -> Unit, visible: Boo
 fun FloorSelectorButton(selectedFloor : Int, visible: Boolean, changeFloorVisibility: (Boolean) -> Unit, modifier: Modifier) {
     Button(
         onClick = {changeFloorVisibility(!visible)},
-        modifier = modifier.width(60.dp).height(60.dp)
+        modifier = modifier
+            .width(60.dp)
+            .height(60.dp)
             .offset(x = -20.dp, y = -260.dp)
-            .border(width = 2.dp, color = colorResource(id = R.color.light_blue), shape = RoundedCornerShape(6.dp)),
+            .border(
+                width = 2.dp,
+                color = colorResource(id = R.color.light_blue),
+                shape = RoundedCornerShape(6.dp)
+            ),
         colors = ButtonDefaults.buttonColors(
             containerColor = if (visible) colorResource(id = R.color.light_blue) else colorResource(id = R.color.darker_white)
         ),
@@ -198,7 +229,9 @@ fun FloorSelectorButton(selectedFloor : Int, visible: Boolean, changeFloorVisibi
     ) {
         Text("$selectedFloor",
             color = if (visible) colorResource(id = R.color.darker_white) else colorResource(id = R.color.light_blue),
-            modifier = Modifier.fillMaxSize().wrapContentHeight(align = Alignment.CenterVertically),
+            modifier = Modifier
+                .fillMaxSize()
+                .wrapContentHeight(align = Alignment.CenterVertically),
             textAlign = TextAlign.Center
         )
     }
@@ -208,24 +241,38 @@ fun FloorSelectorButton(selectedFloor : Int, visible: Boolean, changeFloorVisibi
 fun ResetPositionButton(selectedFloor: Int, positionFloor: Int, modifier: Modifier, changeFloor: (Int) -> Unit) {
     Box(
         modifier = modifier
-            .width(60.dp).height(60.dp)
+            .width(60.dp)
+            .height(60.dp)
             .offset(x = -20.dp, y = -180.dp)
             .alpha(if (selectedFloor != positionFloor) 1f else 0f)
-            .background(color = colorResource(id = R.color.darker_white), shape = RoundedCornerShape(60.dp))
-            .border(width = 2.dp, color = colorResource(id = R.color.light_blue), shape = RoundedCornerShape(60.dp))
+            .background(
+                color = colorResource(id = R.color.darker_white),
+                shape = RoundedCornerShape(60.dp)
+            )
+            .border(
+                width = 2.dp,
+                color = colorResource(id = R.color.light_blue),
+                shape = RoundedCornerShape(60.dp)
+            )
             .clickable {
                 changeFloor(positionFloor)
             }
     )
     {
         Box(modifier = modifier
-            .width(24.dp).height(24.dp)
+            .width(24.dp)
+            .height(24.dp)
             .offset(x = 10.dp, y = -40.dp)
-            .background(color = colorResource(id = R.color.light_blue), shape = RoundedCornerShape(60.dp))
+            .background(
+                color = colorResource(id = R.color.light_blue),
+                shape = RoundedCornerShape(60.dp)
+            )
         ) {
             Text(text = positionFloor.toString(),
                 color = colorResource(R.color.darker_white),
-                modifier = Modifier.fillMaxSize().wrapContentHeight(align = Alignment.CenterVertically),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .wrapContentHeight(align = Alignment.CenterVertically),
                 textAlign = TextAlign.Center
             )
         }
@@ -248,7 +295,8 @@ fun MapView(viewModel: MapViewModel = viewModel()) {
     var rotation:Float by remember { mutableFloatStateOf(180f) }
 
     Column {
-        Box(modifier = Modifier.fillMaxSize()
+        Box(modifier = Modifier
+            .fillMaxSize()
             .pointerInput(Unit) {
                 detectTapGestures(onTap = {
                     floorSelectorVisible = false
@@ -258,7 +306,11 @@ fun MapView(viewModel: MapViewModel = viewModel()) {
             MapImageView(
                 floor = viewModel.currentFloor,
                 offset = viewModel.offset,
-                onOffsetChange = viewModel::updateOffset,
+                zoom = viewModel.zoom,
+                angle = viewModel.angle,
+                updateOffset = {viewModel.updateOffset(it)},
+                updateZoom = {viewModel.updateZoom(it)},
+                updateAngle = {viewModel.updateAngle(it)},
                 positionXPercentage = positionX,
                 positionYPercentage = positionY,
                 positionFloor = positionFloor,
