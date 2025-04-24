@@ -2,13 +2,6 @@ package com.example.compsci399testproject
 import android.content.Context
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
-import java.io.BufferedReader
-
-private fun loadNodesFromJson(context: Context): List<NodeJson> {
-    val jsonString = context.assets.open("Nodes/nodes.json").bufferedReader().use { it.readText() }
-    val type = object : TypeToken<List<NodeJson>>() {}.type
-    return Gson().fromJson(jsonString, type)
-}
 
 // Data classes for JSON parsing
 data class NodeJson(
@@ -18,7 +11,6 @@ data class NodeJson(
     val floor: Int,
     val edges: List<EdgeJson>?
 )
-
 data class EdgeJson(
     val to: String,
     val weight: Float
@@ -85,6 +77,14 @@ class NavigationGraph {
     }
 }
 
+// Function to Load nodes from JSON
+private fun loadNodesFromJson(context: Context): List<NodeJson> {
+    val jsonString = context.assets.open("Nodes/nodes.json").bufferedReader().use { it.readText() }
+    val type = object : TypeToken<List<NodeJson>>() {}.type
+    return Gson().fromJson(jsonString, type)
+}
+
+// Function to initialise the graph
 fun initialiseGraph(context: Context): NavigationGraph {
     val navigationGraph = NavigationGraph()
     val nodesJson = loadNodesFromJson(context)
@@ -113,14 +113,11 @@ fun initialiseGraph(context: Context): NavigationGraph {
             }
         }
     }
-
     return navigationGraph
 }
 
-
-
-
-fun dijkstra(graph: MutableMap<String, Node>, start: Node, goal: Node): MutableList<Node> {
+// Dijkstra's algorithm implementation
+private fun dijkstra(graph: MutableMap<String, Node>, start: Node, goal: Node): MutableList<Node> {
     val unseenNodes = graph
     val predecessor = mutableMapOf<String, Node?>()
     val shortestDistance = mutableMapOf<Node, Int>()
@@ -169,22 +166,14 @@ fun dijkstra(graph: MutableMap<String, Node>, start: Node, goal: Node): MutableL
     return (path)
 }
 
-fun getPath(start: Node, goal: Node): MutableList<Node> {
-    // Create an instance of NavigationGraph
-    val navigationGraph = NavigationGraph()
+// Function to get the path between two nodes
+fun getPath(start: Node, goal: Node, navigationGraph: NavigationGraph): MutableList<Node> {
 
-    // Create nodes
-
-    // Add nodes to the graph
-
-    // Add edges to the nodes
-
-
-    // Find a node
+    // Find start and goal nodes in the graph
     val startNode = navigationGraph.findNode(start.id)
     val goalNode = navigationGraph.findNode(goal.id)
 
-    // Perform Dijkstra's algorithm
+    // Get the shortest path
     val shortestPath = dijkstra(navigationGraph.graph, startNode, goalNode)
 
     return (shortestPath)
