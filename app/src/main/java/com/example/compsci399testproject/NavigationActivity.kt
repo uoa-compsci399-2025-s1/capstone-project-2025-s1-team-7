@@ -4,14 +4,14 @@ import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 
 // Data classes for JSON parsing
-data class NodeJson(
+private data class NodeJson(
     val id: String,
     val x: Int,
     val y: Int,
     val floor: Int,
     val edges: List<EdgeJson>?
 )
-data class EdgeJson(
+private data class EdgeJson(
     val to: String,
     val weight: Float
 )
@@ -166,11 +166,30 @@ private fun dijkstra(graph: MutableMap<String, Node>, start: Node, goal: Node): 
     return (path)
 }
 
-// Function to get the path between two nodes
-fun getPath(start: Node, goal: Node, navigationGraph: NavigationGraph): MutableList<Node> {
+private fun calculateDistance(x1: Int, y1: Int, x2: Int, y2: Int): Float {
+    return kotlin.math.sqrt(((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1)).toFloat())
+}
 
-    // Find start and goal nodes in the graph
-    val startNode = navigationGraph.findNode(start.id)
+private fun getClosestNodes(location: Node, navigationGraph: NavigationGraph, n: Int = 3) : List<Pair<Node, Float>> {
+    return navigationGraph.graph.values
+        .filter {it.floor == location.floor} // Only nodes on the same floor
+        .map { node ->
+            Pair(node, calculateDistance(location.x, location.y, node.x, node.y))
+        }
+        .sortedBy { it.second } // Sort by distance
+        .take(n) // Take the closest n nodes
+}
+
+// Function to get the path between two nodes
+fun getPath(startNode: Node, goal: Node, navigationGraph: NavigationGraph): MutableList<Node> {
+
+    // link location to the graph
+    val closestNodes = getClosestNodes(startNode, navigationGraph)
+    for (edge in closestNodes) {
+        startNode.edges.add(Edge(edge.first, edge.second.toFloat()))
+    }
+
+    // Find goal node in the graph
     val goalNode = navigationGraph.findNode(goal.id)
 
     // Get the shortest path
