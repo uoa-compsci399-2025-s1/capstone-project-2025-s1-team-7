@@ -23,8 +23,6 @@ class MapViewModel : ViewModel() {
 
     fun setFloor(floor: Int){
         currentFloor = floor
-        offset = Offset.Zero
-        Log.d("MAP VIEW MODEL", "setFloor called")
     }
 
     fun getFloor(): Int {
