@@ -294,51 +294,49 @@ fun MapView(viewModel: MapViewModel = viewModel()) {
     var positionFloor: Int by remember { mutableIntStateOf(0) }
     var rotation:Float by remember { mutableFloatStateOf(180f) }
 
-    Column {
-        Box(modifier = Modifier
-            .fillMaxSize()
-            .pointerInput(Unit) {
-                detectTapGestures(onTap = {
-                    floorSelectorVisible = false
-                })
-            }) {
+    Box(modifier = Modifier
+        .fillMaxSize()
+        .pointerInput(Unit) {
+            detectTapGestures(onTap = {
+                floorSelectorVisible = false
+            })
+        }) {
 
-            MapImageView(
-                floor = viewModel.currentFloor,
-                offset = viewModel.offset,
-                zoom = viewModel.zoom,
-                angle = viewModel.angle,
-                updateOffset = {viewModel.updateOffset(it)},
-                updateZoom = {viewModel.updateZoom(it)},
-                updateAngle = {viewModel.updateAngle(it)},
-                positionXPercentage = positionX,
-                positionYPercentage = positionY,
-                positionFloor = positionFloor,
-                rotation = rotation
-            )
+        MapImageView(
+            floor = viewModel.currentFloor,
+            offset = viewModel.offset,
+            zoom = viewModel.zoom,
+            angle = viewModel.angle,
+            updateOffset = {viewModel.updateOffset(it)},
+            updateZoom = {viewModel.updateZoom(it)},
+            updateAngle = {viewModel.updateAngle(it)},
+            positionXPercentage = positionX,
+            positionYPercentage = positionY,
+            positionFloor = positionFloor,
+            rotation = rotation
+        )
 
-            ResetPositionButton(
-                selectedFloor = viewModel.currentFloor,
-                positionFloor = positionFloor,
-                modifier = Modifier.align(Alignment.BottomEnd),
-                changeFloor = { viewModel.setFloor(it)}
-            )
+        ResetPositionButton(
+            selectedFloor = viewModel.currentFloor,
+            positionFloor = positionFloor,
+            modifier = Modifier.align(Alignment.BottomEnd),
+            changeFloor = { viewModel.setFloor(it)}
+        )
 
-            FloorSelectorButton(
-                selectedFloor = viewModel.currentFloor,
-                visible = floorSelectorVisible,
-                changeFloorVisibility = {floorSelectorVisible = it},
-                modifier = Modifier.align(Alignment.BottomEnd)
-            )
+        FloorSelectorButton(
+            selectedFloor = viewModel.currentFloor,
+            visible = floorSelectorVisible,
+            changeFloorVisibility = {floorSelectorVisible = it},
+            modifier = Modifier.align(Alignment.BottomEnd)
+        )
 
-            FloorSelectorList(
-                selectedFloor = viewModel.currentFloor,
-                onSelect = { viewModel.setFloor(it)},
-                visible = floorSelectorVisible,
-                changeFloorVisibility = {floorSelectorVisible = it},
-                modifier = Modifier.align(Alignment.BottomEnd)
-            )
-        }
+        FloorSelectorList(
+            selectedFloor = viewModel.currentFloor,
+            onSelect = { viewModel.setFloor(it)},
+            visible = floorSelectorVisible,
+            changeFloorVisibility = {floorSelectorVisible = it},
+            modifier = Modifier.align(Alignment.BottomEnd)
+        )
     }
 }
 
