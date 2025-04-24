@@ -1,0 +1,22 @@
+{
+  "nodes": [
+    {"id": "302 0 R1Door1", "x": -175, "y": 162, "floor": 0},
+    {"id": "302 0 R1Out1", "x": -161, "y": 150, "floor": 0},
+    {"id": "302 0 R1Door2", "x": -119, "y": 231, "floor": 0},
+    {"id": "302 0 R1Out2", "x": -107, "y": 221, "floor": 0},
+    {"id": "302 0 CaseStudyRoomD1", "x": -84, "y": 270, "floor": 0},
+    {"id": "302 0 CaseStudyRoomO1", "x": -75, "y": 262, "floor": 0},
+    {"id": "302 0 CaseStudyRoomD2", "x": -30, "y": 338, "floor": 0},
+    {"id": "302 0 CaseStudyRoomO2", "x": -18, "y": 329, "floor": 0},
+    {"id": "302 0 cornerEntrance", "x": -86, "y": 20, "floor": 0},
+    {"id": "302 0 cornerEntranceStairs", "x": -83, "y": 71, "floor": 0},
+    {"id": "302 0 cornerEntranceInner", "x": -83, "y": 89, "floor": 0},
+    {"id": "302 0 foyerWalk1F0", "x": -125, "y": 120, "floor": 0},
+    {"id": "302 0 foyerWalk2", "x": -58, "y": 180, "floor": 0},
+    {"id": "302 0 foyerWalk3", "x": -20, "y": 220, "floor": 0},
+    {"id": "302 0 ", "x": , "y": , "floor": 0}
+  ],
+  "edges": [
+    {"from": "nodeA", "to": "nodeB", "weight": 5}
+  ]
+}

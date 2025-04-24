@@ -2,12 +2,11 @@ package com.example.compsci399testproject
 
 data class Node(
     val id: String,
-    // val latitude: Double,
-    // val longitude: Double,
-    // val floor: Int,
+    val x: Int,
+    val y: Int,
+    val floor: Int,
     var edges: MutableList<Edge>
-    // val type: NodeType // ROOM, HALLWAY, STAIRS, ELEVATOR                    Add later
-) {
+    ) {
     override fun toString(): String {
         return "Node(id='$id', edges=${edges.map { it.to.id }})"
     }
@@ -32,7 +31,7 @@ data class Edge(
     }
 
     override fun hashCode(): Int {
-        return to.id.hashCode() * 31 + weight.hashCode()
+        return to.id.hashCode() + weight.hashCode()
     }
 
     override fun equals(other: Any?): Boolean {
@@ -125,20 +124,23 @@ fun main() {
     val navigationGraph = NavigationGraph()
 
     // Create nodes
-    val nodeA = Node("a", mutableListOf())
-    val nodeB = Node("b", mutableListOf())
-    val nodeC = Node("c", mutableListOf())
-    val nodeD = Node("d", mutableListOf())
-    val nodeE = Node("e", mutableListOf())
+    var nodes = mutableListOf<Node>()
+    nodes.add(Node("a", mutableListOf()))
+    nodes.add(Node("b", mutableListOf()))
+    nodes.add(Node("c", mutableListOf()))
+    nodes.add(Node("d", mutableListOf()))
+    nodes.add(Node("e", mutableListOf()))
+
 
     // Add nodes to the graph
-    navigationGraph.addNodeToGraph(nodeA)
-    navigationGraph.addNodeToGraph(nodeB)
-    navigationGraph.addNodeToGraph(nodeC)
-    navigationGraph.addNodeToGraph(nodeD)
-    navigationGraph.addNodeToGraph(nodeE)
+    for (node in nodes) {
+        navigationGraph.addNodeToGraph(node)
+    }
 
     // Add edges to the nodes
+    var edges = mutableListOf<Edge>(
+
+    )
     navigationGraph.addEdge("a", "b", 10.0f)
     navigationGraph.addEdge("a", "c", 3.0f)
     navigationGraph.addEdge("b", "c", 1.0f)
