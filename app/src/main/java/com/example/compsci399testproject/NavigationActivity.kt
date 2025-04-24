@@ -1,4 +1,28 @@
 package com.example.compsci399testproject
+import android.content.Context
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
+import java.io.BufferedReader
+
+private fun loadNodesFromJson(context: Context): List<NodeJson> {
+    val jsonString = context.assets.open("Nodes/nodes.json").bufferedReader().use { it.readText() }
+    val type = object : TypeToken<List<NodeJson>>() {}.type
+    return Gson().fromJson(jsonString, type)
+}
+
+// Data classes for JSON parsing
+data class NodeJson(
+    val id: String,
+    val x: Int,
+    val y: Int,
+    val floor: Int,
+    val edges: List<EdgeJson>?
+)
+
+data class EdgeJson(
+    val to: String,
+    val weight: Float
+)
 
 data class Node(
     val id: String,
@@ -59,12 +83,38 @@ class NavigationGraph {
         }
         return retNode ?: throw NoSuchElementException("Node with id $id not found")
     }
+}
 
-    fun addEdge(from: String, to: String, weight: Float) {
-        val toNode = findNode(to)
-        val edge = Edge(toNode, weight)
-        findNode(from).edges.add(edge)
+fun initialiseGraph(context: Context): NavigationGraph {
+    val navigationGraph = NavigationGraph()
+    val nodesJson = loadNodesFromJson(context)
+
+    // Create nodes
+    val nodes = nodesJson.map { nodeJson ->
+        Node(
+            id = nodeJson.id,
+            x = nodeJson.x,
+            y = nodeJson.y,
+            floor = nodeJson.floor,
+            edges = mutableListOf()
+        )
     }
+
+    // Add nodes to the graph and edges to the nodes
+    for (node in nodes) {
+        navigationGraph.addNodeToGraph(node)
+
+        val nodeJson = nodesJson.find { it.id == node.id }
+        nodeJson?.edges?.forEach { edgeJson ->
+            val toNode = nodes.find { it.id == edgeJson.to }
+            if (toNode != null) {
+                val edge = Edge(toNode, edgeJson.weight)
+                node.edges.add(edge)
+            }
+        }
+    }
+
+    return navigationGraph
 }
 
 
@@ -119,50 +169,23 @@ fun dijkstra(graph: MutableMap<String, Node>, start: Node, goal: Node): MutableL
     return (path)
 }
 
-fun main() {
+fun getPath(start: Node, goal: Node): MutableList<Node> {
     // Create an instance of NavigationGraph
     val navigationGraph = NavigationGraph()
 
     // Create nodes
-    var nodes = mutableListOf<Node>()
-    nodes.add(Node("a", mutableListOf()))
-    nodes.add(Node("b", mutableListOf()))
-    nodes.add(Node("c", mutableListOf()))
-    nodes.add(Node("d", mutableListOf()))
-    nodes.add(Node("e", mutableListOf()))
-
 
     // Add nodes to the graph
-    for (node in nodes) {
-        navigationGraph.addNodeToGraph(node)
-    }
 
     // Add edges to the nodes
-    var edges = mutableListOf<Edge>(
 
-    )
-    navigationGraph.addEdge("a", "b", 10.0f)
-    navigationGraph.addEdge("a", "c", 3.0f)
-    navigationGraph.addEdge("b", "c", 1.0f)
-    navigationGraph.addEdge("b", "d", 2.0f)
-    navigationGraph.addEdge("c", "b", 4.0f)
-    navigationGraph.addEdge("c", "d", 8.0f)
-    navigationGraph.addEdge("c", "e", 2.0f)
-    navigationGraph.addEdge("d", "e", 7.0f)
-    navigationGraph.addEdge("e", "d", 9.0f)
-
-
-
-
-    // Print the graph to verify
-    println("Nodes added to the graph successfully!")
-    println(navigationGraph.graph)
 
     // Find a node
-    val startNode = navigationGraph.findNode("a")
-    val goalNode = navigationGraph.findNode("b")
+    val startNode = navigationGraph.findNode(start.id)
+    val goalNode = navigationGraph.findNode(goal.id)
 
     // Perform Dijkstra's algorithm
     val shortestPath = dijkstra(navigationGraph.graph, startNode, goalNode)
-    println(shortestPath)
+
+    return (shortestPath)
 }
