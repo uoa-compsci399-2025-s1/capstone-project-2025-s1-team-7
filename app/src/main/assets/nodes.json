@@ -1,22 +1,74 @@
 {
   "nodes": [
-    {"id": "302 0 R1Door1", "x": -175, "y": 162, "floor": 0},
-    {"id": "302 0 R1Out1", "x": -161, "y": 150, "floor": 0},
-    {"id": "302 0 R1Door2", "x": -119, "y": 231, "floor": 0},
-    {"id": "302 0 R1Out2", "x": -107, "y": 221, "floor": 0},
-    {"id": "302 0 CaseStudyRoomD1", "x": -84, "y": 270, "floor": 0},
-    {"id": "302 0 CaseStudyRoomO1", "x": -75, "y": 262, "floor": 0},
-    {"id": "302 0 CaseStudyRoomD2", "x": -30, "y": 338, "floor": 0},
-    {"id": "302 0 CaseStudyRoomO2", "x": -18, "y": 329, "floor": 0},
-    {"id": "302 0 cornerEntrance", "x": -86, "y": 20, "floor": 0},
-    {"id": "302 0 cornerEntranceStairs", "x": -83, "y": 71, "floor": 0},
-    {"id": "302 0 cornerEntranceInner", "x": -83, "y": 89, "floor": 0},
-    {"id": "302 0 foyerWalk1F0", "x": -125, "y": 120, "floor": 0},
-    {"id": "302 0 foyerWalk2", "x": -58, "y": 180, "floor": 0},
-    {"id": "302 0 foyerWalk3", "x": -20, "y": 220, "floor": 0},
-    {"id": "302 0 ", "x": , "y": , "floor": 0}
+    {"id": "302 G40", "x": -196, "y": 244, "floor": 0},
+    {"id": "302 G40 D1", "x": -175, "y": 162, "floor": 0},
+    {"id": "302 G40 O1", "x": -161, "y": 150, "floor": 0},
+    {"id": "302 G40 D2", "x": -119, "y": 231, "floor": 0},
+    {"id": "302 G40 O2", "x": -107, "y": 221, "floor": 0},
+
+    {"id": "302 G20", "x": -116, "y": 338, "floor": 0},
+    {"id": "302 G20 D1", "x": -84, "y": 270, "floor": 0},
+    {"id": "302 G20 O1", "x": -75, "y": 262, "floor": 0},
+    {"id": "302 G20 D2", "x": -30, "y": 338, "floor": 0},
+    {"id": "302 G20 O2", "x": -18, "y": 329, "floor": 0},
+
+    {"id": "302 entranceAlbertSymonds", "x": -86, "y": 20, "floor": 0},
+    {"id": "302 entranceAlbertSymondsStairs", "x": -83, "y": 71, "floor": 0},
+    {"id": "302 entranceAlbertSymondsInner", "x": -83, "y": 89, "floor": 0},
+
+    {"id": "302 foyer1", "x": -125, "y": 120, "floor": 0},
+    {"id": "302 foyer2", "x": -58, "y": 180, "floor": 0},
+    {"id": "302 foyer3", "x": -20, "y": 220, "floor": 0},
+    {"id": "302 foyer4", "x": 38, "y": 284, "floor": 0},
+    {"id": "302 foyer5", "x": 82, "y": 337, "floor": 0},
+
+    {"id": "302 mainStairs", "x": 46, "y": 370, "floor": 0},
+
+    {"id": "302 eleEnt1", "x": 102, "y": 322, "floor": 0},
+    {"id": "302 eleB1-F0", "x": 155, "y": 281, "floor": 0},
+
+    {"id": "302 eleEnt2", "x": 22, "y": 386, "floor": 0},
+    {"id": "302 eleB2-F0", "x": -17, "y": 417, "floor": 0},
+    {"id": "302 eleEnt3","x": -69,"y": 466,"floor": 0},
+    {"id": "catwalk1", "x": -142, "y": 525, "floor": 0}
   ],
   "edges": [
-    {"from": "nodeA", "to": "nodeB", "weight": 5}
+    {"from": "302 entranceAlbertSymonds", "to": "302 entranceAlbertSymondsStairs"},
+    {"from": "302 entranceAlbertSymondsStairs", "to": "302 entranceAlbertSymondsInner"},
+    {"from": "302 entranceAlbertSymondsInner", "to": "302 foyer1"},
+    {"from": "302 foyer1", "to": "302 foyer2"},
+    {"from": "302 foyer2", "to": "302 foyer3"},
+    {"from": "302 foyer3", "to": "302 foyer4"},
+    {"from": "302 foyer4", "to": "302 foyer5"},
+
+    {"from": "302 foyer5", "to": "302 mainStairs"},
+    {"from": "302 foyer5", "to": "302 eleEnt1"},
+    {"from": "302 eleEnt1", "to": "302 eleB1-F0"},
+    {"from": "302 mainStairs", "to": "302 eleEnt2"},
+    {"from": "302 eleEnt2", "to": "302 eleB2-F0"},
+    {"from": "302 eleB2-F0", "to": "302 eleEnt3"},
+
+    {"from": "302 G40", "to": "302 G40 D2"},
+    {"from": "302 G40", "to": "302 G40 D1"},
+    {"from": "302 G40 D2", "to": "302 G40 O2"},
+    {"from": "302 G40 D1", "to": "302 G40 O1"},
+    {"from": "302 G40 O1", "to": "302 G40 O2"},
+
+    {"from": "302 G40 O1", "to": "302 foyer1"},
+    {"from": "302 G40 O2", "to": "302 foyer2"},
+
+    {"from": "302 G40 O2", "to": "302 G20 O1"},
+
+    {"from": "302 G20", "to": "302 G20 D1"},
+    {"from": "302 G20", "to": "302 G20 D2"},
+    {"from": "302 G20 D1", "to": "302 G20 O1"},
+    {"from": "302 G20 D2", "to": "302 G20 O2"},
+    {"from": "302 G20 O1", "to": "302 G20 O2"},
+
+    {"from": "302 G20 O1", "to": "302 foyer3"},
+    {"from": "302 G20 O2", "to": "302 foyer4"},
+
+    {"from": "302 ", "to": "302 "}
+
   ]
 }
