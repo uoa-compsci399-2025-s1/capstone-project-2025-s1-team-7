@@ -23,6 +23,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.detectTransformGestures
 import androidx.compose.foundation.rememberScrollState
@@ -37,6 +38,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.zIndex
 
 import androidx.lifecycle.viewmodel.compose.viewModel
 
@@ -202,6 +204,36 @@ fun FloorSelectorButton(selectedFloor : Int, visible: Boolean, changeFloorVisibi
     }
 }
 
+@Composable
+fun ResetPositionButton(selectedFloor: Int, positionFloor: Int, modifier: Modifier, changeFloor: (Int) -> Unit) {
+    Box(
+        modifier = modifier
+            .width(60.dp).height(60.dp)
+            .offset(x = -20.dp, y = -180.dp)
+            .alpha(if (selectedFloor != positionFloor) 1f else 0f)
+            .background(color = colorResource(id = R.color.darker_white), shape = RoundedCornerShape(60.dp))
+            .border(width = 2.dp, color = colorResource(id = R.color.light_blue), shape = RoundedCornerShape(60.dp))
+            .clickable {
+                changeFloor(positionFloor)
+            }
+    )
+    {
+        Box(modifier = modifier
+            .width(24.dp).height(24.dp)
+            .offset(x = 10.dp, y = -40.dp)
+            .background(color = colorResource(id = R.color.light_blue), shape = RoundedCornerShape(60.dp))
+        ) {
+            Text(text = positionFloor.toString(),
+                color = colorResource(R.color.darker_white),
+                modifier = Modifier.fillMaxSize().wrapContentHeight(align = Alignment.CenterVertically),
+                textAlign = TextAlign.Center
+            )
+        }
+
+    }
+
+}
+
 //Main screen for map view.
 @Composable
 @Preview
@@ -231,6 +263,13 @@ fun MapView(viewModel: MapViewModel = viewModel()) {
                 positionYPercentage = positionY,
                 positionFloor = positionFloor,
                 rotation = rotation
+            )
+
+            ResetPositionButton(
+                selectedFloor = viewModel.currentFloor,
+                positionFloor = positionFloor,
+                modifier = Modifier.align(Alignment.BottomEnd),
+                changeFloor = { viewModel.setFloor(it)}
             )
 
             FloorSelectorButton(
