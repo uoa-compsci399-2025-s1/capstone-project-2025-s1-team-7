@@ -105,7 +105,7 @@ fun MapImageView(
     // Had to create local variables as there was some weird cache issue with the gesture code using old values
     // This meant that the variables were never updated and always used the default values below
     var localOffset:Offset by remember { mutableStateOf(Offset.Zero) }
-    var localZoom:Float by remember { mutableFloatStateOf(3f) }
+    var localZoom:Float by remember { mutableFloatStateOf(3.5f) }
     var localAngle:Float by remember { mutableFloatStateOf(0f) }
 
     val floorImageSizeWidth : Dp  = 300.dp
