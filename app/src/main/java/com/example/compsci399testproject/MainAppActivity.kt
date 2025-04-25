@@ -27,6 +27,8 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.detectTransformGestures
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -38,6 +40,7 @@ import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.painterResource
@@ -294,17 +297,18 @@ fun ResetPositionButton(selectedFloor: Int, positionFloor: Int, modifier: Modifi
 }
 
 @Composable
-fun SearchBar(modifier: Modifier, searchText: String, updateSearchText: (String) -> Unit, searchResults : List<String>) {
+fun SearchBar(modifier: Modifier, searchText: String, updateSearchText: (String) -> Unit, searchResults : List<Node>) {
+    val singleSearchResultHeight: Dp = 40.dp
+    val totalSearchHeight = singleSearchResultHeight * 4
 
     Box(modifier = modifier
         .offset(x = 0.dp, y = 30.dp)
         .width(280.dp)
-        .height(56.dp)
     ) {
         OutlinedTextField(value = searchText,
             onValueChange = { updateSearchText(it) },
             placeholder = { Text("Search") },
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier.fillMaxWidth().height(56.dp),
             colors = OutlinedTextFieldDefaults.colors(
                 focusedBorderColor = colorResource(id = R.color.dark_blue),
                 unfocusedBorderColor = colorResource(id = R.color.light_blue),
@@ -313,16 +317,35 @@ fun SearchBar(modifier: Modifier, searchText: String, updateSearchText: (String)
                 unfocusedContainerColor = colorResource(id = R.color.darker_white)
             ),
             leadingIcon = {Icon(imageVector = Icons.Filled.Search, contentDescription = "")},
-            singleLine = true
+            singleLine = true,
+            shape = RoundedCornerShape(8.dp)
         )
 
+        LazyColumn (modifier = Modifier.fillMaxWidth()
+            .heightIn(0.dp, totalSearchHeight)
+            .height(singleSearchResultHeight * searchResults.size)
+            .offset(x = 0.dp, y = 62.dp)
+            .clip(shape = RoundedCornerShape(8.dp))
+            .background(color = colorResource(id = R.color.darker_white), shape = RoundedCornerShape(8.dp))
+            .border(2.dp, color = colorResource(id = R.color.dark_blue), shape = RoundedCornerShape(8.dp)),
+        ) {
+
+            items(searchResults) { node ->
+                Box(modifier = Modifier.fillMaxWidth().height(singleSearchResultHeight)) {
+                    Text(text = node.id, modifier = Modifier.fillMaxSize()
+                        .wrapContentHeight(align = Alignment.CenterVertically)
+                        .padding(horizontal = 12.dp))
+                }
+            }
+        }
     }
 }
 
 //Main screen for map view.
 @Composable
-@Preview
 fun MapView(viewModel: MapViewModel = viewModel(), wifiViewModel: WifiViewModel = viewModel()) {
+    val context = LocalContext.current
+
     var floorSelectorVisible:Boolean by remember { mutableStateOf(false) }
 
     // Position X and Y take percentage values
@@ -332,8 +355,25 @@ fun MapView(viewModel: MapViewModel = viewModel(), wifiViewModel: WifiViewModel 
     var positionFloor: Int by remember { mutableIntStateOf(0) }
     var rotation:Float by remember { mutableFloatStateOf(180f) }
 
+    val navigationGraph: NavigationGraph = remember {initialiseGraph(context)}
+    val rooms: List<Node> = remember {getRoomNodes(navigationGraph)}
+
     var searchText: String by remember { mutableStateOf("") }
-    var searchResults: List<String> = remember { mutableStateListOf<String>() }
+    var searchResults = remember { mutableStateListOf<Node>() }
+
+    fun getSearchResults(query: String) {
+        searchText = query
+        searchResults.clear()
+
+        if (searchText.trim() == "") return
+
+        for (room: Node in rooms) {
+            if (room.id.lowercase().contains(query.lowercase())) {
+                searchResults.add(room)
+            }
+        }
+        Log.d("MAP", searchResults.toString())
+    }
 
     LaunchedEffect(Unit) {
         while (true) {
@@ -385,7 +425,7 @@ fun MapView(viewModel: MapViewModel = viewModel(), wifiViewModel: WifiViewModel 
             rotation = rotation
         )
 
-        SearchBar(modifier = Modifier.align(Alignment.TopCenter), searchText = searchText, updateSearchText = {searchText = it}, searchResults = searchResults)
+        SearchBar(modifier = Modifier.align(Alignment.TopCenter), searchText = searchText, updateSearchText = {getSearchResults(it)}, searchResults = searchResults)
 
         ResetPositionButton(
             selectedFloor = viewModel.currentFloor,
@@ -409,5 +449,20 @@ fun MapView(viewModel: MapViewModel = viewModel(), wifiViewModel: WifiViewModel 
             modifier = Modifier.align(Alignment.BottomEnd)
         )
     }
+}
+
+@Composable
+@Preview
+fun MapPreviewFun() {
+    var arrayList: ArrayList<Node> = ArrayList<Node>()
+
+    arrayList.add(Node("Room 1", 30, 30, 0, NodeType.ROOM, mutableListOf()))
+    arrayList.add(Node("Room 2", 30, 30, 0, NodeType.ROOM, mutableListOf()))
+    arrayList.add(Node("Room 3", 30, 30, 0, NodeType.ROOM, mutableListOf()))
+    arrayList.add(Node("Room 4", 30, 30, 0, NodeType.ROOM, mutableListOf()))
+    arrayList.add(Node("Room 5", 30, 30, 0, NodeType.ROOM, mutableListOf()))
+
+
+    SearchBar(Modifier, "", {}, arrayList)
 }
 
