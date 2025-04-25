@@ -4,6 +4,7 @@
         "x": -196,
         "y": 244,
         "floor": 0,
+        "type": "ROOM",
         "edges": [
             {
                 "to": "302 G40 D2",
@@ -20,6 +21,7 @@
         "x": -175,
         "y": 162,
         "floor": 0,
+        "type": "TRAVEL",
         "edges": [
             {
                 "to": "302 G40",
@@ -36,6 +38,7 @@
         "x": -161,
         "y": 150,
         "floor": 0,
+        "type": "TRAVEL",
         "edges": [
             {
                 "to": "302 G40 D1",
@@ -56,6 +59,7 @@
         "x": -119,
         "y": 231,
         "floor": 0,
+        "type": "TRAVEL",
         "edges": [
             {
                 "to": "302 G40",
@@ -72,6 +76,7 @@
         "x": -107,
         "y": 221,
         "floor": 0,
+        "type": "TRAVEL",
         "edges": [
             {
                 "to": "302 G40 D2",
@@ -96,6 +101,7 @@
         "x": -116,
         "y": 338,
         "floor": 0,
+        "type": "ROOM",
         "edges": [
             {
                 "to": "302 G20 D1",
@@ -112,6 +118,7 @@
         "x": -84,
         "y": 270,
         "floor": 0,
+        "type": "TRAVEL",
         "edges": [
             {
                 "to": "302 G20",
@@ -128,6 +135,7 @@
         "x": -75,
         "y": 262,
         "floor": 0,
+        "type": "TRAVEL",
         "edges": [
             {
                 "to": "302 G40 O2",
@@ -152,6 +160,7 @@
         "x": -30,
         "y": 338,
         "floor": 0,
+        "type": "TRAVEL",
         "edges": [
             {
                 "to": "302 G20",
@@ -168,6 +177,7 @@
         "x": -18,
         "y": 329,
         "floor": 0,
+        "type": "TRAVEL",
         "edges": [
             {
                 "to": "302 G20 D2",
@@ -188,6 +198,7 @@
         "x": -86,
         "y": 20,
         "floor": 0,
+        "type": "TRAVEL",
         "edges": [
             {
                 "to": "302 entranceAlbertSymondsStairs",
@@ -200,6 +211,7 @@
         "x": -83,
         "y": 71,
         "floor": 0,
+        "type": "STAIRS",
         "edges": [
             {
                 "to": "302 entranceAlbertSymonds",
@@ -216,6 +228,7 @@
         "x": -83,
         "y": 89,
         "floor": 0,
+        "type": "TRAVEL",
         "edges": [
             {
                 "to": "302 entranceAlbertSymondsStairs",
@@ -232,6 +245,7 @@
         "x": 234,
         "y": 357,
         "floor": 0,
+        "type": "TRAVEL",
         "edges": [
             {
                 "to": "302 foyer8",
@@ -244,6 +258,7 @@
         "x": -125,
         "y": 120,
         "floor": 0,
+        "type": "TRAVEL",
         "edges": [
             {
                 "to": "302 entranceAlbertSymondsInner",
@@ -264,6 +279,7 @@
         "x": -58,
         "y": 180,
         "floor": 0,
+        "type": "TRAVEL",
         "edges": [
             {
                 "to": "302 foyer1",
@@ -284,6 +300,7 @@
         "x": -20,
         "y": 220,
         "floor": 0,
+        "type": "TRAVEL",
         "edges": [
             {
                 "to": "302 foyer2",
@@ -304,6 +321,7 @@
         "x": 38,
         "y": 284,
         "floor": 0,
+        "type": "TRAVEL",
         "edges": [
             {
                 "to": "302 foyer3",
@@ -324,6 +342,7 @@
         "x": 82,
         "y": 337,
         "floor": 0,
+        "type": "TRAVEL",
         "edges": [
             {
                 "to": "302 foyer4",
@@ -348,6 +367,7 @@
         "x": 90,
         "y": 389,
         "floor": 0,
+        "type": "TRAVEL",
         "edges": [
             {
                 "to": "302 foyer5",
@@ -368,6 +388,7 @@
         "x": 166,
         "y": 360,
         "floor": 0,
+        "type": "TRAVEL",
         "edges": [
             {
                 "to": "302 foyer6",
@@ -388,6 +409,7 @@
         "x": 204,
         "y": 325,
         "floor": 0,
+        "type": "TRAVEL",
         "edges": [
             {
                 "to": "302 foyer7",
@@ -404,6 +426,7 @@
         "x": 68,
         "y": 436,
         "floor": 0,
+        "type": "TRAVEL",
         "edges": [
             {
                 "to": "302 foyer6",
@@ -424,6 +447,7 @@
         "x": 46,
         "y": 370,
         "floor": 0,
+        "type": "STAIRS",
         "edges": [
             {
                 "to": "302 foyer9",
@@ -448,6 +472,7 @@
         "x": 102,
         "y": 322,
         "floor": 0,
+        "type": "TRAVEL",
         "edges": [
             {
                 "to": "302 foyer5",
@@ -464,6 +489,7 @@
         "x": 155,
         "y": 281,
         "floor": 0,
+        "type": "ELEVATOR",
         "edges": [
             {
                 "to": "302 eleEnt1",
@@ -476,6 +502,7 @@
         "x": 22,
         "y": 386,
         "floor": 0,
+        "type": "TRAVEL",
         "edges": [
             {
                 "to": "302 mainStairs-F0",
@@ -492,6 +519,7 @@
         "x": -17,
         "y": 417,
         "floor": 0,
+        "type": "ELEVATOR",
         "edges": [
             {
                 "to": "302 eleEnt2",
@@ -508,6 +536,7 @@
         "x": -69,
         "y": 466,
         "floor": 0,
+        "type": "TRAVEL",
         "edges": [
             {
                 "to": "302 eleB2-F0",
@@ -524,6 +553,7 @@
         "x": -142,
         "y": 525,
         "floor": 0,
+        "type": "TRAVEL",
         "edges": [
             {
                 "to": "302 eleEnt3",
@@ -536,6 +566,7 @@
         "x": 78,
         "y": 458,
         "floor": 0,
+        "type": "TRAVEL",
         "edges": [
             {
                 "to": "302 foyer9",
@@ -552,6 +583,7 @@
         "x": 120,
         "y": 513,
         "floor": 0,
+        "type": "TRAVEL",
         "edges": [
             {
                 "to": "302-301 a",
@@ -572,6 +604,7 @@
         "x": 171,
         "y": 581,
         "floor": 0,
+        "type": "TRAVEL",
         "edges": [
             {
                 "to": "301 hw",
@@ -584,6 +617,7 @@
         "x": 183,
         "y": 457,
         "floor": 0,
+        "type": "TRAVEL",
         "edges": [
             {
                 "to": "302 foyer7",
@@ -600,6 +634,7 @@
         "x": 155,
         "y": 474,
         "floor": 0,
+        "type": "TRAVEL",
         "edges": [
             {
                 "to": "301 GL2/2",
@@ -624,6 +659,7 @@
         "x": 127,
         "y": 501,
         "floor": 0,
+        "type": "TRAVEL",
         "edges": [
             {
                 "to": "301 hw",
@@ -640,6 +676,7 @@
         "x": 151,
         "y": 438,
         "floor": 0,
+        "type": "STAIRS",
         "edges": [
             {
                 "to": "301 GL2",
@@ -652,6 +689,7 @@
         "x": 118,
         "y": 468,
         "floor": 0,
+        "type": "ELEVATOR",
         "edges": [
             {
                 "to": "301 GL2",
@@ -664,6 +702,7 @@
         "x": -6,
         "y": 300,
         "floor": 1,
+        "type": "STAIRS",
         "edges": [
             {
                 "to": "302 mainStairs-F0",
@@ -684,6 +723,7 @@
         "x": -30,
         "y": 310,
         "floor": 1,
+        "type": "TRAVEL",
         "edges": [
             {
                 "to": "302 mainStairs-F1",
@@ -708,6 +748,7 @@
         "x": -84,
         "y": 233,
         "floor": 1,
+        "type": "TRAVEL",
         "edges": [
             {
                 "to": "302 a1",
@@ -732,6 +773,7 @@
         "x": -120,
         "y": 192,
         "floor": 1,
+        "type": "TRAVEL",
         "edges": [
             {
                 "to": "302 a2",
@@ -752,6 +794,7 @@
         "x": -90,
         "y": 168,
         "floor": 1,
+        "type": "TRAVEL",
         "edges": [
             {
                 "to": "302 a2",
@@ -780,6 +823,7 @@
         "x": -60,
         "y": 144,
         "floor": 1,
+        "type": "TRAVEL",
         "edges": [
             {
                 "to": "302 a4",
@@ -804,6 +848,7 @@
         "x": -18,
         "y": 190,
         "floor": 1,
+        "type": "TRAVEL",
         "edges": [
             {
                 "to": "302 a2",
@@ -824,6 +869,7 @@
         "x": 7,
         "y": 210,
         "floor": 1,
+        "type": "TRAVEL",
         "edges": [
             {
                 "to": "302 a6",
@@ -848,6 +894,7 @@
         "x": 98,
         "y": 325,
         "floor": 1,
+        "type": "TRAVEL",
         "edges": [
             {
                 "to": "302 a7",
@@ -855,7 +902,7 @@
             },
             {
                 "to": "302 eleB1-F1",
-                "weight": 0.0
+                "weight": 99.04544411531506
             },
             {
                 "to": "302-301 c",
@@ -868,6 +915,7 @@
         "x": 20,
         "y": 386,
         "floor": 1,
+        "type": "TRAVEL",
         "edges": [
             {
                 "to": "302 a1",
@@ -875,7 +923,7 @@
             },
             {
                 "to": "302 eleB2-F1",
-                "weight": 135.94484175576505
+                "weight": 45.967379738244816
             },
             {
                 "to": "302-301 b",
@@ -888,6 +936,7 @@
         "x": 84,
         "y": 458,
         "floor": 1,
+        "type": "TRAVEL",
         "edges": [
             {
                 "to": "302 a9",
@@ -900,6 +949,7 @@
         "x": 155,
         "y": 402,
         "floor": 1,
+        "type": "TRAVEL",
         "edges": [
             {
                 "to": "302 a8",
@@ -908,24 +958,37 @@
         ]
     },
     {
-        "id": "301 eleB1-F1",
+        "id": "302 eleB1-F1",
         "x": 179,
         "y": 268,
         "floor": 1,
-        "edges": []
+        "type": "ELEVATOR",
+        "edges": [
+            {
+                "to": "302 a8",
+                "weight": 99.04544411531506
+            }
+        ]
     },
     {
-        "id": "301 eleB2-F1",
+        "id": "302 eleB2-F1",
         "x": -13,
         "y": 418,
         "floor": 1,
-        "edges": []
+        "type": "ELEVATOR",
+        "edges": [
+            {
+                "to": "302 a9",
+                "weight": 45.967379738244816
+            }
+        ]
     },
     {
         "id": "301 eleB1-F1",
         "x": 118,
         "y": 468,
-        "floor": 0,
+        "floor": 1,
+        "type": "ELEVATOR",
         "edges": []
     },
     {
@@ -933,6 +996,7 @@
         "x": -61,
         "y": 325,
         "floor": 1,
+        "type": "ROOM",
         "edges": [
             {
                 "to": "302 a1",
@@ -945,6 +1009,7 @@
         "x": -150,
         "y": 210,
         "floor": 1,
+        "type": "ROOM",
         "edges": [
             {
                 "to": "302 a3",
@@ -957,6 +1022,7 @@
         "x": -122,
         "y": 154,
         "floor": 1,
+        "type": "ROOM",
         "edges": [
             {
                 "to": "302 a4",
@@ -969,6 +1035,7 @@
         "x": -101,
         "y": 142,
         "floor": 1,
+        "type": "ROOM",
         "edges": [
             {
                 "to": "302 a4",
@@ -981,6 +1048,7 @@
         "x": -32,
         "y": 114,
         "floor": 1,
+        "type": "ROOM",
         "edges": [
             {
                 "to": "302 a5",
@@ -993,6 +1061,7 @@
         "x": 11,
         "y": 193,
         "floor": 1,
+        "type": "ROOM",
         "edges": [
             {
                 "to": "302 a7",
@@ -1005,6 +1074,7 @@
         "x": 26,
         "y": 209,
         "floor": 1,
+        "type": "ROOM",
         "edges": [
             {
                 "to": "302 a7",
@@ -1017,6 +1087,7 @@
         "x": -52,
         "y": 113,
         "floor": 1,
+        "type": "TRAVEL",
         "edges": [
             {
                 "to": "302 a5",
@@ -1033,6 +1104,7 @@
         "x": -86,
         "y": 71,
         "floor": 1,
+        "type": "STAIRS",
         "edges": [
             {
                 "to": "302 entranceAlbertSymondsStrais",
@@ -1049,6 +1121,7 @@
         "x": -56,
         "y": 230,
         "floor": 2,
+        "type": "STAIRS",
         "edges": [
             {
                 "to": "302 mainStairs-F1",
@@ -1065,6 +1138,7 @@
         "x": -68,
         "y": 218,
         "floor": 2,
+        "type": "TRAVEL",
         "edges": [
             {
                 "to": "302 mainStairs-F2",
@@ -1085,6 +1159,7 @@
         "x": -82,
         "y": 252,
         "floor": 2,
+        "type": "TRAVEL",
         "edges": [
             {
                 "to": "302 b1",
@@ -1101,6 +1176,7 @@
         "x": -73,
         "y": 265,
         "floor": 2,
+        "type": "TRAVEL",
         "edges": [
             {
                 "to": "302 b2",
@@ -1121,6 +1197,7 @@
         "x": -36,
         "y": 306,
         "floor": 2,
+        "type": "TRAVEL",
         "edges": [
             {
                 "to": "302 b3",
@@ -1137,6 +1214,7 @@
         "x": -84,
         "y": 274,
         "floor": 2,
+        "type": "ROOM",
         "edges": [
             {
                 "to": "302 b3",
@@ -1149,6 +1227,7 @@
         "x": -49,
         "y": 318,
         "floor": 2,
+        "type": "ROOM",
         "edges": [
             {
                 "to": "302 b4",
@@ -1161,6 +1240,7 @@
         "x": -22,
         "y": 188,
         "floor": 2,
+        "type": "TRAVEL",
         "edges": [
             {
                 "to": "302 b1",
@@ -1177,6 +1257,7 @@
         "x": 8,
         "y": 218,
         "floor": 2,
+        "type": "TRAVEL",
         "edges": [
             {
                 "to": "302 b5",
@@ -1193,6 +1274,7 @@
         "x": 19,
         "y": 212,
         "floor": 2,
+        "type": "ROOM",
         "edges": [
             {
                 "to": "302 b6",

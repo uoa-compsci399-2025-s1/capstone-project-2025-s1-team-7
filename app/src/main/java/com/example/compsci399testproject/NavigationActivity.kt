@@ -9,6 +9,7 @@ private data class NodeJson(
     val x: Int,
     val y: Int,
     val floor: Int,
+    val type: String,
     val edges: List<EdgeJson>?
 )
 private data class EdgeJson(
@@ -16,11 +17,19 @@ private data class EdgeJson(
     val weight: Float
 )
 
+enum class NodeType {
+    ROOM,
+    TRAVEL,
+    STAIRS,
+    ELEVATOR
+}
+
 data class Node(
     val id: String,
     val x: Int,
     val y: Int,
     val floor: Int,
+    val type: NodeType,
     var edges: MutableList<Edge>
     ) {
     override fun toString(): String {
@@ -96,6 +105,13 @@ fun initialiseGraph(context: Context): NavigationGraph {
             x = nodeJson.x,
             y = nodeJson.y,
             floor = nodeJson.floor,
+            type = when (nodeJson.type) {
+                "ROOM" -> NodeType.ROOM
+                "TRAVEL" -> NodeType.TRAVEL
+                "STAIRS" -> NodeType.STAIRS
+                "ELEVATOR" -> NodeType.ELEVATOR
+                else -> throw IllegalArgumentException("Unknown node type: ${nodeJson.type}")
+            },
             edges = mutableListOf()
         )
     }
