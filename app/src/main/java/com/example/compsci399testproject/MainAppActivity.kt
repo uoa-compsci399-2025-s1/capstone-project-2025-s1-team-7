@@ -51,6 +51,10 @@ import com.example.compsci399testproject.machinelearning.LocationPredictor
 
 import com.example.compsci399testproject.viewmodel.MapViewModel
 import com.example.compsci399testproject.viewmodel.WifiViewModel
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.time.withTimeoutOrNull
+import kotlinx.coroutines.withTimeoutOrNull
 import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.sin
@@ -332,18 +336,31 @@ fun MapView(viewModel: MapViewModel = viewModel(), wifiViewModel: WifiViewModel 
     var searchResults: List<String> = remember { mutableStateListOf<String>() }
 
     LaunchedEffect(Unit) {
-        wifiViewModel.updateScanResults()
+        while (true) {
+            wifiViewModel.scan()
 
-        val strengthArray = wifiViewModel.getStrengthArray()
-        val floor = LocationPredictor.predictFloor(strengthArray.toFloatArray())
-        val x = LocationPredictor.predictX(strengthArray.toFloatArray())
-        val y = LocationPredictor.predictY(strengthArray.toFloatArray())
+            val timeout = withTimeoutOrNull(10000) {
+                wifiViewModel.scanResults.firstOrNull { results ->
+                    if (results.isNotEmpty()) {
+                        wifiViewModel.updateScanResults()
 
-        Log.d("Predictor", "Predicted X: $x, Y: $y, Floor: $floor")
+                        val strengthArray = wifiViewModel.getStrengthArray()
+                        val floor = LocationPredictor.predictFloor(strengthArray.toFloatArray())
+                        val x = LocationPredictor.predictX(strengthArray.toFloatArray())
+                        val y = LocationPredictor.predictY(strengthArray.toFloatArray())
 
-        positionX = (754f + x) / 1536f
-        positionY = (1330f - y) / 1536f
-        positionFloor = floor
+                        Log.d("predictor", "Predicted X: $x, Y: $y, Floor: $floor")
+
+                        positionX = (754f + x) / 1536f
+                        positionY = (1330f - y) / 1536f
+                        positionFloor = floor
+                        true
+                    } else false
+                }
+            }
+
+            delay(30000)
+        }
     }
 
     Box(modifier = Modifier
