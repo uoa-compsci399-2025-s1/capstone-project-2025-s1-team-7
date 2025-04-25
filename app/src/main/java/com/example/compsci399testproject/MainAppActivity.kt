@@ -29,6 +29,11 @@ import androidx.compose.foundation.gestures.detectTransformGestures
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.Icon
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
@@ -281,6 +286,32 @@ fun ResetPositionButton(selectedFloor: Int, positionFloor: Int, modifier: Modifi
 
 }
 
+@Composable
+fun SearchBar(modifier: Modifier, searchText: String, updateSearchText: (String) -> Unit, searchResults : List<String>) {
+
+    Box(modifier = modifier
+        .offset(x = 0.dp, y = 30.dp)
+        .width(280.dp)
+        .height(56.dp)
+    ) {
+        OutlinedTextField(value = searchText,
+            onValueChange = { updateSearchText(it) },
+            placeholder = { Text("Search") },
+            modifier = Modifier.fillMaxSize(),
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedBorderColor = colorResource(id = R.color.dark_blue),
+                unfocusedBorderColor = colorResource(id = R.color.light_blue),
+                cursorColor = colorResource(id = R.color.dark_blue),
+                focusedContainerColor = colorResource(id = R.color.darker_white),
+                unfocusedContainerColor = colorResource(id = R.color.darker_white)
+            ),
+            leadingIcon = {Icon(imageVector = Icons.Filled.Search, contentDescription = "")},
+            singleLine = true
+        )
+
+    }
+}
+
 //Main screen for map view.
 @Composable
 @Preview
@@ -293,6 +324,9 @@ fun MapView(viewModel: MapViewModel = viewModel()) {
     var positionY:Float by remember { mutableFloatStateOf(1330f / 1536f) }
     var positionFloor: Int by remember { mutableIntStateOf(0) }
     var rotation:Float by remember { mutableFloatStateOf(180f) }
+
+    var searchText: String by remember { mutableStateOf("") }
+    var searchResults: List<String> = remember { mutableStateListOf<String>() }
 
     Box(modifier = Modifier
         .fillMaxSize()
@@ -315,6 +349,8 @@ fun MapView(viewModel: MapViewModel = viewModel()) {
             positionFloor = positionFloor,
             rotation = rotation
         )
+
+        SearchBar(modifier = Modifier.align(Alignment.TopCenter), searchText = searchText, updateSearchText = {searchText = it}, searchResults = searchResults)
 
         ResetPositionButton(
             selectedFloor = viewModel.currentFloor,
