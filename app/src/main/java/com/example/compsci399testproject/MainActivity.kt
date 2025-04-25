@@ -108,7 +108,7 @@ class MainActivity : ComponentActivity() {
                 }
 
                 composable("MainApp") {
-                    MapView(mapViewModel)
+                    MapView(mapViewModel, wifiViewModel)
                 }
             })
         }
