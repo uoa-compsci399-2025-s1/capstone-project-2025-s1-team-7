@@ -11,7 +11,7 @@ import com.example.compsci399testproject.machinelearning.models.YRandomForest
 
 class LocationPredictor() {
     companion object{
-        fun  predictFloor(input: IntArray) : Int {
+        fun  predictFloor(input: FloatArray) : Int {
             val predictionScores: DoubleArray = FloorRandomForest.score(input)
             var predictedClassIndex = -1
             var maxScore = Double.NEGATIVE_INFINITY
@@ -26,18 +26,18 @@ class LocationPredictor() {
             return predictedClassIndex
         }
 
-        fun predictX(input: IntArray) : Int {
-            val floor = predictFloor(input)
-            val newInput = intArrayOf(floor) + input
+        fun predictX(input: FloatArray) : Float {
+            val floor = predictFloor(input).toFloat()
+            val newInput = floatArrayOf(floor) + input
             val prediction : Double = XRandomForest.score(newInput)
-            return prediction.toInt()
+            return prediction.toFloat()
         }
 
-        fun predictY(input: IntArray) : Int {
-            val floor = predictFloor(input)
-            val newInput = intArrayOf(floor) + input
+        fun predictY(input: FloatArray) : Float {
+            val floor = predictFloor(input).toFloat()
+            val newInput = floatArrayOf(floor) + input
             val prediction : Double = YRandomForest.score(newInput)
-            return prediction.toInt()
+            return prediction.toFloat()
         }
     }
 

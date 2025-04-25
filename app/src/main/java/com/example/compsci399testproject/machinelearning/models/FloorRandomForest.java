@@ -1,7 +1,7 @@
 package com.example.compsci399testproject.machinelearning.models;
 
 public class FloorRandomForest {
-    public static double[] score(int[] input) {
+    public static double[] score(float[] input) {
         double[] var0;
         if (input[25] <= 20.5) {
             if (input[355] <= 12.0) {
@@ -1168,7 +1168,7 @@ public class FloorRandomForest {
         }
         return mulVectorNumber(addVectors(addVectors(addVectors(addVectors(subroutine0(input), var0), var1), var2), var3), 0.005);
     }
-    public static double[] subroutine0(int[] input) {
+    public static double[] subroutine0(float[] input) {
         double[] var0;
         if (input[360] <= 31.0) {
             if (input[83] <= 21.0) {
@@ -2657,7 +2657,7 @@ public class FloorRandomForest {
         }
         return addVectors(addVectors(addVectors(addVectors(addVectors(subroutine1(input), var0), var1), var2), var3), var4);
     }
-    public static double[] subroutine1(int[] input) {
+    public static double[] subroutine1(float[] input) {
         double[] var0;
         if (input[0] <= 24.0) {
             if (input[393] <= 17.0) {
@@ -4058,7 +4058,7 @@ public class FloorRandomForest {
         }
         return addVectors(addVectors(addVectors(addVectors(addVectors(subroutine2(input), var0), var1), var2), var3), var4);
     }
-    public static double[] subroutine2(int[] input) {
+    public static double[] subroutine2(float[] input) {
         double[] var0;
         if (input[184] <= 26.5) {
             if (input[131] <= 16.5) {
@@ -5479,7 +5479,7 @@ public class FloorRandomForest {
         }
         return addVectors(addVectors(addVectors(addVectors(addVectors(subroutine3(input), var0), var1), var2), var3), var4);
     }
-    public static double[] subroutine3(int[] input) {
+    public static double[] subroutine3(float[] input) {
         double[] var0;
         if (input[1] <= 26.0) {
             if (input[146] <= 15.5) {
@@ -6884,7 +6884,7 @@ public class FloorRandomForest {
         }
         return addVectors(addVectors(addVectors(addVectors(addVectors(subroutine4(input), var0), var1), var2), var3), var4);
     }
-    public static double[] subroutine4(int[] input) {
+    public static double[] subroutine4(float[] input) {
         double[] var0;
         if (input[27] <= 28.0) {
             if (input[161] <= 12.5) {
@@ -8289,7 +8289,7 @@ public class FloorRandomForest {
         }
         return addVectors(addVectors(addVectors(addVectors(addVectors(subroutine5(input), var0), var1), var2), var3), var4);
     }
-    public static double[] subroutine5(int[] input) {
+    public static double[] subroutine5(float[] input) {
         double[] var0;
         if (input[10] <= 23.5) {
             if (input[17] <= 24.0) {
@@ -9670,7 +9670,7 @@ public class FloorRandomForest {
         }
         return addVectors(addVectors(addVectors(addVectors(addVectors(subroutine6(input), var0), var1), var2), var3), var4);
     }
-    public static double[] subroutine6(int[] input) {
+    public static double[] subroutine6(float[] input) {
         double[] var0;
         if (input[17] <= 24.0) {
             if (input[358] <= 10.5) {
@@ -11047,7 +11047,7 @@ public class FloorRandomForest {
         }
         return addVectors(addVectors(addVectors(addVectors(addVectors(subroutine7(input), var0), var1), var2), var3), var4);
     }
-    public static double[] subroutine7(int[] input) {
+    public static double[] subroutine7(float[] input) {
         double[] var0;
         if (input[4] <= 23.5) {
             if (input[393] <= -73.0) {
@@ -12416,7 +12416,7 @@ public class FloorRandomForest {
         }
         return addVectors(addVectors(addVectors(addVectors(addVectors(subroutine8(input), var0), var1), var2), var3), var4);
     }
-    public static double[] subroutine8(int[] input) {
+    public static double[] subroutine8(float[] input) {
         double[] var0;
         if (input[3] <= 21.0) {
             if (input[164] <= 14.5) {
@@ -13909,7 +13909,7 @@ public class FloorRandomForest {
         }
         return addVectors(addVectors(addVectors(addVectors(addVectors(subroutine9(input), var0), var1), var2), var3), var4);
     }
-    public static double[] subroutine9(int[] input) {
+    public static double[] subroutine9(float[] input) {
         double[] var0;
         if (input[25] <= 20.5) {
             if (input[504] <= 17.0) {
@@ -15350,7 +15350,7 @@ public class FloorRandomForest {
         }
         return addVectors(addVectors(addVectors(addVectors(addVectors(subroutine10(input), var0), var1), var2), var3), var4);
     }
-    public static double[] subroutine10(int[] input) {
+    public static double[] subroutine10(float[] input) {
         double[] var0;
         if (input[178] <= 26.5) {
             if (input[25] <= 13.0) {
@@ -16691,7 +16691,7 @@ public class FloorRandomForest {
         }
         return addVectors(addVectors(addVectors(addVectors(addVectors(subroutine11(input), var0), var1), var2), var3), var4);
     }
-    public static double[] subroutine11(int[] input) {
+    public static double[] subroutine11(float[] input) {
         double[] var0;
         if (input[6] <= 26.5) {
             if (input[573] <= 11.5) {
@@ -18096,7 +18096,7 @@ public class FloorRandomForest {
         }
         return addVectors(addVectors(addVectors(addVectors(addVectors(subroutine12(input), var0), var1), var2), var3), var4);
     }
-    public static double[] subroutine12(int[] input) {
+    public static double[] subroutine12(float[] input) {
         double[] var0;
         if (input[574] <= 22.5) {
             if (input[15] <= -86.5) {
@@ -19545,7 +19545,7 @@ public class FloorRandomForest {
         }
         return addVectors(addVectors(addVectors(addVectors(addVectors(subroutine13(input), var0), var1), var2), var3), var4);
     }
-    public static double[] subroutine13(int[] input) {
+    public static double[] subroutine13(float[] input) {
         double[] var0;
         if (input[330] <= 20.5) {
             if (input[63] <= 15.5) {
@@ -20970,7 +20970,7 @@ public class FloorRandomForest {
         }
         return addVectors(addVectors(addVectors(addVectors(addVectors(subroutine14(input), var0), var1), var2), var3), var4);
     }
-    public static double[] subroutine14(int[] input) {
+    public static double[] subroutine14(float[] input) {
         double[] var0;
         if (input[4] <= 22.0) {
             if (input[175] <= 12.0) {
@@ -22307,7 +22307,7 @@ public class FloorRandomForest {
         }
         return addVectors(addVectors(addVectors(addVectors(addVectors(subroutine15(input), var0), var1), var2), var3), var4);
     }
-    public static double[] subroutine15(int[] input) {
+    public static double[] subroutine15(float[] input) {
         double[] var0;
         if (input[20] <= 23.0) {
             if (input[188] <= 15.5) {
@@ -23748,7 +23748,7 @@ public class FloorRandomForest {
         }
         return addVectors(addVectors(addVectors(addVectors(addVectors(subroutine16(input), var0), var1), var2), var3), var4);
     }
-    public static double[] subroutine16(int[] input) {
+    public static double[] subroutine16(float[] input) {
         double[] var0;
         if (input[12] <= 26.5) {
             if (input[72] <= -81.5) {
@@ -25157,7 +25157,7 @@ public class FloorRandomForest {
         }
         return addVectors(addVectors(addVectors(addVectors(addVectors(subroutine17(input), var0), var1), var2), var3), var4);
     }
-    public static double[] subroutine17(int[] input) {
+    public static double[] subroutine17(float[] input) {
         double[] var0;
         if (input[55] <= 28.0) {
             if (input[532] <= 15.5) {
@@ -26526,7 +26526,7 @@ public class FloorRandomForest {
         }
         return addVectors(addVectors(addVectors(addVectors(addVectors(subroutine18(input), var0), var1), var2), var3), var4);
     }
-    public static double[] subroutine18(int[] input) {
+    public static double[] subroutine18(float[] input) {
         double[] var0;
         if (input[19] <= 26.5) {
             if (input[368] <= 18.0) {
@@ -27875,7 +27875,7 @@ public class FloorRandomForest {
         }
         return addVectors(addVectors(addVectors(addVectors(addVectors(subroutine19(input), var0), var1), var2), var3), var4);
     }
-    public static double[] subroutine19(int[] input) {
+    public static double[] subroutine19(float[] input) {
         double[] var0;
         if (input[20] <= 23.5) {
             if (input[73] <= 12.5) {
@@ -29356,7 +29356,7 @@ public class FloorRandomForest {
         }
         return addVectors(addVectors(addVectors(addVectors(addVectors(subroutine20(input), var0), var1), var2), var3), var4);
     }
-    public static double[] subroutine20(int[] input) {
+    public static double[] subroutine20(float[] input) {
         double[] var0;
         if (input[168] <= 31.0) {
             if (input[145] <= 16.0) {
@@ -30761,7 +30761,7 @@ public class FloorRandomForest {
         }
         return addVectors(addVectors(addVectors(addVectors(addVectors(subroutine21(input), var0), var1), var2), var3), var4);
     }
-    public static double[] subroutine21(int[] input) {
+    public static double[] subroutine21(float[] input) {
         double[] var0;
         if (input[11] <= 24.0) {
             if (input[56] <= 15.0) {
@@ -32234,7 +32234,7 @@ public class FloorRandomForest {
         }
         return addVectors(addVectors(addVectors(addVectors(addVectors(subroutine22(input), var0), var1), var2), var3), var4);
     }
-    public static double[] subroutine22(int[] input) {
+    public static double[] subroutine22(float[] input) {
         double[] var0;
         if (input[79] <= 13.5) {
             var0 = new double[] {1.0, 0.0, 0.0, 0.0};
@@ -33647,7 +33647,7 @@ public class FloorRandomForest {
         }
         return addVectors(addVectors(addVectors(addVectors(addVectors(subroutine23(input), var0), var1), var2), var3), var4);
     }
-    public static double[] subroutine23(int[] input) {
+    public static double[] subroutine23(float[] input) {
         double[] var0;
         if (input[23] <= 23.5) {
             if (input[4] <= 23.5) {
@@ -34988,7 +34988,7 @@ public class FloorRandomForest {
         }
         return addVectors(addVectors(addVectors(addVectors(addVectors(subroutine24(input), var0), var1), var2), var3), var4);
     }
-    public static double[] subroutine24(int[] input) {
+    public static double[] subroutine24(float[] input) {
         double[] var0;
         if (input[15] <= 24.5) {
             if (input[187] <= 15.0) {
@@ -36445,7 +36445,7 @@ public class FloorRandomForest {
         }
         return addVectors(addVectors(addVectors(addVectors(addVectors(subroutine25(input), var0), var1), var2), var3), var4);
     }
-    public static double[] subroutine25(int[] input) {
+    public static double[] subroutine25(float[] input) {
         double[] var0;
         if (input[19] <= 26.0) {
             if (input[574] <= 14.0) {
@@ -37778,7 +37778,7 @@ public class FloorRandomForest {
         }
         return addVectors(addVectors(addVectors(addVectors(addVectors(subroutine26(input), var0), var1), var2), var3), var4);
     }
-    public static double[] subroutine26(int[] input) {
+    public static double[] subroutine26(float[] input) {
         double[] var0;
         if (input[27] <= 28.0) {
             if (input[73] <= 12.0) {
@@ -39099,7 +39099,7 @@ public class FloorRandomForest {
         }
         return addVectors(addVectors(addVectors(addVectors(addVectors(subroutine27(input), var0), var1), var2), var3), var4);
     }
-    public static double[] subroutine27(int[] input) {
+    public static double[] subroutine27(float[] input) {
         double[] var0;
         if (input[3] <= 23.0) {
             if (input[58] <= 14.5) {
@@ -40500,7 +40500,7 @@ public class FloorRandomForest {
         }
         return addVectors(addVectors(addVectors(addVectors(addVectors(subroutine28(input), var0), var1), var2), var3), var4);
     }
-    public static double[] subroutine28(int[] input) {
+    public static double[] subroutine28(float[] input) {
         double[] var0;
         if (input[197] <= 33.0) {
             if (input[146] <= 16.0) {
@@ -41821,7 +41821,7 @@ public class FloorRandomForest {
         }
         return addVectors(addVectors(addVectors(addVectors(addVectors(subroutine29(input), var0), var1), var2), var3), var4);
     }
-    public static double[] subroutine29(int[] input) {
+    public static double[] subroutine29(float[] input) {
         double[] var0;
         if (input[19] <= 26.5) {
             if (input[180] <= 14.0) {
@@ -43162,7 +43162,7 @@ public class FloorRandomForest {
         }
         return addVectors(addVectors(addVectors(addVectors(addVectors(subroutine30(input), var0), var1), var2), var3), var4);
     }
-    public static double[] subroutine30(int[] input) {
+    public static double[] subroutine30(float[] input) {
         double[] var0;
         if (input[29] <= 23.5) {
             if (input[543] <= 18.5) {
@@ -44671,7 +44671,7 @@ public class FloorRandomForest {
         }
         return addVectors(addVectors(addVectors(addVectors(addVectors(subroutine31(input), var0), var1), var2), var3), var4);
     }
-    public static double[] subroutine31(int[] input) {
+    public static double[] subroutine31(float[] input) {
         double[] var0;
         if (input[40] <= 20.0) {
             if (input[11] <= -86.0) {
@@ -45992,7 +45992,7 @@ public class FloorRandomForest {
         }
         return addVectors(addVectors(addVectors(addVectors(addVectors(subroutine32(input), var0), var1), var2), var3), var4);
     }
-    public static double[] subroutine32(int[] input) {
+    public static double[] subroutine32(float[] input) {
         double[] var0;
         if (input[5] <= 23.0) {
             if (input[139] <= 16.0) {
@@ -47313,7 +47313,7 @@ public class FloorRandomForest {
         }
         return addVectors(addVectors(addVectors(addVectors(addVectors(subroutine33(input), var0), var1), var2), var3), var4);
     }
-    public static double[] subroutine33(int[] input) {
+    public static double[] subroutine33(float[] input) {
         double[] var0;
         if (input[197] <= 31.5) {
             if (input[86] <= 18.0) {
@@ -48622,7 +48622,7 @@ public class FloorRandomForest {
         }
         return addVectors(addVectors(addVectors(addVectors(addVectors(subroutine34(input), var0), var1), var2), var3), var4);
     }
-    public static double[] subroutine34(int[] input) {
+    public static double[] subroutine34(float[] input) {
         double[] var0;
         if (input[517] <= 20.0) {
             var0 = new double[] {0.0, 0.0, 1.0, 0.0};
@@ -49991,7 +49991,7 @@ public class FloorRandomForest {
         }
         return addVectors(addVectors(addVectors(addVectors(addVectors(subroutine35(input), var0), var1), var2), var3), var4);
     }
-    public static double[] subroutine35(int[] input) {
+    public static double[] subroutine35(float[] input) {
         double[] var0;
         if (input[20] <= 21.5) {
             if (input[185] <= 19.0) {
@@ -51528,7 +51528,7 @@ public class FloorRandomForest {
         }
         return addVectors(addVectors(addVectors(addVectors(addVectors(subroutine36(input), var0), var1), var2), var3), var4);
     }
-    public static double[] subroutine36(int[] input) {
+    public static double[] subroutine36(float[] input) {
         double[] var0;
         if (input[355] <= 20.0) {
             if (input[56] <= 13.0) {
@@ -52829,7 +52829,7 @@ public class FloorRandomForest {
         }
         return addVectors(addVectors(addVectors(addVectors(addVectors(subroutine37(input), var0), var1), var2), var3), var4);
     }
-    public static double[] subroutine37(int[] input) {
+    public static double[] subroutine37(float[] input) {
         double[] var0;
         if (input[19] <= 26.5) {
             if (input[17] <= -87.5) {
