@@ -213,3 +213,9 @@ fun getPath(startNode: Node, goal: Node, navigationGraph: NavigationGraph): Muta
 
     return (shortestPath)
 }
+
+fun getRoomNodes(navigationGraph: NavigationGraph): List<Node> {
+    return navigationGraph.graph.values
+        .filter { it.type == NodeType.ROOM }
+        .toList()
+}
