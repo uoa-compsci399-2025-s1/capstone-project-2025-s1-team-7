@@ -322,46 +322,17 @@ fun SearchBar(modifier: Modifier, searchText: String, updateSearchText: (String)
 //Main screen for map view.
 @Composable
 @Preview
-fun MapView(viewModel: MapViewModel = viewModel(), wifiViewModel: WifiViewModel = viewModel()) {
+fun MapView(viewModel: MapViewModel = viewModel()) {
     var floorSelectorVisible:Boolean by remember { mutableStateOf(false) }
 
-    // Position X and Y take percentage values
-    // This is because the image scaling is different and can't use the raw pixel values
-    var positionX:Float by remember { mutableFloatStateOf((754f)/ 1536f) }
-    var positionY:Float by remember { mutableFloatStateOf((1330f) / 1536f) }
-    var positionFloor: Int by remember { mutableIntStateOf(0) }
-    var rotation:Float by remember { mutableFloatStateOf(180f) }
+    val positionX by viewModel.positionX.collectAsState()
+    val positionY by viewModel.positionY.collectAsState()
+    val positionFloor by viewModel.positionFloor.collectAsState()
+    val rotation by viewModel.rotation.collectAsState()
 
     var searchText: String by remember { mutableStateOf("") }
     var searchResults: List<String> = remember { mutableStateListOf<String>() }
 
-    LaunchedEffect(Unit) {
-        while (true) {
-            wifiViewModel.scan()
-
-            val timeout = withTimeoutOrNull(10000) {
-                wifiViewModel.scanResults.firstOrNull { results ->
-                    if (results.isNotEmpty()) {
-                        wifiViewModel.updateScanResults()
-
-                        val strengthArray = wifiViewModel.getStrengthArray()
-                        val floor = LocationPredictor.predictFloor(strengthArray.toFloatArray())
-                        val x = LocationPredictor.predictX(strengthArray.toFloatArray())
-                        val y = LocationPredictor.predictY(strengthArray.toFloatArray())
-
-                        Log.d("predictor", "Predicted X: $x, Y: $y, Floor: $floor")
-
-                        positionX = (754f + x) / 1536f
-                        positionY = (1330f - y) / 1536f
-                        positionFloor = floor
-                        true
-                    } else false
-                }
-            }
-
-            delay(30000)
-        }
-    }
 
     Box(modifier = Modifier
         .fillMaxSize()
