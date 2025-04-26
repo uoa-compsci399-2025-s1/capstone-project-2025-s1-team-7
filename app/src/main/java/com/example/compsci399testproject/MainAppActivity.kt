@@ -75,7 +75,9 @@ fun MapImageView(
     positionXPercentage: Float,
     positionYPercentage: Float,
     positionFloor: Int,
-    rotation: Float
+    rotation: Float,
+    lockedOnPosition: Boolean,
+    changeLockOnPosition: (Boolean) -> Unit
 ) {
     val context = LocalContext.current
     val imageBitmap = remember(floor) {
@@ -140,25 +142,50 @@ fun MapImageView(
                     updateOffset(localOffset)
                     updateZoom(localZoom)
                     updateAngle(localAngle)
+                    changeLockOnPosition(false)
                 }
             )
         }
         .graphicsLayer {
+            if (lockedOnPosition) {
+                val width = this.size.width
+                val height = this.size.height
+
+                val newZoom = 15f
+
+                val x = with(context) { positionX.toPx() - ((width / 2) / zoom)}
+                val y = with(context) { positionY.toPx() - ((height / 2) / zoom) + 20}
+
+                localOffset = Offset(x, y)
+                localZoom = newZoom
+                localAngle = 0f
+
+                updateOffset(localOffset)
+                updateZoom(localZoom)
+                updateAngle(localAngle)
+                Log.d("MAP", "Pixel position of User | ${x}, ${y} | Size ${with(context) { floorImageSizeWidth.toPx() }}")
+            }
+
             translationX = -offset.x * zoom
             translationY = -offset.y * zoom
             scaleX = zoom
             scaleY = zoom
             rotationZ = angle
             transformOrigin = TransformOrigin(0f, 0f)
-        }
-        .fillMaxSize()) {
 
-        //Log.d("MAP", "Zoom ${zoom} | Rotation ${angle} | Offset ${offset} ")
+
+        }
+        .fillMaxSize()
+    ) {
+
+        Log.d("MAP", "Zoom ${zoom} | Rotation ${angle} | Offset ${offset},  ")
 
         Image(bitmap = imageBitmap,
             contentDescription = "${floor} image",
             modifier = Modifier
-                .size(width = floorImageSizeWidth, height = floorImageSizeHeight))
+                .size(width = floorImageSizeWidth, height = floorImageSizeHeight)
+                //.background(color = Color.Blue)
+        )
 
         Image(painter = painterResource(id = R.drawable.position_icon),
             contentDescription = "${floor} image",
@@ -168,7 +195,8 @@ fun MapImageView(
                 .offset(positionX, positionY)
                 .graphicsLayer {
                     rotationZ = rotation
-                })
+                }
+        )
     }
 }
 
@@ -253,13 +281,13 @@ fun FloorSelectorButton(selectedFloor : Int, visible: Boolean, changeFloorVisibi
 }
 
 @Composable
-fun ResetPositionButton(selectedFloor: Int, positionFloor: Int, modifier: Modifier, changeFloor: (Int) -> Unit) {
+fun ResetPositionButton(selectedFloor: Int, positionFloor: Int, modifier: Modifier, changeFloor: (Int) -> Unit, lockedOnPosition: Boolean, changeLockedOnPosition: (Boolean) -> Unit) {
     Box(
         modifier = modifier
             .width(60.dp)
             .height(60.dp)
             .offset(x = -20.dp, y = -180.dp)
-            .alpha(if (selectedFloor != positionFloor) 1f else 0f)
+            .alpha(if (selectedFloor != positionFloor || !lockedOnPosition) 1f else 0f)
             .background(
                 color = colorResource(id = R.color.darker_white),
                 shape = RoundedCornerShape(60.dp)
@@ -271,6 +299,7 @@ fun ResetPositionButton(selectedFloor: Int, positionFloor: Int, modifier: Modifi
             )
             .clickable {
                 changeFloor(positionFloor)
+                changeLockedOnPosition(true)
             }
     )
     {
@@ -346,6 +375,7 @@ fun SearchBar(modifier: Modifier, searchText: String, updateSearchText: (String)
 fun MapView(viewModel: MapViewModel = viewModel()) {
     val context = LocalContext.current
 
+
     var floorSelectorVisible:Boolean by remember { mutableStateOf(false) }
 
     val positionX by viewModel.positionX.collectAsState()
@@ -393,7 +423,9 @@ fun MapView(viewModel: MapViewModel = viewModel()) {
             positionXPercentage = positionX,
             positionYPercentage = positionY,
             positionFloor = positionFloor,
-            rotation = rotation
+            rotation = rotation,
+            lockedOnPosition = viewModel.lockedOnPosition,
+            changeLockOnPosition = {viewModel.updateLockedOnPosition(it)}
         )
 
         SearchBar(modifier = Modifier.align(Alignment.TopCenter), searchText = searchText, updateSearchText = {getSearchResults(it)}, searchResults = searchResults)
@@ -402,7 +434,9 @@ fun MapView(viewModel: MapViewModel = viewModel()) {
             selectedFloor = viewModel.currentFloor,
             positionFloor = positionFloor,
             modifier = Modifier.align(Alignment.BottomEnd),
-            changeFloor = { viewModel.setFloor(it)}
+            changeFloor = { viewModel.setFloor(it)},
+            lockedOnPosition = viewModel.lockedOnPosition,
+            changeLockedOnPosition = {viewModel.updateLockedOnPosition(it)}
         )
 
         FloorSelectorButton(

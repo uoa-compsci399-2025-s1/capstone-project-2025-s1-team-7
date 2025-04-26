@@ -30,6 +30,9 @@ class MapViewModel(wifiViewModel: WifiViewModel) : ViewModel() {
     var angle by mutableStateOf(0f)
         private set
 
+    var lockedOnPosition by mutableStateOf(true)
+        private set
+
     // Position X and Y take percentage values
     // This is because the image scaling is different and can't use the raw pixel values
     private val _positionX = MutableStateFlow((754f) / 1536f)
@@ -70,6 +73,10 @@ class MapViewModel(wifiViewModel: WifiViewModel) : ViewModel() {
         angle = newAngle
     }
 
+    fun updateLockedOnPosition(value: Boolean) {
+        lockedOnPosition = value
+    }
+
     private fun startPredictingLocation() {
         viewModelScope.launch {
             while (true) {
@@ -90,6 +97,8 @@ class MapViewModel(wifiViewModel: WifiViewModel) : ViewModel() {
                             _positionX.value = (754f + x) / 1536f
                             _positionY.value = (1330f - y) / 1536f
                             _positionFloor.value = floor
+
+                            if (lockedOnPosition) {setFloor(floor)}
                             true
                         } else false
                     }
