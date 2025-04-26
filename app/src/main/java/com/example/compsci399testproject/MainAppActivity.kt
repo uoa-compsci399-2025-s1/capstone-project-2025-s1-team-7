@@ -15,7 +15,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.graphics.asImageBitmap
 import android.graphics.BitmapFactory
-import android.location.Location
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.animation.animateContentSize
@@ -40,24 +39,16 @@ import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.zIndex
 
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.compsci399testproject.machinelearning.LocationPredictor
 
 import com.example.compsci399testproject.viewmodel.MapViewModel
-import com.example.compsci399testproject.viewmodel.WifiViewModel
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.coroutines.time.withTimeoutOrNull
-import kotlinx.coroutines.withTimeoutOrNull
 import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.sin
@@ -110,13 +101,16 @@ fun MapImageView(
     var localZoom:Float by remember { mutableFloatStateOf(3.5f) }
     var localAngle:Float by remember { mutableFloatStateOf(0f) }
 
-    val floorImageSizeWidth : Dp  = 300.dp
-    val floorImageSizeHeight : Dp = 300.dp
+    val floorImageSizeWidth : Dp  = 316.dp
+    val floorImageSizeHeight : Dp = 316.dp
 
-    val sizeX : Dp  = 4.dp
-    val sizeY : Dp = 4.dp
-    val positionX : Dp = (floorImageSizeWidth * positionXPercentage) - (sizeX / 2)
-    val positionY : Dp = (floorImageSizeHeight * positionYPercentage) - (sizeY / 2)
+    val rawPositionX: Dp = (floorImageSizeWidth * positionXPercentage)
+    val rawPositionY: Dp = (floorImageSizeHeight * positionYPercentage)
+
+    val positionIconSizeX : Dp  = 4.dp
+    val positionIconSizeY : Dp = 4.dp
+    val positionIconPosX : Dp = rawPositionX - (positionIconSizeX / 2)
+    val positionIconPosY : Dp = rawPositionY - (positionIconSizeY / 2)
 
 
     Box(modifier = Modifier
@@ -156,8 +150,8 @@ fun MapImageView(
                 val widthOffset = (width / 2) / newZoom
                 val heightOffset = (height / 2) / newZoom
 
-                val x = positionX.toPx() - widthOffset + 10
-                val y = positionY.toPx() - heightOffset + 20
+                val x = rawPositionX.toPx() - widthOffset
+                val y = rawPositionY.toPx() - heightOffset
 
                 localOffset = Offset(x, y)
                 localZoom = newZoom
@@ -194,8 +188,8 @@ fun MapImageView(
             contentDescription = "${floor} image",
             modifier = Modifier
                 .alpha(if (floor != positionFloor) 0f else 1f)
-                .size(sizeX, sizeY)
-                .offset(positionX, positionY)
+                .size(positionIconSizeX, positionIconSizeY)
+                .offset(positionIconPosX, positionIconPosY)
                 .graphicsLayer {
                     rotationZ = rotation
                 }
