@@ -84,7 +84,7 @@ class MainActivity : ComponentActivity() {
         val factory = WifiScannerViewModelFactory(applicationContext)
         wifiViewModel = ViewModelProvider(this, factory)[WifiViewModel::class.java]
 
-        val mapFactory = MapViewModelFactory()
+        val mapFactory = MapViewModelFactory(wifiViewModel)
         mapViewModel = ViewModelProvider(this, mapFactory)[MapViewModel::class.java]
 
         setContent {
@@ -108,7 +108,7 @@ class MainActivity : ComponentActivity() {
                 }
 
                 composable("MainApp") {
-                    MapView(mapViewModel, wifiViewModel)
+                    MapView(mapViewModel)
                 }
             })
         }
