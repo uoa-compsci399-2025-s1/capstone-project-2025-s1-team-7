@@ -153,8 +153,11 @@ fun MapImageView(
 
                 val newZoom = 15f
 
-                val x = with(context) { positionX.toPx() - ((width / 2) / zoom)}
-                val y = with(context) { positionY.toPx() - ((height / 2) / zoom) + 20}
+                val widthOffset = (width / 2) / newZoom
+                val heightOffset = (height / 2) / newZoom
+
+                val x = positionX.toPx() - widthOffset + 10
+                val y = positionY.toPx() - heightOffset + 20
 
                 localOffset = Offset(x, y)
                 localZoom = newZoom
@@ -163,7 +166,7 @@ fun MapImageView(
                 updateOffset(localOffset)
                 updateZoom(localZoom)
                 updateAngle(localAngle)
-                Log.d("MAP", "Pixel position of User | ${x}, ${y} | Size ${with(context) { floorImageSizeWidth.toPx() }}")
+                //Log.d("MAP", "Pixel position of User | ${x}, ${y} | Pos ${positionX.toPx()}, ${positionY.toPx()} | ${width}, ${floorImageSizeWidth.toPx()}")
             }
 
             translationX = -offset.x * zoom
