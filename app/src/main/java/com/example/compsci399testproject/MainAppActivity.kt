@@ -47,6 +47,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.compsci399testproject.utils.NavigationGraph
+import com.example.compsci399testproject.utils.Node
+import com.example.compsci399testproject.utils.NodeType
+import com.example.compsci399testproject.utils.getRoomNodes
+import com.example.compsci399testproject.utils.initialiseGraph
 
 import com.example.compsci399testproject.viewmodel.MapViewModel
 import kotlin.math.PI
@@ -381,7 +386,7 @@ fun MapView(viewModel: MapViewModel = viewModel()) {
     val rotation by viewModel.rotation.collectAsState()
 
     val navigationGraph: NavigationGraph = remember {initialiseGraph(context)}
-    val rooms: List<Node> = remember {getRoomNodes(navigationGraph)}
+    val rooms: List<Node> = remember { getRoomNodes(navigationGraph) }
 
     var searchText: String by remember { mutableStateOf("") }
     var searchResults = remember { mutableStateListOf<Node>() }
