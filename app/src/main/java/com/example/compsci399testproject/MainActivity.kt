@@ -34,6 +34,7 @@ import android.util.Log
 import androidx.annotation.RequiresPermission
 import androidx.core.content.ContextCompat
 import androidx.compose.ui.geometry.Offset
+import com.example.compsci399testproject.utils.initialiseGraph
 import com.example.compsci399testproject.viewmodel.MapViewModel
 import com.example.compsci399testproject.viewmodel.MapViewModelFactory
 
@@ -86,6 +87,8 @@ class MainActivity : ComponentActivity() {
 
         val mapFactory = MapViewModelFactory(wifiViewModel)
         mapViewModel = ViewModelProvider(this, mapFactory)[MapViewModel::class.java]
+
+        val navigationGraph = initialiseGraph(applicationContext)
 
         setContent {
             val navController = rememberNavController()
