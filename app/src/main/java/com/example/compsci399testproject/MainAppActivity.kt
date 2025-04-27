@@ -15,6 +15,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.graphics.asImageBitmap
 import android.graphics.BitmapFactory
+import android.graphics.Path
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.animation.animateContentSize
@@ -39,13 +40,18 @@ import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawWithCache
+import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusModifier
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.TransformOrigin
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.modifier.modifierLocalMapOf
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
@@ -66,7 +72,6 @@ import com.example.compsci399testproject.viewmodel.UIState
 import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.sin
-
 
 @Composable
 fun MapImageView(
@@ -208,6 +213,14 @@ fun MapImageView(
                 //.background(color = Color.Blue)
         )
 
+        Spacer(modifier = Modifier.fillMaxSize().drawWithCache {
+            onDrawBehind {
+                //drawPath(path, Color.Green, style = Stroke(2.dp.toPx()))
+            }
+        })
+
+
+
         Image(painter = painterResource(id = R.drawable.position_icon),
             contentDescription = "${floor} image",
             modifier = Modifier
@@ -292,7 +305,7 @@ fun FloorSelectorButton(selectedFloor : Int, visible: Boolean, changeFloorVisibi
                 shape = RoundedCornerShape(6.dp)
             )
             .width(60.dp)
-            .height(if (uiState.equals(UIState.MAIN)) 60.dp else 0.dp),
+            .height(if (uiState.equals(UIState.MAIN) || uiState.equals(UIState.NAVIGATING)) 60.dp else 0.dp),
         colors = ButtonDefaults.buttonColors(
             containerColor = if (visible) colorResource(id = R.color.light_blue) else colorResource(id = R.color.darker_white)
         ),
@@ -317,7 +330,7 @@ fun ResetPositionButton(selectedFloor: Int, positionFloor: Int, modifier: Modifi
     Box(
         modifier = modifier
             .width(60.dp)
-            .height(if (uiState.equals(UIState.MAIN) && (selectedFloor != positionFloor || !lockedOnPosition)) 60.dp else 0.dp)
+            .height(if ((uiState.equals(UIState.MAIN) || uiState.equals(UIState.NAVIGATING)) && (selectedFloor != positionFloor || !lockedOnPosition)) 60.dp else 0.dp)
             .offset(x = -20.dp, y = -180.dp)
             .background(
                 color = colorResource(id = R.color.darker_white),
@@ -416,7 +429,11 @@ fun SearchBar(modifier: Modifier, searchText: String, updateSearchText: (String)
 
 @Composable
 fun PreviewNavigationSearchBar(modifier: Modifier, destinationNode: Node,
-                               uiState: UIState, updateUiState: (UIState) -> Unit) {
+                               uiState: UIState, updateUiState: (UIState) -> Unit,
+                               startNavigation: () -> Unit) {
+
+    var destinationSearchTextFocused: Boolean by remember { mutableStateOf(false) }
+
     Column(modifier = modifier
         .offset(x = 0.dp, y = 30.dp)
         .width(if (uiState.equals(UIState.NAVIGATION_PREVIEW)) 280.dp else 0.dp)
@@ -438,7 +455,7 @@ fun PreviewNavigationSearchBar(modifier: Modifier, destinationNode: Node,
                 Text("Cancel")
             }
 
-            Button(onClick = {}, modifier = Modifier.width(120.dp).height(36.dp).padding(10.dp, 0.dp, 0.dp, 0.dp),
+            Button(onClick = {startNavigation()}, modifier = Modifier.width(120.dp).height(36.dp).padding(10.dp, 0.dp, 0.dp, 0.dp),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = colorResource(id = R.color.light_blue)
                 ),
@@ -446,6 +463,30 @@ fun PreviewNavigationSearchBar(modifier: Modifier, destinationNode: Node,
             ) {
                 Text("Navigate")
             }
+        }
+    }
+}
+
+@Composable
+fun NavigationTopBar(modifier: Modifier, destinationNode: Node,
+                               uiState: UIState, updateUiState: (UIState) -> Unit) {
+    Column(modifier = modifier
+        .offset(x = 0.dp, y = 30.dp)
+        .width(if (uiState.equals(UIState.NAVIGATING)) 280.dp else 0.dp)
+        .height(100.dp)
+        .background(color = colorResource(id = R.color.darker_white), shape = RoundedCornerShape(6.dp))
+        .border(color = colorResource(id = R.color.dark_blue), width = 2.dp, shape = RoundedCornerShape(6.dp)),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text("Navigating to " + destinationNode.id, modifier.fillMaxWidth().offset(x = 0.dp, y = 20.dp), textAlign = TextAlign.Center)
+
+        Button(onClick = {updateUiState(UIState.MAIN)}, modifier = Modifier.width(120.dp).height(36.dp).offset(x = 0.dp, y = 30.dp),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = colorResource(id = R.color.red_cancel)
+            ),
+            shape = RoundedCornerShape(6.dp)
+        ) {
+            Text("Cancel")
         }
     }
 }
@@ -534,6 +575,13 @@ fun MapView(viewModel: MapViewModel = viewModel()) {
         PreviewNavigationSearchBar(modifier = Modifier.align(Alignment.TopCenter),
             destinationNode = viewModel.currentNavDestinationNode,
             uiState = viewModel.uiState,
+            updateUiState = {viewModel.updateUiState(it)},
+            startNavigation = {viewModel.startNavigation(navigationGraph)}
+        )
+
+        NavigationTopBar (modifier = Modifier.align(Alignment.TopCenter),
+            destinationNode = viewModel.currentNavDestinationNode,
+            uiState = viewModel.uiState,
             updateUiState = {viewModel.updateUiState(it)}
         )
 
@@ -582,7 +630,14 @@ fun MapPreviewFun() {
     PreviewNavigationSearchBar(Modifier,
         Node("Room 1", 30, 30, 0, NodeType.ROOM, mutableListOf()),
         UIState.NAVIGATION_PREVIEW,
+        {},
         {}
     )
+
+    //NavigationTopBar (Modifier,
+    //    Node("Room 1", 30, 30, 0, NodeType.ROOM, mutableListOf()),
+    //    UIState.NAVIGATING,
+    //    {}
+    //)
 }
 
