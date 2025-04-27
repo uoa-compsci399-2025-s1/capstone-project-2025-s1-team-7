@@ -42,6 +42,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusModifier
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.graphicsLayer
@@ -364,6 +365,8 @@ fun SearchBar(modifier: Modifier, searchText: String, updateSearchText: (String)
 
     val focusManager = LocalFocusManager.current
 
+    var searchFocused by remember { mutableStateOf(false) }
+
     Box(modifier = modifier
         .offset(x = 0.dp, y = 30.dp)
         .width(if (uiState.equals(UIState.MAIN)) 280.dp else 0.dp)
@@ -371,7 +374,10 @@ fun SearchBar(modifier: Modifier, searchText: String, updateSearchText: (String)
         OutlinedTextField(value = searchText,
             onValueChange = { updateSearchText(it) },
             placeholder = { Text("Search") },
-            modifier = Modifier.fillMaxWidth().height(56.dp),
+            modifier = Modifier.fillMaxWidth().height(56.dp)
+                .onFocusChanged {
+                    searchFocused = it.isFocused
+                },
             colors = OutlinedTextFieldDefaults.colors(
                 focusedBorderColor = colorResource(id = R.color.dark_blue),
                 unfocusedBorderColor = colorResource(id = R.color.light_blue),
@@ -386,7 +392,7 @@ fun SearchBar(modifier: Modifier, searchText: String, updateSearchText: (String)
 
         LazyColumn (modifier = Modifier.fillMaxWidth()
             .heightIn(0.dp, totalSearchHeight)
-            .height(if (uiState.equals(UIState.MAIN)) singleSearchResultHeight * searchResults.size else 0.dp)
+            .height(if (uiState.equals(UIState.MAIN) && searchFocused) singleSearchResultHeight * searchResults.size else 0.dp)
             .offset(x = 0.dp, y = 62.dp)
             .clip(shape = RoundedCornerShape(8.dp))
             .background(color = colorResource(id = R.color.darker_white), shape = RoundedCornerShape(8.dp))
