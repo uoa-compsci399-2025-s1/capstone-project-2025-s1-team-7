@@ -179,7 +179,7 @@ fun MapImageView(
                 updateZoom(localZoom)
                 updateAngle(localAngle)
                 //Log.d("MAP", "Pixel position of User | ${x}, ${y} | Pos ${width} ${height}")
-            } else if (uiState.equals(UIState.NAVIGATION_PREVIEW)) {
+            } else if (!uiState.equals(UIState.MAIN)) {
                 // This is a very hacky method to update the local position and should be changed later
                 localOffset = offset
                 localZoom = zoom
