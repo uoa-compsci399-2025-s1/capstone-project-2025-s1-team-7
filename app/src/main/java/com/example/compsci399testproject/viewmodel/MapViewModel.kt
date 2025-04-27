@@ -143,7 +143,7 @@ class MapViewModel(wifiViewModel: WifiViewModel) : ViewModel() {
         updateZoom(localZoom)
         updateAngle(localAngle)
 
-        Log.d("MAP VIEWMODEL", "VIEW DESTINATION ${localOffset} ${localZoom} ${localAngle}")
+        Log.d("MAP VIEWMODEL", "VIEW DESTINATION ${localOffset} ${localZoom} ${localAngle} | NODE ${node.id} ${node.x}, ${node.y}")
     }
 
     // Wifi Location Prediction Function
