@@ -162,7 +162,7 @@ fun MapImageView(
                 val width = this.size.width
                 val height = this.size.height
 
-                val newZoom = 15f
+                val newZoom = 6f
 
                 val widthOffset = (width / 2) / newZoom
                 val heightOffset = (height / 2) / newZoom
