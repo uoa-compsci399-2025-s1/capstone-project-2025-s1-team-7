@@ -39,12 +39,19 @@ import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusModifier
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.times
 
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.compsci399testproject.utils.NavigationGraph
@@ -54,6 +61,7 @@ import com.example.compsci399testproject.utils.getRoomNodes
 import com.example.compsci399testproject.utils.initialiseGraph
 
 import com.example.compsci399testproject.viewmodel.MapViewModel
+import com.example.compsci399testproject.viewmodel.UIState
 import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.sin
@@ -73,7 +81,11 @@ fun MapImageView(
     positionFloor: Int,
     rotation: Float,
     lockedOnPosition: Boolean,
-    changeLockOnPosition: (Boolean) -> Unit
+    changeLockOnPosition: (Boolean) -> Unit,
+    uiState: UIState,
+    navigationNode: Node,
+    mapImageSizeWidth: Dp,
+    mapImageSizeHeight: Dp
 ) {
     val context = LocalContext.current
     val imageBitmap = remember(floor) {
@@ -106,8 +118,8 @@ fun MapImageView(
     var localZoom:Float by remember { mutableFloatStateOf(3.5f) }
     var localAngle:Float by remember { mutableFloatStateOf(0f) }
 
-    val floorImageSizeWidth : Dp  = 316.dp
-    val floorImageSizeHeight : Dp = 316.dp
+    val floorImageSizeWidth : Dp  = mapImageSizeWidth
+    val floorImageSizeHeight : Dp = mapImageSizeHeight
 
     val rawPositionX: Dp = (floorImageSizeWidth * positionXPercentage)
     val rawPositionY: Dp = (floorImageSizeHeight * positionYPercentage)
@@ -165,7 +177,13 @@ fun MapImageView(
                 updateOffset(localOffset)
                 updateZoom(localZoom)
                 updateAngle(localAngle)
-                //Log.d("MAP", "Pixel position of User | ${x}, ${y} | Pos ${positionX.toPx()}, ${positionY.toPx()} | ${width}, ${floorImageSizeWidth.toPx()}")
+                //Log.d("MAP", "Pixel position of User | ${x}, ${y} | Pos ${width} ${height}")
+            } else if (uiState.equals(UIState.NAVIGATION_PREVIEW)) {
+                // This is a very hacky method to update the local position and should be changed later
+                localOffset = offset
+                localZoom = zoom
+                localAngle = angle
+
             }
 
             translationX = -offset.x * zoom
@@ -198,6 +216,14 @@ fun MapImageView(
                 .graphicsLayer {
                     rotationZ = rotation
                 }
+        )
+
+        Box(modifier = Modifier
+            .width(4.dp)
+            .height(if (uiState.equals(UIState.NAVIGATION_PREVIEW) && floor == navigationNode.floor) 4.dp else 0.dp)
+            .offset(x = (((754f + navigationNode.x) / 1536f) * floorImageSizeWidth) - 2.dp,
+                y = (((1330f - navigationNode.y) / 1536f) * floorImageSizeHeight) - 2.dp)
+            .background(color = colorResource(id = R.color.light_blue), shape = RoundedCornerShape(6.dp))
         )
     }
 }
@@ -254,18 +280,18 @@ fun FloorSelectorList(selectedFloor : Int, onSelect: (Int) -> Unit, visible: Boo
 }
 
 @Composable
-fun FloorSelectorButton(selectedFloor : Int, visible: Boolean, changeFloorVisibility: (Boolean) -> Unit, modifier: Modifier) {
+fun FloorSelectorButton(selectedFloor : Int, visible: Boolean, changeFloorVisibility: (Boolean) -> Unit, modifier: Modifier, uiState: UIState) {
     Button(
         onClick = {changeFloorVisibility(!visible)},
         modifier = modifier
-            .width(60.dp)
-            .height(60.dp)
             .offset(x = -20.dp, y = -260.dp)
             .border(
                 width = 2.dp,
                 color = colorResource(id = R.color.light_blue),
                 shape = RoundedCornerShape(6.dp)
-            ),
+            )
+            .width(60.dp)
+            .height(if (uiState.equals(UIState.MAIN)) 60.dp else 0.dp),
         colors = ButtonDefaults.buttonColors(
             containerColor = if (visible) colorResource(id = R.color.light_blue) else colorResource(id = R.color.darker_white)
         ),
@@ -283,13 +309,15 @@ fun FloorSelectorButton(selectedFloor : Int, visible: Boolean, changeFloorVisibi
 }
 
 @Composable
-fun ResetPositionButton(selectedFloor: Int, positionFloor: Int, modifier: Modifier, changeFloor: (Int) -> Unit, lockedOnPosition: Boolean, changeLockedOnPosition: (Boolean) -> Unit) {
+fun ResetPositionButton(selectedFloor: Int, positionFloor: Int, modifier: Modifier, changeFloor: (Int) -> Unit,
+                        lockedOnPosition: Boolean, changeLockedOnPosition: (Boolean) -> Unit,
+                        uiState: UIState
+) {
     Box(
         modifier = modifier
             .width(60.dp)
-            .height(60.dp)
+            .height(if (uiState.equals(UIState.MAIN) && (selectedFloor != positionFloor || !lockedOnPosition)) 60.dp else 0.dp)
             .offset(x = -20.dp, y = -180.dp)
-            .alpha(if (selectedFloor != positionFloor || !lockedOnPosition) 1f else 0f)
             .background(
                 color = colorResource(id = R.color.darker_white),
                 shape = RoundedCornerShape(60.dp)
@@ -328,13 +356,17 @@ fun ResetPositionButton(selectedFloor: Int, positionFloor: Int, modifier: Modifi
 }
 
 @Composable
-fun SearchBar(modifier: Modifier, searchText: String, updateSearchText: (String) -> Unit, searchResults : List<Node>) {
+fun SearchBar(modifier: Modifier, searchText: String, updateSearchText: (String) -> Unit, searchResults : List<Node>,
+              uiState: UIState,
+              viewDestinationNode: (Node) -> Unit){
     val singleSearchResultHeight: Dp = 40.dp
     val totalSearchHeight = singleSearchResultHeight * 4
 
+    val focusManager = LocalFocusManager.current
+
     Box(modifier = modifier
         .offset(x = 0.dp, y = 30.dp)
-        .width(280.dp)
+        .width(if (uiState.equals(UIState.MAIN)) 280.dp else 0.dp)
     ) {
         OutlinedTextField(value = searchText,
             onValueChange = { updateSearchText(it) },
@@ -354,7 +386,7 @@ fun SearchBar(modifier: Modifier, searchText: String, updateSearchText: (String)
 
         LazyColumn (modifier = Modifier.fillMaxWidth()
             .heightIn(0.dp, totalSearchHeight)
-            .height(singleSearchResultHeight * searchResults.size)
+            .height(if (uiState.equals(UIState.MAIN)) singleSearchResultHeight * searchResults.size else 0.dp)
             .offset(x = 0.dp, y = 62.dp)
             .clip(shape = RoundedCornerShape(8.dp))
             .background(color = colorResource(id = R.color.darker_white), shape = RoundedCornerShape(8.dp))
@@ -362,7 +394,11 @@ fun SearchBar(modifier: Modifier, searchText: String, updateSearchText: (String)
         ) {
 
             items(searchResults) { node ->
-                Box(modifier = Modifier.fillMaxWidth().height(singleSearchResultHeight)) {
+                Box(modifier = Modifier.fillMaxWidth().height(singleSearchResultHeight)
+                    .clickable {
+                        viewDestinationNode(node)
+                        focusManager.clearFocus()
+                    }) {
                     Text(text = node.id, modifier = Modifier.fillMaxSize()
                         .wrapContentHeight(align = Alignment.CenterVertically)
                         .padding(horizontal = 12.dp))
@@ -372,10 +408,55 @@ fun SearchBar(modifier: Modifier, searchText: String, updateSearchText: (String)
     }
 }
 
+@Composable
+fun PreviewNavigationSearchBar(modifier: Modifier, destinationNode: Node,
+                               uiState: UIState, updateUiState: (UIState) -> Unit) {
+    Column(modifier = modifier
+        .offset(x = 0.dp, y = 30.dp)
+        .width(if (uiState.equals(UIState.NAVIGATION_PREVIEW)) 280.dp else 0.dp)
+        .height(120.dp)
+        .background(color = colorResource(id = R.color.darker_white), shape = RoundedCornerShape(6.dp))
+        .border(color = colorResource(id = R.color.dark_blue), width = 2.dp, shape = RoundedCornerShape(6.dp)),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text("From Current Location", modifier.fillMaxWidth().offset(x = 0.dp, y = 10.dp), textAlign = TextAlign.Center)
+        Text("To " + destinationNode.id, modifier.fillMaxWidth().offset(x = 0.dp, y = 20.dp), textAlign = TextAlign.Center)
+
+        Row(modifier = Modifier.offset(0.dp, 40.dp)) {
+            Button(onClick = {updateUiState(UIState.MAIN)}, modifier = Modifier.width(120.dp).height(36.dp).padding(0.dp, 0.dp, 10.dp, 0.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = colorResource(id = R.color.red_cancel)
+                ),
+                shape = RoundedCornerShape(6.dp)
+            ) {
+                Text("Cancel")
+            }
+
+            Button(onClick = {}, modifier = Modifier.width(120.dp).height(36.dp).padding(10.dp, 0.dp, 0.dp, 0.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = colorResource(id = R.color.light_blue)
+                ),
+                shape = RoundedCornerShape(6.dp)
+            ) {
+                Text("Navigate")
+            }
+        }
+    }
+}
+
 //Main screen for map view.
 @Composable
 fun MapView(viewModel: MapViewModel = viewModel()) {
     val context = LocalContext.current
+    val currentFocusManager = LocalFocusManager.current
+    val displayMetrics = context.resources.displayMetrics
+
+    viewModel.updateScreenSize(displayMetrics.widthPixels.toFloat(), displayMetrics.heightPixels.toFloat())
+
+    var floorImageSizeWidth = 316.dp
+    var floorImageSizeHeight = 316.dp
+
+    viewModel.updateMapImageSize(with(LocalDensity.current) {floorImageSizeWidth.toPx()}, with(LocalDensity.current) {floorImageSizeHeight.toPx()})
 
 
     var floorSelectorVisible:Boolean by remember { mutableStateOf(false) }
@@ -411,6 +492,7 @@ fun MapView(viewModel: MapViewModel = viewModel()) {
         .pointerInput(Unit) {
             detectTapGestures(onTap = {
                 floorSelectorVisible = false
+                currentFocusManager.clearFocus()
             })
         }) {
 
@@ -427,10 +509,27 @@ fun MapView(viewModel: MapViewModel = viewModel()) {
             positionFloor = positionFloor,
             rotation = rotation,
             lockedOnPosition = viewModel.lockedOnPosition,
-            changeLockOnPosition = {viewModel.updateLockedOnPosition(it)}
+            changeLockOnPosition = {viewModel.updateLockedOnPosition(it)},
+            uiState = viewModel.uiState,
+            navigationNode = viewModel.currentNavDestinationNode,
+            mapImageSizeWidth = floorImageSizeWidth,
+            mapImageSizeHeight = floorImageSizeHeight
         )
 
-        SearchBar(modifier = Modifier.align(Alignment.TopCenter), searchText = searchText, updateSearchText = {getSearchResults(it)}, searchResults = searchResults)
+        SearchBar(
+            modifier = Modifier.align(Alignment.TopCenter),
+            searchText = searchText,
+            updateSearchText = {getSearchResults(it)},
+            searchResults = searchResults,
+            uiState = viewModel.uiState,
+            viewDestinationNode = {viewModel.viewDestinationNode(it)}
+        )
+
+        PreviewNavigationSearchBar(modifier = Modifier.align(Alignment.TopCenter),
+            destinationNode = viewModel.currentNavDestinationNode,
+            uiState = viewModel.uiState,
+            updateUiState = {viewModel.updateUiState(it)}
+        )
 
         ResetPositionButton(
             selectedFloor = viewModel.currentFloor,
@@ -438,14 +537,16 @@ fun MapView(viewModel: MapViewModel = viewModel()) {
             modifier = Modifier.align(Alignment.BottomEnd),
             changeFloor = { viewModel.setFloor(it)},
             lockedOnPosition = viewModel.lockedOnPosition,
-            changeLockedOnPosition = {viewModel.updateLockedOnPosition(it)}
+            changeLockedOnPosition = {viewModel.updateLockedOnPosition(it)},
+            uiState = viewModel.uiState
         )
 
         FloorSelectorButton(
             selectedFloor = viewModel.currentFloor,
             visible = floorSelectorVisible,
             changeFloorVisibility = {floorSelectorVisible = it},
-            modifier = Modifier.align(Alignment.BottomEnd)
+            modifier = Modifier.align(Alignment.BottomEnd),
+            uiState = viewModel.uiState
         )
 
         FloorSelectorList(
@@ -470,6 +571,12 @@ fun MapPreviewFun() {
     arrayList.add(Node("Room 5", 30, 30, 0, NodeType.ROOM, mutableListOf()))
 
 
-    SearchBar(Modifier, "", {}, arrayList)
+    //SearchBar(Modifier, "", {}, arrayList)
+
+    PreviewNavigationSearchBar(Modifier,
+        Node("Room 1", 30, 30, 0, NodeType.ROOM, mutableListOf()),
+        UIState.NAVIGATION_PREVIEW,
+        {}
+    )
 }
 

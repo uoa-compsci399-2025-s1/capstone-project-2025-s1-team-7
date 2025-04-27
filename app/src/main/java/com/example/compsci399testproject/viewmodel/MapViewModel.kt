@@ -5,9 +5,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.times
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.compsci399testproject.machinelearning.LocationPredictor
+import com.example.compsci399testproject.utils.Node
+import com.example.compsci399testproject.utils.NodeType
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -15,6 +19,12 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeoutOrNull
+
+enum class UIState {
+    MAIN,
+    NAVIGATION_PREVIEW,
+    NAVIGATING
+}
 
 class MapViewModel(wifiViewModel: WifiViewModel) : ViewModel() {
 
@@ -33,6 +43,20 @@ class MapViewModel(wifiViewModel: WifiViewModel) : ViewModel() {
     var lockedOnPosition by mutableStateOf(true)
         private set
 
+    var uiState by mutableStateOf(UIState.MAIN)
+
+    // Screen Size
+    var screenSizeWidth by mutableStateOf(0f)
+    var screenSizeHeight by mutableStateOf(0f)
+
+    // Map Image Size
+    var mapImageSizeWidth by mutableStateOf(0f)
+    var mapImageSizeHeight by mutableStateOf(0f)
+
+    // Navigation
+    var currentNavDestinationNode by mutableStateOf(Node("", 0, 0, 0, NodeType.ROOM, mutableListOf()))
+
+    // Position
     // Position X and Y take percentage values
     // This is because the image scaling is different and can't use the raw pixel values
     private val _positionX = MutableStateFlow((754f) / 1536f)
@@ -77,6 +101,52 @@ class MapViewModel(wifiViewModel: WifiViewModel) : ViewModel() {
         lockedOnPosition = value
     }
 
+    fun updateUiState(state: UIState) {
+        uiState = state
+    }
+
+    // Screen Size Functions
+    fun updateScreenSize(width: Float, height: Float) {
+        screenSizeWidth = width
+        screenSizeHeight = height
+    }
+
+    fun updateMapImageSize(width: Float, height: Float) {
+        mapImageSizeWidth = width
+        mapImageSizeHeight = height
+    }
+
+    // Navigation functions
+    fun updateNavDestinationNode(n: Node) {
+        currentNavDestinationNode = n
+    }
+
+    fun viewDestinationNode(node: Node) {
+        updateLockedOnPosition(false)
+        updateUiState(UIState.NAVIGATION_PREVIEW)
+        updateNavDestinationNode(node)
+        setFloor(node.floor)
+
+        val newZoom = 6f
+
+        val widthOffset = (screenSizeWidth / 2) / newZoom
+        val heightOffset = (screenSizeHeight / 2) / newZoom
+
+        val x = (((754f + node.x) / 1536f) * mapImageSizeWidth) - widthOffset
+        val y = (((1330f - node.y) / 1536f) * mapImageSizeHeight) - heightOffset
+
+        val localOffset = Offset(x, y)
+        val localZoom = newZoom
+        val localAngle = 0f
+
+        updateOffset(localOffset)
+        updateZoom(localZoom)
+        updateAngle(localAngle)
+
+        Log.d("MAP VIEWMODEL", "VIEW DESTINATION ${localOffset} ${localZoom} ${localAngle}")
+    }
+
+    // Wifi Location Prediction Function
     private fun startPredictingLocation() {
         viewModelScope.launch {
             while (true) {
