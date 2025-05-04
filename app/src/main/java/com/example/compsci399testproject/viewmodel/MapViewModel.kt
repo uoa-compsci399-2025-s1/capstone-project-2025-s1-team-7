@@ -57,6 +57,13 @@ class MapViewModel(wifiViewModel: WifiViewModel) : ViewModel() {
     var mapImageSizeWidth by mutableStateOf(0f)
     var mapImageSizeHeight by mutableStateOf(0f)
 
+    // Actual Map Image Size in Pixels
+    var actualImageSizeWidth by mutableStateOf(1536f)
+    var actualImageSizeHeight by mutableStateOf(1536f)
+
+    var origin_x by mutableStateOf(754f);
+    var origin_y by mutableStateOf(1330f);
+
     // Navigation
     var currentNavDestinationNode by mutableStateOf(Node("", 0, 0, 0, NodeType.ROOM, mutableListOf()))
 
@@ -66,10 +73,10 @@ class MapViewModel(wifiViewModel: WifiViewModel) : ViewModel() {
 
     // Position X and Y take percentage values
     // This is because the image scaling is different and can't use the raw pixel values
-    private val _positionX = MutableStateFlow((754f) / 1536f)
+    private val _positionX = MutableStateFlow((origin_x) / actualImageSizeWidth)
     val positionX: StateFlow<Float> = _positionX.asStateFlow()
 
-    private val _positionY = MutableStateFlow((1330f) / 1536f)
+    private val _positionY = MutableStateFlow((origin_y) / actualImageSizeHeight)
     val positionY: StateFlow<Float> = _positionY.asStateFlow()
 
     private val _positionFloor = MutableStateFlow(0)
@@ -152,7 +159,7 @@ class MapViewModel(wifiViewModel: WifiViewModel) : ViewModel() {
         updateNavDestinationNode(node)
         setFloor(node.floor)
 
-        updateMapOffset((((754f + node.x) / 1536f) * mapImageSizeWidth), (((1330f - node.y) / 1536f) * mapImageSizeHeight), 6f)
+        updateMapOffset((((origin_x + node.x) / actualImageSizeWidth) * mapImageSizeWidth), (((origin_y - node.y) / actualImageSizeHeight) * mapImageSizeHeight), 6f)
 
         Log.d("MAP VIEWMODEL", "VIEW DESTINATION ${offset} ${zoom} ${angle} | NODE ${node.id} ${node.x}, ${node.y}")
     }
@@ -178,8 +185,8 @@ class MapViewModel(wifiViewModel: WifiViewModel) : ViewModel() {
         val path = Path()
 
         for (node in nodeList) {
-            val x = (((754f + node.x) / 1536f) * mapImageSizeWidth)
-            val y = (((1330f - node.y) / 1536f) * mapImageSizeHeight)
+            val x = (((origin_x + node.x) / actualImageSizeWidth) * mapImageSizeWidth)
+            val y = (((origin_y - node.y) / actualImageSizeHeight) * mapImageSizeHeight)
 
             path.lineTo(x, y)
         }
@@ -209,8 +216,8 @@ class MapViewModel(wifiViewModel: WifiViewModel) : ViewModel() {
 
                             Log.d("predictor", "Predicted X: $x, Y: $y, Floor: $floor")
 
-                            _positionX.value = (754f + x) / 1536f
-                            _positionY.value = (1330f - y) / 1536f
+                            _positionX.value = (origin_x + x) / actualImageSizeWidth
+                            _positionY.value = (origin_y - y) / actualImageSizeHeight
                             _positionFloor.value = floor
 
                             if (lockedOnPosition) {setFloor(floor)}
