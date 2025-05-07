@@ -431,9 +431,9 @@ fun SearchBar(modifier: Modifier, searchText: String, updateSearchText: (String)
                     searchFocused = it.isFocused
                 },
             colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = colorResource(id = R.color.dark_blue),
+                focusedBorderColor = colorResource(id = R.color.light_blue),
                 unfocusedBorderColor = colorResource(id = R.color.light_blue),
-                cursorColor = colorResource(id = R.color.dark_blue),
+                cursorColor = colorResource(id = R.color.light_blue),
                 focusedContainerColor = colorResource(id = R.color.darker_white),
                 unfocusedContainerColor = colorResource(id = R.color.darker_white)
             ),
@@ -448,7 +448,7 @@ fun SearchBar(modifier: Modifier, searchText: String, updateSearchText: (String)
             .offset(x = 0.dp, y = 62.dp)
             .clip(shape = RoundedCornerShape(8.dp))
             .background(color = colorResource(id = R.color.darker_white), shape = RoundedCornerShape(8.dp))
-            .border(2.dp, color = colorResource(id = R.color.dark_blue), shape = RoundedCornerShape(8.dp)),
+            .border(2.dp, color = colorResource(id = R.color.light_blue), shape = RoundedCornerShape(8.dp)),
         ) {
 
             items(searchResults) { node ->
@@ -478,7 +478,7 @@ fun PreviewNavigationSearchBar(modifier: Modifier, destinationNode: Node,
         .width(if (uiState.equals(UIState.NAVIGATION_PREVIEW)) 280.dp else 0.dp)
         .height(120.dp)
         .background(color = colorResource(id = R.color.darker_white), shape = RoundedCornerShape(6.dp))
-        .border(color = colorResource(id = R.color.dark_blue), width = 2.dp, shape = RoundedCornerShape(6.dp)),
+        .border(color = colorResource(id = R.color.light_blue), width = 2.dp, shape = RoundedCornerShape(6.dp)),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text("From Current Location", modifier.fillMaxWidth().offset(x = 0.dp, y = 10.dp), textAlign = TextAlign.Center)
@@ -514,7 +514,7 @@ fun NavigationTopBar(modifier: Modifier, destinationNode: Node,
         .width(if (uiState.equals(UIState.NAVIGATING)) 280.dp else 0.dp)
         .height(100.dp)
         .background(color = colorResource(id = R.color.darker_white), shape = RoundedCornerShape(6.dp))
-        .border(color = colorResource(id = R.color.dark_blue), width = 2.dp, shape = RoundedCornerShape(6.dp)),
+        .border(color = colorResource(id = R.color.light_blue), width = 2.dp, shape = RoundedCornerShape(6.dp)),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text("Navigating to " + destinationNode.id, modifier.fillMaxWidth().offset(x = 0.dp, y = 20.dp), textAlign = TextAlign.Center)
