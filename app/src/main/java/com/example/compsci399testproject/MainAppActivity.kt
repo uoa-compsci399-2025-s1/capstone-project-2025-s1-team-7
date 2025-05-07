@@ -44,6 +44,7 @@ import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.graphicsLayer
@@ -214,36 +215,16 @@ fun MapImageView(
                 //.background(color = Color.Blue)
         )
 
+        // Navigation path
         val pathColor = colorResource(id = R.color.dark_blue)
 
         Spacer(modifier = Modifier.fillMaxSize().drawWithContent {
             if (uiState.equals(UIState.NAVIGATING)) {
-                drawPath(path = navigationPath, color = pathColor, style = Stroke(1.dp.toPx()))
+                drawPath(path = navigationPath, color = pathColor, style = Stroke(1.dp.toPx(), pathEffect = PathEffect.cornerPathEffect(2.dp.toPx())))
             }
         })
 
-
-
-        Image(painter = painterResource(id = R.drawable.position_icon),
-            contentDescription = "${floor} image",
-            modifier = Modifier
-                .alpha(if (floor != positionFloor) 0f else 1f)
-                .size(positionIconSizeX, positionIconSizeY)
-                .offset(positionIconPosX, positionIconPosY)
-                .graphicsLayer {
-                    rotationZ = rotation
-                }
-        )
-
-        Box(modifier = Modifier
-            .width(4.dp)
-            .height(if (uiState.equals(UIState.NAVIGATION_PREVIEW) && floor == navigationNode.floor) 4.dp else 0.dp)
-            .offset(x = (((754f + navigationNode.x) / 1536f) * floorImageSizeWidth) - 2.dp,
-                y = (((1330f - navigationNode.y) / 1536f) * floorImageSizeHeight) - 2.dp)
-            .background(color = colorResource(id = R.color.light_blue), shape = RoundedCornerShape(6.dp))
-        )
-
-        // Navigation end path
+        // Navigation end path icon, shows arrow if user has to change floors
         Box(modifier = Modifier
             .width(4.dp)
             .height(if (uiState.equals(UIState.NAVIGATING)) 4.dp else 0.dp)
@@ -278,6 +259,25 @@ fun MapImageView(
 
             }.fillMaxSize())
         }
+
+        Image(painter = painterResource(id = R.drawable.position_icon),
+            contentDescription = "${floor} image",
+            modifier = Modifier
+                .alpha(if (floor != positionFloor) 0f else 1f)
+                .size(positionIconSizeX, positionIconSizeY)
+                .offset(positionIconPosX, positionIconPosY)
+                .graphicsLayer {
+                    rotationZ = rotation
+                }
+        )
+
+        Box(modifier = Modifier
+            .width(4.dp)
+            .height(if (uiState.equals(UIState.NAVIGATION_PREVIEW) && floor == navigationNode.floor) 4.dp else 0.dp)
+            .offset(x = (((754f + navigationNode.x) / 1536f) * floorImageSizeWidth) - 2.dp,
+                y = (((1330f - navigationNode.y) / 1536f) * floorImageSizeHeight) - 2.dp)
+            .background(color = colorResource(id = R.color.light_blue), shape = RoundedCornerShape(6.dp))
+        )
     }
 }
 
