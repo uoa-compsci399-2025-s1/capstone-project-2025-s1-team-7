@@ -230,6 +230,7 @@ class MapViewModel(wifiViewModel: WifiViewModel) : ViewModel() {
         arrayList.add(Node("0T1", 10, 66, 0, NodeType.TRAVEL, mutableListOf()))
         arrayList.add(Node("0T2", 16, 264, 0, NodeType.TRAVEL, mutableListOf()))
         arrayList.add(Node("0T3", 82, 371, 0, NodeType.TRAVEL, mutableListOf()))
+        arrayList.add(Node("0T3", 62, 388, 0, NodeType.TRAVEL, mutableListOf()))
         arrayList.add(Node("0S1", 18, 330, 0, NodeType.STAIRS, mutableListOf()))
 
         arrayList.add(Node("1T1", 47, 352, 1, NodeType.TRAVEL, mutableListOf()))
