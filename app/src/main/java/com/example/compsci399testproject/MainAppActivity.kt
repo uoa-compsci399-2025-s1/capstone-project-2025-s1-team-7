@@ -40,18 +40,13 @@ import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.drawWithCache
+import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.draw.drawWithContent
-import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusModifier
-import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
-import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.modifier.modifierLocalMapOf
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
@@ -91,6 +86,8 @@ fun MapImageView(
     uiState: UIState,
     navigationNode: Node,
     navigationPath: Path,
+    currentFloorPathEndNode: Node,
+    nextFloorPathEndNode: Node,
     drawNavPath: (Int) -> Unit,
     mapImageSizeWidth: Dp,
     mapImageSizeHeight: Dp
@@ -245,6 +242,42 @@ fun MapImageView(
                 y = (((1330f - navigationNode.y) / 1536f) * floorImageSizeHeight) - 2.dp)
             .background(color = colorResource(id = R.color.light_blue), shape = RoundedCornerShape(6.dp))
         )
+
+        // Navigation end path
+        Box(modifier = Modifier
+            .width(4.dp)
+            .height(if (uiState.equals(UIState.NAVIGATING)) 4.dp else 0.dp)
+            .offset(x = (((754f + currentFloorPathEndNode.x) / 1536f) * floorImageSizeWidth) - 2.dp,
+                y = (((1330f - currentFloorPathEndNode.y) / 1536f) * floorImageSizeHeight) - 2.dp)
+            .background(color = colorResource(id = R.color.dark_blue), shape = RoundedCornerShape(6.dp))
+        ) {
+
+            val arrowColor = colorResource(id = R.color.darker_white)
+
+            Box(modifier = Modifier.alpha(if (uiState.equals(UIState.NAVIGATING)) 1f else 0f).drawBehind {
+                val sideWidthOffset = 2f
+                val sideHeightOffset = 2f
+                val topOffset = 3f
+
+                if (!nextFloorPathEndNode.type.equals(NodeType.NULL)) {
+                    val path = Path()
+
+                    if (nextFloorPathEndNode.floor < currentFloorPathEndNode.floor) { // Going down a floor
+                        path.moveTo(sideWidthOffset, (size.height / 2) - sideHeightOffset)
+                        path.lineTo((size.width / 2), size.height - topOffset)
+                        path.lineTo((size.width) - sideWidthOffset, (size.height / 2) - sideHeightOffset)
+                    } else { // Going up a floor
+                        path.moveTo(sideWidthOffset, (size.height / 2) + sideHeightOffset)
+                        path.lineTo((size.width / 2), topOffset)
+                        path.lineTo((size.width) - sideWidthOffset, (size.height / 2) + sideHeightOffset)
+                    }
+
+                    drawPath(path, arrowColor, style = Stroke(width = 1f))
+                }
+
+
+            }.fillMaxSize())
+        }
     }
 }
 
@@ -566,6 +599,8 @@ fun MapView(viewModel: MapViewModel = viewModel()) {
             uiState = viewModel.uiState,
             navigationNode = viewModel.currentNavDestinationNode,
             navigationPath = viewModel.navigationPath,
+            currentFloorPathEndNode = viewModel.currentFloorPathEndNode,
+            nextFloorPathEndNode = viewModel.nextFloorPathEndNode,
             drawNavPath = {viewModel.drawNavPath(it)},
             mapImageSizeWidth = floorImageSizeWidth,
             mapImageSizeHeight = floorImageSizeHeight

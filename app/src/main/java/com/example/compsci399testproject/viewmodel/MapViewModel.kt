@@ -70,6 +70,8 @@ class MapViewModel(wifiViewModel: WifiViewModel) : ViewModel() {
     var currentNavDestinationNode by mutableStateOf(Node("", 0, 0, 0, NodeType.ROOM, mutableListOf()))
     var navigationNodeList : List<Node> = ArrayList<Node>()
     var navigationPath = Path()
+    var currentFloorPathEndNode = Node("", 0, 0, 0, NodeType.NULL, mutableListOf())
+    var nextFloorPathEndNode = Node("", 0, 0, 0, NodeType.NULL, mutableListOf())
 
     // Position
     private var rawPositionX: Float by mutableFloatStateOf(0f)
@@ -207,12 +209,16 @@ class MapViewModel(wifiViewModel: WifiViewModel) : ViewModel() {
             val node = navigationNodeList.get(i)
 
             if (node.floor != currentFloor) {
+                nextFloorPathEndNode = node
                 break
             }
 
             val x = (((origin_x + node.x) / actualImageSizeWidth) * mapImageSizeWidth)
             val y = (((origin_y - node.y) / actualImageSizeHeight) * mapImageSizeHeight)
             path.lineTo(x, y)
+
+            currentFloorPathEndNode = node
+            nextFloorPathEndNode = Node("", 0, 0, 0, NodeType.NULL, mutableListOf())
         }
 
         navigationPath = path
