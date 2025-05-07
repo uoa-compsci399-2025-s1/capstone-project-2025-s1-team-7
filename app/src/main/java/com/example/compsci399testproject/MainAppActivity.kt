@@ -15,7 +15,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.graphics.asImageBitmap
 import android.graphics.BitmapFactory
-import android.graphics.Path
+import androidx.compose.ui.graphics.Path
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.animation.animateContentSize
@@ -90,6 +90,8 @@ fun MapImageView(
     changeLockOnPosition: (Boolean) -> Unit,
     uiState: UIState,
     navigationNode: Node,
+    navigationPath: Path,
+    drawNavPath: (Int) -> Unit,
     mapImageSizeWidth: Dp,
     mapImageSizeHeight: Dp
 ) {
@@ -190,6 +192,8 @@ fun MapImageView(
                 localZoom = zoom
                 localAngle = angle
 
+                // Also update the UI path when the user is navigating, should be changed later
+                drawNavPath(floor)
             }
 
             translationX = -offset.x * zoom
@@ -213,9 +217,11 @@ fun MapImageView(
                 //.background(color = Color.Blue)
         )
 
-        Spacer(modifier = Modifier.fillMaxSize().drawWithCache {
-            onDrawBehind {
-                //drawPath(path, Color.Green, style = Stroke(2.dp.toPx()))
+        val pathColor = colorResource(id = R.color.dark_blue)
+
+        Spacer(modifier = Modifier.fillMaxSize().drawWithContent {
+            if (uiState.equals(UIState.NAVIGATING)) {
+                drawPath(path = navigationPath, color = pathColor, style = Stroke(1.dp.toPx()))
             }
         })
 
@@ -559,6 +565,8 @@ fun MapView(viewModel: MapViewModel = viewModel()) {
             changeLockOnPosition = {viewModel.updateLockedOnPosition(it)},
             uiState = viewModel.uiState,
             navigationNode = viewModel.currentNavDestinationNode,
+            navigationPath = viewModel.navigationPath,
+            drawNavPath = {viewModel.drawNavPath(it)},
             mapImageSizeWidth = floorImageSizeWidth,
             mapImageSizeHeight = floorImageSizeHeight
         )

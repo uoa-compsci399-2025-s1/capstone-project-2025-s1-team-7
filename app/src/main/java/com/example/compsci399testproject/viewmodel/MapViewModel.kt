@@ -1,10 +1,12 @@
 package com.example.compsci399testproject.viewmodel
 
-import android.graphics.Path
+import androidx.compose.ui.graphics.Path
 import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.unit.dp
@@ -66,6 +68,8 @@ class MapViewModel(wifiViewModel: WifiViewModel) : ViewModel() {
 
     // Navigation
     var currentNavDestinationNode by mutableStateOf(Node("", 0, 0, 0, NodeType.ROOM, mutableListOf()))
+    var navigationNodeList : List<Node> = ArrayList<Node>()
+    var navigationPath = Path()
 
     // Position
     private var rawPositionX: Float by mutableFloatStateOf(0f)
@@ -172,26 +176,67 @@ class MapViewModel(wifiViewModel: WifiViewModel) : ViewModel() {
         )
         Log.d("MAP VIEWMODEL", "NAV CURRENT POSITION NODE ${rawPositionX.toInt()}, ${rawPositionY.toInt()}| FLOOR ${positionFloor.value}")
         Log.d("MAP VIEWMODEL", "NAV DESTINATION NODE ${currentNavDestinationNode.x} ${currentNavDestinationNode.y}, ${currentNavDestinationNode.floor}")
-        val pathNodeList: List<Node> = getPath(currentPositionNode, currentNavDestinationNode, navigationGraph)
 
-        Log.d("MAP VIEWMODEL", "PATH NODE LIST ${pathNodeList}")
+        //val pathNodeList: List<Node> = getPath(currentPositionNode, currentNavDestinationNode, navigationGraph)
+        val pathNodeList: List<Node> = createCustomNavNodeList()
+        navigationNodeList = pathNodeList
 
-        //setFloor(positionFloor.value)
-        //updateMapOffset(positionX.value, positionY.value, 6f)
+        setFloor(positionFloor.value)
+        updateLockedOnPosition(true)
     }
 
-
-    fun createNavigationPath(nodeList: List<Node>): Path {
+    fun drawNavPath(floor: Int) {
         val path = Path()
+        var index = 0
 
-        for (node in nodeList) {
+        // Set starting position
+        for (node in navigationNodeList) {
+            index += 1
+            if (node.floor == currentFloor) {
+
+                val startX = (((origin_x + node.x) / actualImageSizeWidth) * mapImageSizeWidth)
+                val startY = (((origin_y - node.y) / actualImageSizeWidth) * mapImageSizeWidth)
+                path.moveTo(startX, startY)
+
+                break
+            }
+        }
+
+        // Loop through nodes on current floor to create Path UI
+        for (i: Int in index..<navigationNodeList.size) {
+            val node = navigationNodeList.get(i)
+
+            if (node.floor != currentFloor) {
+                break
+            }
+
             val x = (((origin_x + node.x) / actualImageSizeWidth) * mapImageSizeWidth)
             val y = (((origin_y - node.y) / actualImageSizeHeight) * mapImageSizeHeight)
-
             path.lineTo(x, y)
         }
 
-        return path
+        navigationPath = path
+    }
+
+    fun createCustomNavNodeList() : List<Node> { // For testing the path UI
+        var arrayList: ArrayList<Node> = ArrayList<Node>()
+
+        arrayList.add(Node("0T1", 10, 66, 0, NodeType.TRAVEL, mutableListOf()))
+        arrayList.add(Node("0T2", 16, 264, 0, NodeType.TRAVEL, mutableListOf()))
+        arrayList.add(Node("0T3", 82, 371, 0, NodeType.TRAVEL, mutableListOf()))
+        arrayList.add(Node("0S1", 18, 330, 0, NodeType.STAIRS, mutableListOf()))
+
+        arrayList.add(Node("1T1", 47, 352, 1, NodeType.TRAVEL, mutableListOf()))
+        arrayList.add(Node("1T2", 31, 363, 1, NodeType.TRAVEL, mutableListOf()))
+        arrayList.add(Node("1T3", 10, 313, 1, NodeType.TRAVEL, mutableListOf()))
+        arrayList.add(Node("1S1", -22, 270, 1, NodeType.STAIRS, mutableListOf()))
+
+        arrayList.add(Node("2T1", -34, 252, 2, NodeType.TRAVEL, mutableListOf()))
+        arrayList.add(Node("2T2", -75, 196, 2, NodeType.TRAVEL, mutableListOf()))
+        arrayList.add(Node("2T3", -70, 148, 2, NodeType.TRAVEL, mutableListOf()))
+        arrayList.add(Node("Room 1", -56, 116, 2, NodeType.ROOM, mutableListOf()))
+
+        return arrayList
     }
 
 
