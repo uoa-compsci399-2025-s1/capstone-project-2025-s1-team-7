@@ -16,8 +16,33 @@ data class EdgeJson(
     val to: String,
     val weight: Float
 )
-fun loadNodesFromJson(context: Context): List<NodeJson> {
-    val jsonString = context.assets.open("Nodes/nodes.json").bufferedReader().use { it.readText() }
+fun loadNodesFromJson(): List<NodeJson> {
+    val jsonString = object {}.javaClass.getResource("/Nodes/nodes.json")?.readText()
+        ?: throw IllegalStateException("Could not load nodes.json")
     val type = object : TypeToken<List<NodeJson>>() {}.type
     return Gson().fromJson(jsonString, type)
+}
+fun loadTestNodes(): List<NodeJson> {
+    return listOf(
+        NodeJson(
+            id = "302 280",
+            x = 280,
+            y = 302,
+            floor = 2,
+            type = "ROOM",
+            edges = listOf(
+                EdgeJson("travel1", 1.0f)
+            )
+        ),
+        NodeJson(
+            id = "travel1",
+            x = 400,
+            y = 0,
+            floor = 2,
+            type = "TRAVEL",
+            edges = listOf(
+                EdgeJson("302 280", 1.0f)
+            )
+        )
+    )
 }
