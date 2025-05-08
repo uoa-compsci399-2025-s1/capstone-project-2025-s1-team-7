@@ -53,13 +53,15 @@ fun dijkstra(graph: MutableMap<String, Node>, start: Node, goal: Node): MutableL
                 minNode = node
             }
         }
+        unseenNodes.remove(minNode?.id)
+
         for (edge in minNode?.edges!!) {
             val newDistance = (shortestDistance[minNode] ?: Int.MAX_VALUE) + edge.weight
             if (newDistance < (shortestDistance[edge.to] ?: Int.MAX_VALUE)) {
                 shortestDistance[edge.to] = newDistance.toInt()
                 predecessor[edge.to.id] = minNode
             }
-            unseenNodes.remove(minNode.id)
+
         }
     }
     var currentNode: Node? = goal
