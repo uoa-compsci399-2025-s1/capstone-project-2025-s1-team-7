@@ -513,7 +513,7 @@ fun MapView(viewModel: MapViewModel = viewModel()) {
     val positionFloor by viewModel.positionFloor.collectAsState()
     val rotation by viewModel.rotation.collectAsState()
 
-    val navigationGraph: NavigationGraph = remember {initialiseGraph(context)}
+    val navigationGraph: NavigationGraph = remember {initialiseGraph()}
     val rooms: List<Node> = remember { getRoomNodes(navigationGraph) }
 
     var searchText: String by remember { mutableStateOf("") }
