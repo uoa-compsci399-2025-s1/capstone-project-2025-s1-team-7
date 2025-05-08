@@ -45,14 +45,6 @@ class NavigationActivityTest {
             type = NodeType.TRAVEL,
             edges = mutableListOf()
         )
-        navigationGraph.addNodeToGraph(startNode)
-
-        // Connect start node to nearest node
-        val travel1 = navigationGraph.findNode("travel1")
-        val distance = calculateDistance(startNode, travel1)
-        startNode.edges.add(Edge(travel1, distance))
-        travel1.edges.add(Edge(startNode, distance))
-
         // Get the target node
         val targetNode = navigationGraph.findNode("302 280")
 
@@ -71,11 +63,5 @@ class NavigationActivityTest {
             val nextNode = path[i + 1]
             assertTrue(currentNode.edges.any { it.to == nextNode })
         }
-    }
-
-    private fun calculateDistance(node1: Node, node2: Node): Float {
-        val dx = node1.x - node2.x
-        val dy = node1.y - node2.y
-        return kotlin.math.sqrt((dx * dx + dy * dy).toDouble()).toFloat()
     }
 }
