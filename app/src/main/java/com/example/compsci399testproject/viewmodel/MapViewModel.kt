@@ -161,11 +161,11 @@ class MapViewModel(wifiViewModel: WifiViewModel) : ViewModel() {
         updateUiState(UIState.NAVIGATING)
 
         val currentPositionNode = Node(id = "Start Node", x = rawPositionX.toInt(), y = rawPositionY.toInt(),
-            floor = positionFloor.value, type = NodeType.ROOM, mutableListOf()
+            floor = positionFloor.value, type = NodeType.TRAVEL, mutableListOf()
         )
         Log.d("MAP VIEWMODEL", "NAV CURRENT POSITION NODE ${rawPositionX.toInt()}, ${rawPositionY.toInt()}| FLOOR ${positionFloor.value}")
         Log.d("MAP VIEWMODEL", "NAV DESTINATION NODE ${currentNavDestinationNode.x} ${currentNavDestinationNode.y}, ${currentNavDestinationNode.floor}")
-        val pathNodeList: List<Node> = getPath(currentPositionNode, currentNavDestinationNode, navigationGraph)
+        val pathNodeList = getPath(currentPositionNode, currentNavDestinationNode, navigationGraph)
 
         Log.d("MAP VIEWMODEL", "PATH NODE LIST ${pathNodeList}")
 
