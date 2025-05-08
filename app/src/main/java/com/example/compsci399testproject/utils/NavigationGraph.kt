@@ -21,9 +21,9 @@ class NavigationGraph {
         return retNode ?: throw NoSuchElementException("Node with id $id not found")
     }
 }
-fun initialiseGraph(context: Context): NavigationGraph {
+fun initialiseGraph(useTestData: Boolean = false): NavigationGraph {
     val navigationGraph = NavigationGraph()
-    val nodesJson = loadNodesFromJson(context)
+    val nodesJson = if (useTestData) loadTestNodes() else loadNodesFromJson()
 
     val nodes = nodesJson.map { nodeJson ->
         Node(
