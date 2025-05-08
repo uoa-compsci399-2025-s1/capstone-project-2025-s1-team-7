@@ -88,8 +88,6 @@ class MainActivity : ComponentActivity() {
         val mapFactory = MapViewModelFactory(wifiViewModel)
         mapViewModel = ViewModelProvider(this, mapFactory)[MapViewModel::class.java]
 
-        val navigationGraph = initialiseGraph(applicationContext)
-
         setContent {
             val navController = rememberNavController()
 
