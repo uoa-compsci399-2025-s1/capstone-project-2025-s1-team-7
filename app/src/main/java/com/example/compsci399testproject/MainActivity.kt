@@ -34,6 +34,8 @@ import android.util.Log
 import androidx.annotation.RequiresPermission
 import androidx.core.content.ContextCompat
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.vector.VectorProperty
+import com.example.compsci399testproject.sensors.RotationSensorService
 import com.example.compsci399testproject.utils.initialiseGraph
 import com.example.compsci399testproject.viewmodel.MapViewModel
 import com.example.compsci399testproject.viewmodel.MapViewModelFactory
@@ -44,6 +46,8 @@ class MainActivity : ComponentActivity() {
     private lateinit var wifiViewModel: WifiViewModel
 
     private lateinit var mapViewModel: MapViewModel
+
+    private lateinit var rotationService: RotationSensorService
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -87,6 +91,8 @@ class MainActivity : ComponentActivity() {
 
         val mapFactory = MapViewModelFactory(wifiViewModel)
         mapViewModel = ViewModelProvider(this, mapFactory)[MapViewModel::class.java]
+
+        rotationService = RotationSensorService(applicationContext)
 
         setContent {
             val navController = rememberNavController()

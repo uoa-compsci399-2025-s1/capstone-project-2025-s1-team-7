@@ -15,7 +15,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.graphics.asImageBitmap
 import android.graphics.BitmapFactory
-import android.graphics.Path
+import androidx.compose.ui.graphics.Path
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.animation.animateContentSize
@@ -40,18 +40,14 @@ import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.drawWithCache
+import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.draw.drawWithContent
-import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusModifier
-import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
-import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.modifier.modifierLocalMapOf
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
@@ -90,6 +86,10 @@ fun MapImageView(
     changeLockOnPosition: (Boolean) -> Unit,
     uiState: UIState,
     navigationNode: Node,
+    navigationPath: Path,
+    currentFloorPathEndNode: Node,
+    nextFloorPathEndNode: Node,
+    drawNavPath: (Int) -> Unit,
     mapImageSizeWidth: Dp,
     mapImageSizeHeight: Dp
 ) {
@@ -190,6 +190,8 @@ fun MapImageView(
                 localZoom = zoom
                 localAngle = angle
 
+                // Also update the UI path when the user is navigating, should be changed later
+                drawNavPath(floor)
             }
 
             translationX = -offset.x * zoom
@@ -213,13 +215,50 @@ fun MapImageView(
                 //.background(color = Color.Blue)
         )
 
-        Spacer(modifier = Modifier.fillMaxSize().drawWithCache {
-            onDrawBehind {
-                //drawPath(path, Color.Green, style = Stroke(2.dp.toPx()))
+        // Navigation path
+        val pathColor = colorResource(id = R.color.dark_blue)
+
+        Spacer(modifier = Modifier.fillMaxSize().drawWithContent {
+            if (uiState.equals(UIState.NAVIGATING)) {
+                drawPath(path = navigationPath, color = pathColor, style = Stroke(1.dp.toPx(), pathEffect = PathEffect.cornerPathEffect(2.dp.toPx())))
             }
         })
 
+        // Navigation end path icon, shows arrow if user has to change floors
+        Box(modifier = Modifier
+            .width(4.dp)
+            .height(if (uiState.equals(UIState.NAVIGATING)) 4.dp else 0.dp)
+            .offset(x = (((754f + currentFloorPathEndNode.x) / 1536f) * floorImageSizeWidth) - 2.dp,
+                y = (((1330f - currentFloorPathEndNode.y) / 1536f) * floorImageSizeHeight) - 2.dp)
+            .background(color = colorResource(id = R.color.dark_blue), shape = RoundedCornerShape(6.dp))
+        ) {
 
+            val arrowColor = colorResource(id = R.color.darker_white)
+
+            Box(modifier = Modifier.alpha(if (uiState.equals(UIState.NAVIGATING)) 1f else 0f).drawBehind {
+                val sideWidthOffset = 2f
+                val sideHeightOffset = 2f
+                val topOffset = 3f
+
+                if (!nextFloorPathEndNode.type.equals(NodeType.NULL)) {
+                    val path = Path()
+
+                    if (nextFloorPathEndNode.floor < currentFloorPathEndNode.floor) { // Going down a floor
+                        path.moveTo(sideWidthOffset, (size.height / 2) - sideHeightOffset)
+                        path.lineTo((size.width / 2), size.height - topOffset)
+                        path.lineTo((size.width) - sideWidthOffset, (size.height / 2) - sideHeightOffset)
+                    } else { // Going up a floor
+                        path.moveTo(sideWidthOffset, (size.height / 2) + sideHeightOffset)
+                        path.lineTo((size.width / 2), topOffset)
+                        path.lineTo((size.width) - sideWidthOffset, (size.height / 2) + sideHeightOffset)
+                    }
+
+                    drawPath(path, arrowColor, style = Stroke(width = 1f))
+                }
+
+
+            }.fillMaxSize())
+        }
 
         Image(painter = painterResource(id = R.drawable.position_icon),
             contentDescription = "${floor} image",
@@ -392,9 +431,9 @@ fun SearchBar(modifier: Modifier, searchText: String, updateSearchText: (String)
                     searchFocused = it.isFocused
                 },
             colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = colorResource(id = R.color.dark_blue),
+                focusedBorderColor = colorResource(id = R.color.light_blue),
                 unfocusedBorderColor = colorResource(id = R.color.light_blue),
-                cursorColor = colorResource(id = R.color.dark_blue),
+                cursorColor = colorResource(id = R.color.light_blue),
                 focusedContainerColor = colorResource(id = R.color.darker_white),
                 unfocusedContainerColor = colorResource(id = R.color.darker_white)
             ),
@@ -409,7 +448,7 @@ fun SearchBar(modifier: Modifier, searchText: String, updateSearchText: (String)
             .offset(x = 0.dp, y = 62.dp)
             .clip(shape = RoundedCornerShape(8.dp))
             .background(color = colorResource(id = R.color.darker_white), shape = RoundedCornerShape(8.dp))
-            .border(2.dp, color = colorResource(id = R.color.dark_blue), shape = RoundedCornerShape(8.dp)),
+            .border(2.dp, color = colorResource(id = R.color.light_blue), shape = RoundedCornerShape(8.dp)),
         ) {
 
             items(searchResults) { node ->
@@ -439,7 +478,7 @@ fun PreviewNavigationSearchBar(modifier: Modifier, destinationNode: Node,
         .width(if (uiState.equals(UIState.NAVIGATION_PREVIEW)) 280.dp else 0.dp)
         .height(120.dp)
         .background(color = colorResource(id = R.color.darker_white), shape = RoundedCornerShape(6.dp))
-        .border(color = colorResource(id = R.color.dark_blue), width = 2.dp, shape = RoundedCornerShape(6.dp)),
+        .border(color = colorResource(id = R.color.light_blue), width = 2.dp, shape = RoundedCornerShape(6.dp)),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text("From Current Location", modifier.fillMaxWidth().offset(x = 0.dp, y = 10.dp), textAlign = TextAlign.Center)
@@ -475,7 +514,7 @@ fun NavigationTopBar(modifier: Modifier, destinationNode: Node,
         .width(if (uiState.equals(UIState.NAVIGATING)) 280.dp else 0.dp)
         .height(100.dp)
         .background(color = colorResource(id = R.color.darker_white), shape = RoundedCornerShape(6.dp))
-        .border(color = colorResource(id = R.color.dark_blue), width = 2.dp, shape = RoundedCornerShape(6.dp)),
+        .border(color = colorResource(id = R.color.light_blue), width = 2.dp, shape = RoundedCornerShape(6.dp)),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text("Navigating to " + destinationNode.id, modifier.fillMaxWidth().offset(x = 0.dp, y = 20.dp), textAlign = TextAlign.Center)
@@ -559,6 +598,10 @@ fun MapView(viewModel: MapViewModel = viewModel()) {
             changeLockOnPosition = {viewModel.updateLockedOnPosition(it)},
             uiState = viewModel.uiState,
             navigationNode = viewModel.currentNavDestinationNode,
+            navigationPath = viewModel.navigationPath,
+            currentFloorPathEndNode = viewModel.currentFloorPathEndNode,
+            nextFloorPathEndNode = viewModel.nextFloorPathEndNode,
+            drawNavPath = {viewModel.drawNavPath(it)},
             mapImageSizeWidth = floorImageSizeWidth,
             mapImageSizeHeight = floorImageSizeHeight
         )

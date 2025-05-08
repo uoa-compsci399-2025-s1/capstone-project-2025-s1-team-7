@@ -26,5 +26,6 @@ enum class NodeType {
     ROOM,
     TRAVEL,
     STAIRS,
-    ELEVATOR
+    ELEVATOR,
+    NULL
 }
