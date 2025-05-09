@@ -4,14 +4,14 @@ import com.example.compsci399testproject.utils.Node
 import com.example.compsci399testproject.utils.NodeType
 import com.example.compsci399testproject.utils.getPath
 import com.example.compsci399testproject.utils.getRoomNodes
-import com.example.compsci399testproject.utils.initialiseGraph
+import com.example.compsci399testproject.utils.initialiseTestGraph
 import org.junit.Test
 import org.junit.Assert.*
 class NavigationActivityTest {
     @Test
     fun testGetRoomNodes() {
 
-        val navigationGraph = initialiseGraph(useTestData = true)
+        val navigationGraph = initialiseTestGraph()
 
         // Test the function
         val roomNodes = getRoomNodes(navigationGraph)
@@ -25,7 +25,7 @@ class NavigationActivityTest {
     @Test
     fun testGetPath() {
         // Create test navigation graph with test data
-        val navigationGraph = initialiseGraph(useTestData = true)
+        val navigationGraph = initialiseTestGraph()
 
         // Create a starting location node
         val startNode = Node(
