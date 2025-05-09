@@ -50,7 +50,7 @@ fun dijkstra(graph: MutableMap<String, Node>, start: Node, goal: Node): MutableL
     val visited = mutableSetOf<Node>()
 
     while (queue.isNotEmpty()) {
-        val (current, currentDistance) = queue.poll()
+        val (current, currentDistance) = queue.poll()!!
 
         if (current == goal) { break }
         if (current in visited) { continue }
