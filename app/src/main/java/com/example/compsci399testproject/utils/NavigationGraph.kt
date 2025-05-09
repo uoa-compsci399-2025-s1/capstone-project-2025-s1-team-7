@@ -1,5 +1,7 @@
 package com.example.compsci399testproject.utils
 
+import android.content.Context
+
 
 class NavigationGraph {
     internal val graph = mutableMapOf<String, Node>()
@@ -20,9 +22,9 @@ class NavigationGraph {
         return retNode ?: throw NoSuchElementException("Node with id $id not found")
     }
 }
-fun initialiseGraph(useTestData: Boolean = false): NavigationGraph {
+fun initialiseGraph(context: Context, useTestData: Boolean = false ): NavigationGraph {
     val navigationGraph = NavigationGraph()
-    val nodesJson = if (useTestData) loadTestNodes() else loadNodesFromJson()
+    val nodesJson = if (useTestData) loadTestNodes() else loadNodesFromJson(context)
 
     val nodes = nodesJson.map { nodeJson ->
         Node(

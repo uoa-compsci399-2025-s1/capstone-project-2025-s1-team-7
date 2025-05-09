@@ -2,6 +2,9 @@ package com.example.compsci399testproject.utils
 
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import android.content.Context
+
+import com.example.compsci399testproject.R as r
 
 data class NodeJson(
     val id: String,
@@ -15,9 +18,9 @@ data class EdgeJson(
     val to: String,
     val weight: Float
 )
-fun loadNodesFromJson(): List<NodeJson> {
-    val jsonString = object {}.javaClass.getResource("/Nodes/nodes.json")?.readText()
-        ?: throw IllegalStateException("Could not load nodes.json")
+fun loadNodesFromJson(context: Context): List<NodeJson> {
+    val inputStream = context.resources.openRawResource(r.raw.nodes)
+    val jsonString = inputStream.bufferedReader().use { it.readText() }
     val type = object : TypeToken<List<NodeJson>>() {}.type
     return Gson().fromJson(jsonString, type)
 }
