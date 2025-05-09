@@ -55,4 +55,21 @@ class NavigationActivityTest {
             assertTrue(currentNode.edges.any { it.to == nextNode })
         }
     }
+    @Test
+    fun testGetPathx10() {}
+    @Test
+    fun testIfOutside() {}
+    @Test
+    fun testDifferentFloors() {}
+    @Test
+    fun testElevatosr() {}
+    @Test
+    fun testStairs() {}
+    @Test
+    fun testGetClosestNodesAA() { // Annoying Areas eg. ping pong
+    }
+    @Test
+    fun testRerouting() { // rerun from new location without changing destination)
+    }
+
 }
