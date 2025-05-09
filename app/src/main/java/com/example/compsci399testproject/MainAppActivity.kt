@@ -227,7 +227,7 @@ fun MapImageView(
         // Navigation end path icon, shows arrow if user has to change floors
         Box(modifier = Modifier
             .width(4.dp)
-            .height(if (uiState.equals(UIState.NAVIGATING)) 4.dp else 0.dp)
+            .height(if (uiState.equals(UIState.NAVIGATING) && currentFloorPathEndNode.type != NodeType.NULL) 4.dp else 0.dp)
             .offset(x = (((754f + currentFloorPathEndNode.x) / 1536f) * floorImageSizeWidth) - 2.dp,
                 y = (((1330f - currentFloorPathEndNode.y) / 1536f) * floorImageSizeHeight) - 2.dp)
             .background(color = colorResource(id = R.color.dark_blue), shape = RoundedCornerShape(6.dp))

@@ -191,6 +191,7 @@ class MapViewModel(wifiViewModel: WifiViewModel) : ViewModel() {
         val path = Path()
         var index = 0
 
+        var startPositionSet: Boolean = false;
         // Set starting position
         for (node in navigationNodeList) {
             index += 1
@@ -199,9 +200,16 @@ class MapViewModel(wifiViewModel: WifiViewModel) : ViewModel() {
                 val startX = (((origin_x + node.x) / actualImageSizeWidth) * mapImageSizeWidth)
                 val startY = (((origin_y - node.y) / actualImageSizeWidth) * mapImageSizeWidth)
                 path.moveTo(startX, startY)
-
+                startPositionSet = true
                 break
             }
+        }
+
+        if (!startPositionSet) {
+            navigationPath = Path()
+            currentFloorPathEndNode = Node("", 0, 0, 0, NodeType.NULL, mutableListOf())
+            nextFloorPathEndNode = Node("", 0, 0, 0, NodeType.NULL, mutableListOf())
+            return
         }
 
         // Loop through nodes on current floor to create Path UI
