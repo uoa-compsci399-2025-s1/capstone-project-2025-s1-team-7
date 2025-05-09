@@ -11,16 +11,7 @@ class NavigationActivityTest {
     @Test
     fun testGetRoomNodes() {
 
-        val navigationGraph = initialiseGraph()
-
-        // Add test nodes with different types
-        val roomNode = Node("room1", 0, 0, 1, NodeType.ROOM, mutableListOf())
-        val travelNode = Node("travel1", 1, 1, 1, NodeType.TRAVEL, mutableListOf())
-        val stairsNode = Node("stairs1", 2, 2, 1, NodeType.STAIRS, mutableListOf())
-
-        navigationGraph.addNodeToGraph(roomNode)
-        navigationGraph.addNodeToGraph(travelNode)
-        navigationGraph.addNodeToGraph(stairsNode)
+        val navigationGraph = initialiseGraph(useTestData = true)
 
         // Test the function
         val roomNodes = getRoomNodes(navigationGraph)
