@@ -1,5 +1,4 @@
 package com.example.compsci399testproject
-import com.example.compsci399testproject.utils.Edge
 import com.example.compsci399testproject.utils.Node
 import com.example.compsci399testproject.utils.NodeType
 import com.example.compsci399testproject.utils.getPath
@@ -8,6 +7,8 @@ import com.example.compsci399testproject.utils.initialiseTestGraph
 import org.junit.Test
 import org.junit.Assert.*
 class NavigationActivityTest {
+
+class NavigationTests {
     @Test
     fun testGetRoomNodes() {
 
@@ -24,6 +25,7 @@ class NavigationActivityTest {
 
     @Test
     fun testGetPath() {
+
         // Create test navigation graph with test data
         val navigationGraph = initialiseTestGraph()
 
@@ -40,7 +42,12 @@ class NavigationActivityTest {
         val targetNode = navigationGraph.findNode("302 280")
 
         // Get the path
+        val startTime = System.currentTimeMillis()
         val path = getPath(startNode, targetNode, navigationGraph)
+        val endTime = System.currentTimeMillis()
+        val duration = endTime - startTime
+
+        print("getPath took $duration ms")
 
         // Assertions
         assertNotNull(path)
