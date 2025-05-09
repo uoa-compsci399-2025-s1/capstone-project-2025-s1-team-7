@@ -539,8 +539,8 @@ fun MapView(viewModel: MapViewModel = viewModel()) {
 
     viewModel.updateScreenSize(displayMetrics.widthPixels.toFloat(), displayMetrics.heightPixels.toFloat())
 
-    var floorImageSizeWidth = 316.dp
-    var floorImageSizeHeight = 316.dp
+    val floorImageSizeWidth = 316.dp
+    val floorImageSizeHeight = 316.dp
 
     viewModel.updateMapImageSize(with(LocalDensity.current) {floorImageSizeWidth.toPx()}, with(LocalDensity.current) {floorImageSizeHeight.toPx()})
 
@@ -552,7 +552,7 @@ fun MapView(viewModel: MapViewModel = viewModel()) {
     val positionFloor by viewModel.positionFloor.collectAsState()
     val rotation by viewModel.rotation.collectAsState()
 
-    val navigationGraph: NavigationGraph = remember {initialiseGraph()}
+    val navigationGraph: NavigationGraph = remember {initialiseGraph(context)}
     val rooms: List<Node> = remember { getRoomNodes(navigationGraph) }
 
     var searchText: String by remember { mutableStateOf("") }
