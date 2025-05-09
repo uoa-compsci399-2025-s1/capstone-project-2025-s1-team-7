@@ -179,8 +179,8 @@ class MapViewModel(wifiViewModel: WifiViewModel) : ViewModel() {
         Log.d("MAP VIEWMODEL", "NAV CURRENT POSITION NODE ${rawPositionX.toInt()}, ${rawPositionY.toInt()}| FLOOR ${positionFloor.value}")
         Log.d("MAP VIEWMODEL", "NAV DESTINATION NODE ${currentNavDestinationNode.x} ${currentNavDestinationNode.y}, ${currentNavDestinationNode.floor}")
 
-        //val pathNodeList: List<Node> = getPath(currentPositionNode, currentNavDestinationNode, navigationGraph)
-        val pathNodeList: List<Node> = createCustomNavNodeList()
+        val pathNodeList: List<Node> = getPath(currentPositionNode, currentNavDestinationNode, navigationGraph)
+        // val pathNodeList: List<Node> = createCustomNavNodeList()
         navigationNodeList = pathNodeList
 
         setFloor(positionFloor.value)
