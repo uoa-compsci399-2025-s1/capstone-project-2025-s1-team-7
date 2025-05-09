@@ -1,5 +1,7 @@
 package com.example.compsci399testproject.utils
 
+import java.util.PriorityQueue
+
 fun getClosestNodes(location: Node, navigationGraph: NavigationGraph, n: Int = 3) : List<Pair<Node, Float>> {
     return navigationGraph.graph.values
         .filter {it.floor == location.floor} // Only nodes on the same floor
@@ -32,55 +34,50 @@ fun getPath(startNode: Node, goalNode: Node, navigationGraph: NavigationGraph): 
     return (shortestPath)
 }
 fun dijkstra(graph: MutableMap<String, Node>, start: Node, goal: Node): MutableList<Node> {
-    val startNode = Pair(start, 0f)
-    var unvisitedNodes = graph.values.map { Pair(it, Float.POSITIVE_INFINITY) }.toMutableList()
-    val pred = mutableMapOf<String, Node>()
+
+    // Map to store distances from start to each node
+    val distances = mutableMapOf<Node, Float>().withDefault { Float.POSITIVE_INFINITY }
+    distances[start] = 0f
+
+    // Prio queue to store nodes still to visit
+    val queue = PriorityQueue<Pair<Node, Float>>(compareBy { it.second })
+    queue.offer(Pair(start, 0f))
+
+    // Map to store predecessors for path reconstruction
+    val predecessors = mutableMapOf<Node, Node>()
+
+    // Set to keep track of visited nodes
+    val visited = mutableSetOf<Node>()
+
+    while (queue.isNotEmpty()) {
+        val (current, currentDistance) = queue.poll()
+
+        if (current == goal) { break }
+        if (current in visited) { continue }
+
+        visited.add(current)
+
+        // Process each edge from current node
+        for (edge in current.edges) {
+            if (edge.to in visited) continue
+
+            val newDistance = currentDistance + edge.weight
+            if (newDistance < distances.getValue(edge.to)) {
+                distances[edge.to] = newDistance
+                predecessors[edge.to] = current
+                queue.offer(Pair(edge.to, newDistance))
+            }
+        }
+    }
+
+    // Reconstruct the path
     val path = mutableListOf<Node>()
+    var current: Node? = goal
 
-    print("start: ${start.id} goal: ${goal.id}")
-    print("unvisitedNodes: $unvisitedNodes")
-
-    pred[start.id] = start
-    while (unvisitedNodes.isNotEmpty()) {
-        var minNode: Node = start.edges[0].to
-
-        print ("minNode: ${minNode.id}")
-
-        for (edge in minNode.edges) {
-            if (edge.weight < minNode.
-
-            }
-        }
-        unseenNodes.remove(minNode?.id)
-        print(unseenNodes)
-
-        for (edge in minNode?.edges!!) {
-            val newDistance = shortestDistance[minNode]?.plus(edge.weight)
-            if (newDistance != null) {
-                if (newDistance < (shortestDistance[edge.to] ?: Float.POSITIVE_INFINITY)) {
-                    shortestDistance[edge.to] = newDistance
-                    predecessor[edge.to.id] = minNode
-                }
-            }
-
-        }
-    }
-    var currentNode: Node? = goal
-    while (currentNode != start){
-        try {
-            path.add(currentNode!!)
-            currentNode = predecessor[currentNode.id]
-        } catch (e: NoSuchElementException) {
-            println("No path found")
-            break
-        }
+    while (current != null) {
+        path.add(0, current)
+        current = predecessors[current]
     }
 
-    path.add(start)
-    path.reverse()
-
-    if (shortestDistance[goal] != Float.POSITIVE_INFINITY) {
-        println("Shortest path from ${start.id} to ${goal.id} is ${shortestDistance[goal]} with path: $path")
-    }
-    return (path)
+    return if (path.first() == start) path else mutableListOf()
 }
