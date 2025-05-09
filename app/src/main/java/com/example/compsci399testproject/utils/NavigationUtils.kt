@@ -17,16 +17,14 @@ fun getRoomNodes(navigationGraph: NavigationGraph): List<Node> {
         .filter { it.type == NodeType.ROOM }
         .toList()
 }
-fun getPath(startNode: Node, goal: Node, navigationGraph: NavigationGraph): MutableList<Node> {
+fun getPath(startNode: Node, goalNode: Node, navigationGraph: NavigationGraph): MutableList<Node> {
 
     // link location to the graph
     val closestNodes = getClosestNodes(startNode, navigationGraph)
+    print(closestNodes)
     for (edge in closestNodes) {
         startNode.edges.add(Edge(edge.first, edge.second))
     }
-
-    // Find goal node in the graph
-    val goalNode = navigationGraph.findNode(goal.id)
 
     // Get the shortest path
     val shortestPath = dijkstra(navigationGraph.graph, startNode, goalNode)
@@ -34,32 +32,35 @@ fun getPath(startNode: Node, goal: Node, navigationGraph: NavigationGraph): Muta
     return (shortestPath)
 }
 fun dijkstra(graph: MutableMap<String, Node>, start: Node, goal: Node): MutableList<Node> {
-    val unseenNodes = graph
-    val predecessor = mutableMapOf<String, Node?>()
-    val shortestDistance = mutableMapOf<Node, Int>()
+    val startNode = Pair(start, 0f)
+    var unvisitedNodes = graph.values.map { Pair(it, Float.POSITIVE_INFINITY) }.toMutableList()
+    val pred = mutableMapOf<String, Node>()
     val path = mutableListOf<Node>()
 
-    for ((_, node) in unseenNodes) {
-        shortestDistance[node] = Int.MAX_VALUE
-    }
-    shortestDistance[start] = 0
+    print("start: ${start.id} goal: ${goal.id}")
+    print("unvisitedNodes: $unvisitedNodes")
 
-    while (unseenNodes.isNotEmpty()) {
-        var minNode: Node? = null
-        for ((_, node) in unseenNodes) {
-            if (minNode == null){
-                minNode = node
-            }else if ((shortestDistance[node] ?: Int.MAX_VALUE) < (shortestDistance[minNode] ?: Int.MAX_VALUE)) {
-                minNode = node
+    pred[start.id] = start
+    while (unvisitedNodes.isNotEmpty()) {
+        var minNode: Node = start.edges[0].to
+
+        print ("minNode: ${minNode.id}")
+
+        for (edge in minNode.edges) {
+            if (edge.weight < minNode.
+
             }
         }
         unseenNodes.remove(minNode?.id)
+        print(unseenNodes)
 
         for (edge in minNode?.edges!!) {
-            val newDistance = (shortestDistance[minNode] ?: Int.MAX_VALUE) + edge.weight
-            if (newDistance < (shortestDistance[edge.to] ?: Int.MAX_VALUE)) {
-                shortestDistance[edge.to] = newDistance.toInt()
-                predecessor[edge.to.id] = minNode
+            val newDistance = shortestDistance[minNode]?.plus(edge.weight)
+            if (newDistance != null) {
+                if (newDistance < (shortestDistance[edge.to] ?: Float.POSITIVE_INFINITY)) {
+                    shortestDistance[edge.to] = newDistance
+                    predecessor[edge.to.id] = minNode
+                }
             }
 
         }
@@ -78,7 +79,7 @@ fun dijkstra(graph: MutableMap<String, Node>, start: Node, goal: Node): MutableL
     path.add(start)
     path.reverse()
 
-    if (shortestDistance[goal] != Int.MAX_VALUE) {
+    if (shortestDistance[goal] != Float.POSITIVE_INFINITY) {
         println("Shortest path from ${start.id} to ${goal.id} is ${shortestDistance[goal]} with path: $path")
     }
     return (path)
