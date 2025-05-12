@@ -21,6 +21,7 @@ class RotationSensorService(context: Context) : SensorEventListener {
     var azimuth by mutableFloatStateOf(0f) // Heading.
     var pitch by mutableFloatStateOf(0f) // Tilt forward/back.
     var roll by mutableFloatStateOf(0f) // Tilt left/right.
+    var azimuthCompass by mutableFloatStateOf(0f) // Compass heading converted to degrees
 
     fun startListening() {
         rotationSensor?.let {
@@ -41,6 +42,7 @@ class RotationSensorService(context: Context) : SensorEventListener {
             SensorManager.getOrientation(rotationMatrix, orientations)
 
             azimuth = Math.toDegrees(orientations[0].toDouble()).toFloat()
+            azimuthCompass = ((Math.toDegrees(orientations[0].toDouble()) + 360) % 360).toFloat()
             pitch = Math.toDegrees(orientations[1].toDouble()).toFloat()
             roll = Math.toDegrees(orientations[2].toDouble()).toFloat()
         }
