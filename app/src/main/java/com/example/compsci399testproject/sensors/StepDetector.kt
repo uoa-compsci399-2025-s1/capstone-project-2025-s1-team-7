@@ -9,7 +9,9 @@ import kotlin.math.sqrt
 
 class StepDetectionService(
     context: Context,
-    private val onStepDetected: () -> Unit
+    private val onStepDetected: () -> Unit,
+    var useRhythm : Boolean = true
+
 ) : SensorEventListener {
 
     private val sensorManager = context.getSystemService(Context.SENSOR_SERVICE) as SensorManager
@@ -42,8 +44,11 @@ class StepDetectionService(
                 magnitudeHistory.removeAt(0)
             }
 
-            detectStepFromRhythm()
-            // Alt: detectStepFromStagger()
+            if (useRhythm){
+                detectStepFromRhythm()
+            } else {
+                detectStepFromStagger()
+            }
         }
     }
 

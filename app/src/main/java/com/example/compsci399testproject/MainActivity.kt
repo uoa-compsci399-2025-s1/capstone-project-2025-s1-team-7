@@ -114,6 +114,10 @@ class MainActivity : ComponentActivity() {
                     ScanTool(wifiViewModel)
                 }
 
+                composable("SensorTool") {
+                    SensorTool()
+                }
+
                 composable("MainApp") {
                     MapView(mapViewModel)
                 }
@@ -131,6 +135,7 @@ fun Menu(navController: NavController)
         MenuButton(onClick = {navController.navigate("WifiSignals")}, text = "Wi-Fi Signals")
         MenuButton(onClick = {navController.navigate("MapLocation")}, text = "Map Location")
         MenuButton(onClick = {navController.navigate("ScanTool")}, text = "Scan Tool")
+        MenuButton(onClick = {navController.navigate("SensorTool")}, text="Sensor Tool")
         MenuButton(onClick = {navController.navigate("MainApp")}, text = "Main App")
     }
 }
