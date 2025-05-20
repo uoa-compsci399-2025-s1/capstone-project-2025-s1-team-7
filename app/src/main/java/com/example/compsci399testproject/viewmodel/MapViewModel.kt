@@ -67,11 +67,12 @@ class MapViewModel(wifiViewModel: WifiViewModel) : ViewModel() {
     var origin_y by mutableStateOf(1330f);
 
     // Navigation
+    var navigationGraph: NavigationGraph = NavigationGraph()
     var currentNavDestinationNode by mutableStateOf(Node("", 0, 0, 0, NodeType.ROOM, mutableListOf()))
     var navigationNodeList : List<Node> = ArrayList<Node>()
-    var navigationPath = Path()
-    var currentFloorPathEndNode = Node("", 0, 0, 0, NodeType.NULL, mutableListOf())
-    var nextFloorPathEndNode = Node("", 0, 0, 0, NodeType.NULL, mutableListOf())
+    var navigationPath by mutableStateOf(Path())
+    var currentFloorPathEndNode by mutableStateOf(Node("", 0, 0, 0, NodeType.NULL, mutableListOf()))
+    var nextFloorPathEndNode by mutableStateOf(Node("", 0, 0, 0, NodeType.NULL, mutableListOf()))
 
     // Position
     private var rawPositionX: Float by mutableFloatStateOf(0f)
@@ -155,6 +156,11 @@ class MapViewModel(wifiViewModel: WifiViewModel) : ViewModel() {
     }
 
     // Navigation functions
+    fun updateNavigationGraph(ng: NavigationGraph) {
+        navigationGraph = ng
+    }
+
+
     fun updateNavDestinationNode(n: Node) {
         currentNavDestinationNode = n
     }
@@ -170,9 +176,7 @@ class MapViewModel(wifiViewModel: WifiViewModel) : ViewModel() {
         Log.d("MAP VIEWMODEL", "VIEW DESTINATION ${offset} ${zoom} ${angle} | NODE ${node.id} ${node.x}, ${node.y}")
     }
 
-    fun startNavigation(navigationGraph: NavigationGraph) {
-        updateUiState(UIState.NAVIGATING)
-
+    fun createNavPathList() {
         val currentPositionNode = Node(id = "Start Node", x = rawPositionX.toInt(), y = rawPositionY.toInt(),
             floor = positionFloor.value, type = NodeType.TRAVEL, mutableListOf()
         )
@@ -183,11 +187,19 @@ class MapViewModel(wifiViewModel: WifiViewModel) : ViewModel() {
         // val pathNodeList: List<Node> = createCustomNavNodeList()
         navigationNodeList = pathNodeList
 
+        //for (node in navigationNodeList) {
+        //    Log.d("NAVIGATION START", "${node.x}, ${node.y}, ${node.floor}, ${node.type}")
+        //}
+    }
+
+    fun startNavigation() {
+        updateUiState(UIState.NAVIGATING)
+        createNavPathList()
         setFloor(positionFloor.value)
         updateLockedOnPosition(true)
     }
 
-    fun drawNavPath(floor: Int) {
+    fun drawNavPath(floor: Int): Path {
         val path = Path()
         var index = 0
 
@@ -195,28 +207,31 @@ class MapViewModel(wifiViewModel: WifiViewModel) : ViewModel() {
         // Set starting position
         for (node in navigationNodeList) {
             index += 1
-            if (node.floor == currentFloor) {
+            if (node.floor == floor) {
 
                 val startX = (((origin_x + node.x) / actualImageSizeWidth) * mapImageSizeWidth)
                 val startY = (((origin_y - node.y) / actualImageSizeWidth) * mapImageSizeWidth)
                 path.moveTo(startX, startY)
+                currentFloorPathEndNode = node
                 startPositionSet = true
                 break
             }
         }
 
+        //Log.d("DRAW NAV PATH", "START POSITION SET ${startPositionSet}")
+
         if (!startPositionSet) {
             navigationPath = Path()
             currentFloorPathEndNode = Node("", 0, 0, 0, NodeType.NULL, mutableListOf())
             nextFloorPathEndNode = Node("", 0, 0, 0, NodeType.NULL, mutableListOf())
-            return
+            return navigationPath
         }
 
         // Loop through nodes on current floor to create Path UI
         for (i: Int in index..<navigationNodeList.size) {
             val node = navigationNodeList.get(i)
 
-            if (node.floor != currentFloor) {
+            if (node.floor != floor) {
                 nextFloorPathEndNode = node
                 break
             }
@@ -230,6 +245,7 @@ class MapViewModel(wifiViewModel: WifiViewModel) : ViewModel() {
         }
 
         navigationPath = path
+        return navigationPath
     }
 
     fun createCustomNavNodeList() : List<Node> { // For testing the path UI
@@ -271,6 +287,11 @@ class MapViewModel(wifiViewModel: WifiViewModel) : ViewModel() {
                             val x = LocationPredictor.predictX(strengthArray.toFloatArray())
                             val y = LocationPredictor.predictY(strengthArray.toFloatArray())
 
+                            // FOR DEBUG PURPOSES
+                            //val floor = 0
+                            //val x = (rawPositionX + 10f) % 100f
+                            //val y = (rawPositionY + 10f) % 100f
+
                             rawPositionX = x
                             rawPositionY = y
 
@@ -281,6 +302,11 @@ class MapViewModel(wifiViewModel: WifiViewModel) : ViewModel() {
                             _positionFloor.value = floor
 
                             if (lockedOnPosition) {setFloor(floor)}
+
+                            if (uiState == UIState.NAVIGATING) {
+                                createNavPathList()
+                            }
+
                             true
                         } else false
                     }
@@ -290,6 +316,4 @@ class MapViewModel(wifiViewModel: WifiViewModel) : ViewModel() {
             }
         }
     }
-
-
 }

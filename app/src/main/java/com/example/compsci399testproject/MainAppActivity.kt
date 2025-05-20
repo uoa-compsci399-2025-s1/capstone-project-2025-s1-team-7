@@ -89,7 +89,7 @@ fun MapImageView(
     navigationPath: Path,
     currentFloorPathEndNode: Node,
     nextFloorPathEndNode: Node,
-    drawNavPath: (Int) -> Unit,
+    drawNavPath: (Int) -> Path,
     mapImageSizeWidth: Dp,
     mapImageSizeHeight: Dp
 ) {
@@ -189,9 +189,6 @@ fun MapImageView(
                 localOffset = offset
                 localZoom = zoom
                 localAngle = angle
-
-                // Also update the UI path when the user is navigating, should be changed later
-                drawNavPath(floor)
             }
 
             translationX = -offset.x * zoom
@@ -220,7 +217,7 @@ fun MapImageView(
 
         Spacer(modifier = Modifier.fillMaxSize().drawWithContent {
             if (uiState.equals(UIState.NAVIGATING)) {
-                drawPath(path = navigationPath, color = pathColor, style = Stroke(1.dp.toPx(), pathEffect = PathEffect.cornerPathEffect(2.dp.toPx())))
+                drawPath(path = drawNavPath(floor), color = pathColor, style = Stroke(1.dp.toPx(), pathEffect = PathEffect.cornerPathEffect(2.dp.toPx())))
             }
         })
 
@@ -555,6 +552,8 @@ fun MapView(viewModel: MapViewModel = viewModel()) {
     val navigationGraph: NavigationGraph = remember {initialiseGraph(context)}
     val rooms: List<Node> = remember { getRoomNodes(navigationGraph) }
 
+    viewModel.updateNavigationGraph(navigationGraph)
+
     var searchText: String by remember { mutableStateOf("") }
     var searchResults = remember { mutableStateListOf<Node>() }
 
@@ -619,7 +618,7 @@ fun MapView(viewModel: MapViewModel = viewModel()) {
             destinationNode = viewModel.currentNavDestinationNode,
             uiState = viewModel.uiState,
             updateUiState = {viewModel.updateUiState(it)},
-            startNavigation = {viewModel.startNavigation(navigationGraph)}
+            startNavigation = {viewModel.startNavigation()}
         )
 
         NavigationTopBar (modifier = Modifier.align(Alignment.TopCenter),
