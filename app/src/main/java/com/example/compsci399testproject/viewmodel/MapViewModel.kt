@@ -32,6 +32,12 @@ enum class UIState {
     NAVIGATING
 }
 
+enum class CameraLockState {
+    LOCKED_ON_USER_POSITION,
+    LOCKED_ON_CUSTOM_POSITION,
+    FREE
+}
+
 class MapViewModel(wifiViewModel: WifiViewModel) : ViewModel() {
 
     var currentFloor by mutableStateOf(0)
@@ -46,7 +52,7 @@ class MapViewModel(wifiViewModel: WifiViewModel) : ViewModel() {
     var angle by mutableStateOf(0f)
         private set
 
-    var lockedOnPosition by mutableStateOf(true)
+    var cameraLockState by mutableStateOf(CameraLockState.LOCKED_ON_USER_POSITION)
         private set
 
     var uiState by mutableStateOf(UIState.MAIN)
@@ -118,8 +124,8 @@ class MapViewModel(wifiViewModel: WifiViewModel) : ViewModel() {
         angle = newAngle
     }
 
-    fun updateLockedOnPosition(value: Boolean) {
-        lockedOnPosition = value
+    fun updateCameraLockState(value: CameraLockState) {
+        cameraLockState = value
     }
 
     fun updateUiState(state: UIState) {
@@ -166,7 +172,7 @@ class MapViewModel(wifiViewModel: WifiViewModel) : ViewModel() {
     }
 
     fun viewDestinationNode(node: Node) {
-        updateLockedOnPosition(false)
+        updateCameraLockState(CameraLockState.LOCKED_ON_CUSTOM_POSITION)
         updateUiState(UIState.NAVIGATION_PREVIEW)
         updateNavDestinationNode(node)
         setFloor(node.floor)
@@ -196,7 +202,7 @@ class MapViewModel(wifiViewModel: WifiViewModel) : ViewModel() {
         updateUiState(UIState.NAVIGATING)
         createNavPathList()
         setFloor(positionFloor.value)
-        updateLockedOnPosition(true)
+        updateCameraLockState(CameraLockState.LOCKED_ON_USER_POSITION)
     }
 
     fun drawNavPath(floor: Int): Path {
@@ -301,7 +307,7 @@ class MapViewModel(wifiViewModel: WifiViewModel) : ViewModel() {
                             _positionY.value = (origin_y - y) / actualImageSizeHeight
                             _positionFloor.value = floor
 
-                            if (lockedOnPosition) {setFloor(floor)}
+                            if (cameraLockState == CameraLockState.LOCKED_ON_USER_POSITION) {setFloor(floor)}
 
                             if (uiState == UIState.NAVIGATING) {
                                 createNavPathList()

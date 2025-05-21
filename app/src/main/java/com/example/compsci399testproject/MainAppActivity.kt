@@ -19,6 +19,7 @@ import androidx.compose.ui.graphics.Path
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.rememberSplineBasedDecay
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.ScrollState
@@ -43,7 +44,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.focus.onFocusChanged
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.drawscope.Stroke
@@ -62,6 +62,7 @@ import com.example.compsci399testproject.utils.Node
 import com.example.compsci399testproject.utils.NodeType
 import com.example.compsci399testproject.utils.getRoomNodes
 import com.example.compsci399testproject.utils.initialiseGraph
+import com.example.compsci399testproject.viewmodel.CameraLockState
 
 import com.example.compsci399testproject.viewmodel.MapViewModel
 import com.example.compsci399testproject.viewmodel.UIState
@@ -83,8 +84,8 @@ fun MapImageView(
     positionYPercentage: Float,
     positionFloor: Int,
     rotation: Float,
-    lockedOnPosition: Boolean,
-    changeLockOnPosition: (Boolean) -> Unit,
+    cameraLockState: CameraLockState,
+    updateCameraLockState: (CameraLockState) -> Unit,
     uiState: UIState,
     navigationNode: Node,
     navigationPath: Path,
@@ -124,6 +125,7 @@ fun MapImageView(
     var localOffset:Offset by remember { mutableStateOf(Offset.Zero) }
     var localZoom:Float by remember { mutableFloatStateOf(3.5f) }
     var localAngle:Float by remember { mutableFloatStateOf(0f) }
+    var madeGesture:Boolean by remember { mutableStateOf(false) }
 
     val floorImageSizeWidth : Dp  = mapImageSizeWidth
     val floorImageSizeHeight : Dp = mapImageSizeHeight
@@ -146,7 +148,7 @@ fun MapImageView(
                     val newScale = Math.max(localZoom * gestureZoom, 1.5f)
 
                     if (gestureRotate == 0f && gestureZoom == 1f && (pan.x.absoluteValue > 10f || pan.y.absoluteValue > 10f)) {
-                        changeLockOnPosition(false)
+                        updateCameraLockState(CameraLockState.FREE)
                     }
 
                     // For natural zooming and rotating, the centroid of the gesture should
@@ -160,11 +162,13 @@ fun MapImageView(
                                 (centroid / newScale + pan / oldScale)
                     localZoom = newScale
                     localAngle += gestureRotate
+
+                    madeGesture = true
                 }
             )
         }
         .graphicsLayer {
-            if (lockedOnPosition) {
+            if (cameraLockState == CameraLockState.LOCKED_ON_USER_POSITION) {
                 val width = this.size.width
                 val height = this.size.height
 
@@ -181,10 +185,28 @@ fun MapImageView(
                 updateZoom(localZoom)
                 updateAngle(localAngle)
                 //Log.d("MAP", "Pixel position of User | ${x}, ${y} | Pos ${width} ${height}")
-            } else if (!lockedOnPosition) {
+                madeGesture = false
+            } else if (cameraLockState == CameraLockState.FREE) {
                 updateOffset(localOffset)
                 updateZoom(localZoom)
                 updateAngle(localAngle)
+                madeGesture = false
+            } else {
+                // This is a very hacky method to update the local position and should probably be changed later
+                // This is mainly here because the local positions needs to be updated when updated from the viewmodel
+
+                if (madeGesture) {
+                    updateOffset(localOffset)
+                    updateZoom(localZoom)
+                    updateAngle(localAngle)
+
+                    updateCameraLockState(CameraLockState.FREE)
+                    madeGesture = false
+                } else {
+                    localOffset = offset
+                    localZoom = zoom
+                    localAngle = angle
+                }
             }
 
             translationX = -offset.x * zoom
@@ -356,13 +378,13 @@ fun FloorSelectorButton(selectedFloor : Int, visible: Boolean, changeFloorVisibi
 
 @Composable
 fun ResetPositionButton(selectedFloor: Int, positionFloor: Int, modifier: Modifier, changeFloor: (Int) -> Unit,
-                        lockedOnPosition: Boolean, changeLockedOnPosition: (Boolean) -> Unit,
+                        cameraLockState: CameraLockState, updateCameraLockState: (CameraLockState) -> Unit,
                         uiState: UIState
 ) {
     Box(
         modifier = modifier
             .width(60.dp)
-            .height(if ((uiState.equals(UIState.MAIN) || uiState.equals(UIState.NAVIGATING)) && (selectedFloor != positionFloor || !lockedOnPosition)) 60.dp else 0.dp)
+            .height(if ((uiState.equals(UIState.MAIN) || uiState.equals(UIState.NAVIGATING)) && (selectedFloor != positionFloor || cameraLockState != CameraLockState.LOCKED_ON_USER_POSITION)) 60.dp else 0.dp)
             .offset(x = -20.dp, y = -180.dp)
             .background(
                 color = colorResource(id = R.color.darker_white),
@@ -375,7 +397,7 @@ fun ResetPositionButton(selectedFloor: Int, positionFloor: Int, modifier: Modifi
             )
             .clickable {
                 changeFloor(positionFloor)
-                changeLockedOnPosition(true)
+                updateCameraLockState(CameraLockState.LOCKED_ON_USER_POSITION)
             }
     )
     {
@@ -589,8 +611,8 @@ fun MapView(viewModel: MapViewModel = viewModel()) {
             positionYPercentage = positionY,
             positionFloor = positionFloor,
             rotation = rotation,
-            lockedOnPosition = viewModel.lockedOnPosition,
-            changeLockOnPosition = {viewModel.updateLockedOnPosition(it)},
+            cameraLockState = viewModel.cameraLockState,
+            updateCameraLockState = {viewModel.updateCameraLockState(it)},
             uiState = viewModel.uiState,
             navigationNode = viewModel.currentNavDestinationNode,
             navigationPath = viewModel.navigationPath,
@@ -628,8 +650,8 @@ fun MapView(viewModel: MapViewModel = viewModel()) {
             positionFloor = positionFloor,
             modifier = Modifier.align(Alignment.BottomEnd),
             changeFloor = { viewModel.setFloor(it)},
-            lockedOnPosition = viewModel.lockedOnPosition,
-            changeLockedOnPosition = {viewModel.updateLockedOnPosition(it)},
+            cameraLockState = viewModel.cameraLockState,
+            updateCameraLockState = {viewModel.updateCameraLockState(it)},
             uiState = viewModel.uiState
         )
 
