@@ -66,6 +66,7 @@ import com.example.compsci399testproject.utils.initialiseGraph
 import com.example.compsci399testproject.viewmodel.MapViewModel
 import com.example.compsci399testproject.viewmodel.UIState
 import kotlin.math.PI
+import kotlin.math.absoluteValue
 import kotlin.math.cos
 import kotlin.math.sin
 
@@ -144,6 +145,10 @@ fun MapImageView(
                     val oldScale = localZoom
                     val newScale = Math.max(localZoom * gestureZoom, 1.5f)
 
+                    if (gestureRotate == 0f && gestureZoom == 1f && (pan.x.absoluteValue > 10f || pan.y.absoluteValue > 10f)) {
+                        changeLockOnPosition(false)
+                    }
+
                     // For natural zooming and rotating, the centroid of the gesture should
                     // be the fixed point where zooming and rotating occurs.
                     // We compute where the centroid was (in the pre-transformed coordinate
@@ -155,11 +160,6 @@ fun MapImageView(
                                 (centroid / newScale + pan / oldScale)
                     localZoom = newScale
                     localAngle += gestureRotate
-
-                    updateOffset(localOffset)
-                    updateZoom(localZoom)
-                    updateAngle(localAngle)
-                    changeLockOnPosition(false)
                 }
             )
         }
@@ -168,27 +168,23 @@ fun MapImageView(
                 val width = this.size.width
                 val height = this.size.height
 
-                val newZoom = 6f
-
-                val widthOffset = (width / 2) / newZoom
-                val heightOffset = (height / 2) / newZoom
+                val widthOffset = (width / 2) / localZoom
+                val heightOffset = (height / 2) / localZoom
 
                 val x = rawPositionX.toPx() - widthOffset
                 val y = rawPositionY.toPx() - heightOffset
 
                 localOffset = Offset(x, y)
-                localZoom = newZoom
                 localAngle = 0f
 
                 updateOffset(localOffset)
                 updateZoom(localZoom)
                 updateAngle(localAngle)
                 //Log.d("MAP", "Pixel position of User | ${x}, ${y} | Pos ${width} ${height}")
-            } else if (!uiState.equals(UIState.MAIN)) {
-                // This is a very hacky method to update the local position and should be changed later
-                localOffset = offset
-                localZoom = zoom
-                localAngle = angle
+            } else if (!lockedOnPosition) {
+                updateOffset(localOffset)
+                updateZoom(localZoom)
+                updateAngle(localAngle)
             }
 
             translationX = -offset.x * zoom
@@ -203,7 +199,7 @@ fun MapImageView(
         .fillMaxSize()
     ) {
 
-        Log.d("MAP", "Zoom ${zoom} | Rotation ${angle} | Offset ${offset},  ")
+        //Log.d("MAP", "Zoom ${zoom} | Rotation ${angle} | Offset ${offset},  ")
 
         Image(bitmap = imageBitmap,
             contentDescription = "${floor} image",
