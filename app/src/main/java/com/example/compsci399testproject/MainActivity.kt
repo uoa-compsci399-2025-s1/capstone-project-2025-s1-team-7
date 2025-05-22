@@ -36,9 +36,41 @@ import androidx.core.content.ContextCompat
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.vector.VectorProperty
 import com.example.compsci399testproject.sensors.RotationSensorService
+import com.example.compsci399testproject.sensors.StepDetectionService
 import com.example.compsci399testproject.utils.initialiseGraph
 import com.example.compsci399testproject.viewmodel.MapViewModel
 import com.example.compsci399testproject.viewmodel.MapViewModelFactory
+
+
+/*
+
+TODO: Here
+
+    - Initialize step detector service
+
+    - Get mean and std of steps and heading
+        -> either Kalman filter
+        -> or generate list of readings+noise and get mean and then std
+
+   - Find where I need to change X, Y
+
+   - Feed means and stds into Particle Filter
+        -> get mean X, Y and set current X, Y to it
+
+   - Also need to find ML output and feed that in
+
+   All code in here should basically be:
+
+        stepKF = KF.update( readings )
+        headingKF = KF.update( readings )
+
+        position = PF.update( stepKF.mean, stepKF.std, headingKF.mean, headingKF.std, landmark=ML_XY )
+        X = position.X
+        Y = position.Y
+
+ */
+
+
 
 class MainActivity : ComponentActivity() {
     private var LOCATION_PERMISSION_REQUEST_CODE = 1
@@ -48,6 +80,7 @@ class MainActivity : ComponentActivity() {
     private lateinit var mapViewModel: MapViewModel
 
     private lateinit var rotationService: RotationSensorService
+    private lateinit var stepDetectionService: StepDetectionService
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -93,6 +126,7 @@ class MainActivity : ComponentActivity() {
         mapViewModel = ViewModelProvider(this, mapFactory)[MapViewModel::class.java]
 
         rotationService = RotationSensorService(applicationContext)
+
 
         setContent {
             val navController = rememberNavController()

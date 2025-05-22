@@ -64,10 +64,18 @@ dependencies {
     // Henry plugins.
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
 
+
+    // Renesh old plugs -- can be removed i think
     implementation(libs.androidx.credentials)
     implementation(libs.androidx.credentials.play.services.auth)
     implementation(libs.google.api.services.sheets)
 
 //    implementation(libs.googleid)
 //    implementation(libs.google.api.client.android)
+
+    // Renesh new plugs for math
+    implementation("space.kscience:kmath-core:0.4.2")
+    implementation("space.kscience:kmath-stat:0.4.2")
+    implementation("space.kscience:kmath-nd4j:0.4.2")
+    implementation("space.kscience:kmath-tensors:0.4.2")
 }

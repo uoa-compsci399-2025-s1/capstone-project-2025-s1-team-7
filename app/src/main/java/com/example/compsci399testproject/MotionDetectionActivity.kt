@@ -16,8 +16,13 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.example.compsci399testproject.sensors.RotationSensorService
 import com.example.compsci399testproject.sensors.StepDetectionService
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
+
+//import android.os.StrictMode
+//import java.io.OutputStreamWriter
+//import java.net.HttpURLConnection
+//import java.net.URL
+//import org.json.JSONObject
 
 
 @Composable
@@ -27,7 +32,6 @@ fun SensorTool() {
     // Step detection method toggle
     var useRhythm by remember { mutableStateOf(true) }
     var stepPulse by remember { mutableStateOf(false) }
-
     // Rotation service
     val rotationService = remember { RotationSensorService(context) }
 
@@ -42,6 +46,17 @@ fun SensorTool() {
             }
         }, useRhythm)
     }
+//    println("Heading: ${rotationService.azimuthCompass.toInt()}")
+//    println("stepPulse: $stepPulse")
+//    println()
+
+//    LaunchedEffect(rotationService.azimuthCompass, stepPulse) {
+//        withContext(Dispatchers.IO) {
+////            sendJsonToServer(heading = rotationService.azimuthCompass.toInt(), step = stepPulse)
+//            sendJsonToServer(heading = 1,  step = true)
+//        }
+//        delay(1500)
+//    }
 
     // Start/stop listeners
     DisposableEffect(Unit) {
@@ -98,3 +113,36 @@ fun SensorTool() {
         Text("Step Detected", modifier = Modifier.alpha(if (stepPulse) 1f else 0f))
     }
 }
+
+// Straight from ChatGPT
+//fun sendJsonToServer(heading: Int, step: Boolean) {
+//    // Optional: Allow network on main thread for testing (not recommended for production)
+////    val policy = StrictMode.ThreadPolicy.Builder().permitAll().build()
+////    StrictMode.setThreadPolicy(policy)
+//
+//    println("Sending POST: heading=$heading, step=$step")
+//
+//    // Doesn't work -> Edit from next day: I think I used wrong IP but i already removed port from Firewall so I don't wanna try again
+//    val url = URL("http://10.x.x.x:x0x0")  // Replace with your server's IP
+//    val jsonBody = JSONObject()
+//    jsonBody.put("heading", heading)
+//    jsonBody.put("step", step)
+//
+//    with(url.openConnection() as HttpURLConnection) {
+//        requestMethod = "POST"
+//        setRequestProperty("Content-Type", "application/json")
+//        doOutput = true
+//
+//        OutputStreamWriter(outputStream).use { writer ->
+//            writer.write(jsonBody.toString())
+//        }
+//
+//        // Read response
+//        val responseCode = responseCode
+//        println("Response Code: $responseCode")
+//        inputStream.bufferedReader().use {
+//            val response = it.readText()
+//            println("Response from server: $response")
+//        }
+//    }
+//}
