@@ -20,6 +20,7 @@ import android.util.Log
 import android.widget.Toast
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.rememberSplineBasedDecay
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.ScrollState
@@ -512,13 +513,15 @@ fun PreviewNavigationSearchBar(modifier: Modifier, destinationNode: Node,
         )
 
         Row(modifier = Modifier.offset(0.dp, 40.dp)) {
-            Button(onClick = {updateUiState(UIState.MAIN)}, modifier = Modifier.width(120.dp).height(36.dp).padding(0.dp, 0.dp, 10.dp, 0.dp),
+            Button(onClick = {updateUiState(UIState.MAIN)},
+                modifier = Modifier.width(120.dp).height(36.dp).padding(0.dp, 0.dp, 10.dp, 0.dp),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = colorResource(id = R.color.red_cancel)
+                    containerColor = colorResource(id = R.color.darker_white)
                 ),
-                shape = RoundedCornerShape(6.dp)
+                shape = RoundedCornerShape(6.dp),
+                border = BorderStroke(2.dp, colorResource(id = R.color.red_cancel))
             ) {
-                Text("Cancel")
+                Text("Cancel", color = colorResource(id = R.color.red_cancel))
             }
 
             Button(onClick = {startNavigation()}, modifier = Modifier.width(120.dp).height(36.dp).padding(10.dp, 0.dp, 0.dp, 0.dp),
@@ -550,13 +553,15 @@ fun NavigationTopBar(modifier: Modifier, destinationNode: Node,
             fontWeight = FontWeight(500)
         )
 
-        Button(onClick = {updateUiState(UIState.MAIN)}, modifier = Modifier.width(120.dp).height(36.dp).offset(x = 0.dp, y = 30.dp),
+        Button(onClick = {updateUiState(UIState.MAIN)},
+            modifier = Modifier.width(120.dp).height(36.dp).offset(x = 0.dp, y = 30.dp),
             colors = ButtonDefaults.buttonColors(
-                containerColor = colorResource(id = R.color.red_cancel)
+                containerColor = colorResource(id = R.color.darker_white)
             ),
-            shape = RoundedCornerShape(6.dp)
+            shape = RoundedCornerShape(6.dp),
+            border = BorderStroke(2.dp, colorResource(id = R.color.red_cancel))
         ) {
-            Text("Cancel")
+            Text("Cancel", color = colorResource(id = R.color.red_cancel))
         }
     }
 }
