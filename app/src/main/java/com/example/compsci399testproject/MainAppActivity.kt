@@ -51,6 +51,7 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
@@ -458,7 +459,7 @@ fun SearchBar(modifier: Modifier, searchText: String, updateSearchText: (String)
         )
 
         LazyColumn (modifier = Modifier.fillMaxWidth()
-            .heightIn(0.dp, totalSearchHeight)
+            .heightIn(0.dp, totalSearchHeight + (singleSearchResultHeight / 1.5f))
             .height(if (uiState.equals(UIState.MAIN) && searchFocused) singleSearchResultHeight * searchResults.size else 0.dp)
             .offset(x = 0.dp, y = 62.dp)
             .clip(shape = RoundedCornerShape(8.dp))
@@ -474,7 +475,10 @@ fun SearchBar(modifier: Modifier, searchText: String, updateSearchText: (String)
                     }) {
                     Text(text = node.id, modifier = Modifier.fillMaxSize()
                         .wrapContentHeight(align = Alignment.CenterVertically)
-                        .padding(horizontal = 12.dp))
+                        .padding(horizontal = 12.dp),
+                        color = colorResource(R.color.light_blue),
+                        fontWeight = FontWeight(500)
+                    )
                 }
             }
         }
@@ -496,8 +500,16 @@ fun PreviewNavigationSearchBar(modifier: Modifier, destinationNode: Node,
         .border(color = colorResource(id = R.color.light_blue), width = 2.dp, shape = RoundedCornerShape(6.dp)),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text("From Current Location", modifier.fillMaxWidth().offset(x = 0.dp, y = 10.dp), textAlign = TextAlign.Center)
-        Text("To " + destinationNode.id, modifier.fillMaxWidth().offset(x = 0.dp, y = 20.dp), textAlign = TextAlign.Center)
+        Text("From Current Location", modifier.fillMaxWidth().offset(x = 0.dp, y = 10.dp),
+            textAlign = TextAlign.Center,
+            color = colorResource(R.color.light_blue),
+            fontWeight = FontWeight(500)
+        )
+        Text("To " + destinationNode.id, modifier.fillMaxWidth().offset(x = 0.dp, y = 20.dp),
+            textAlign = TextAlign.Center,
+            color = colorResource(R.color.light_blue),
+            fontWeight = FontWeight(500)
+        )
 
         Row(modifier = Modifier.offset(0.dp, 40.dp)) {
             Button(onClick = {updateUiState(UIState.MAIN)}, modifier = Modifier.width(120.dp).height(36.dp).padding(0.dp, 0.dp, 10.dp, 0.dp),
@@ -532,7 +544,11 @@ fun NavigationTopBar(modifier: Modifier, destinationNode: Node,
         .border(color = colorResource(id = R.color.light_blue), width = 2.dp, shape = RoundedCornerShape(6.dp)),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text("Navigating to " + destinationNode.id, modifier.fillMaxWidth().offset(x = 0.dp, y = 20.dp), textAlign = TextAlign.Center)
+        Text("Navigating to " + destinationNode.id, modifier.fillMaxWidth().offset(x = 0.dp, y = 20.dp),
+            textAlign = TextAlign.Center,
+            color = colorResource(R.color.light_blue),
+            fontWeight = FontWeight(500)
+        )
 
         Button(onClick = {updateUiState(UIState.MAIN)}, modifier = Modifier.width(120.dp).height(36.dp).offset(x = 0.dp, y = 30.dp),
             colors = ButtonDefaults.buttonColors(
