@@ -102,6 +102,7 @@ class MapViewModel(wifiViewModel: WifiViewModel) : ViewModel() {
 
     init {
         startPredictingLocation()
+        loopFunction()
     }
 
     fun setFloor(floor: Int){
@@ -276,6 +277,16 @@ class MapViewModel(wifiViewModel: WifiViewModel) : ViewModel() {
         return arrayList
     }
 
+    private fun loopFunction() {
+        viewModelScope.launch {
+            while (true) {
+                if (uiState == UIState.NAVIGATING) {
+                    createNavPathList()
+                }
+                delay(1_000)
+            }
+        }
+    }
 
     // Wifi Location Prediction Function
     private fun startPredictingLocation() {
@@ -308,10 +319,6 @@ class MapViewModel(wifiViewModel: WifiViewModel) : ViewModel() {
                             _positionFloor.value = floor
 
                             if (cameraLockState == CameraLockState.LOCKED_ON_USER_POSITION) {setFloor(floor)}
-
-                            if (uiState == UIState.NAVIGATING) {
-                                createNavPathList()
-                            }
 
                             true
                         } else false
