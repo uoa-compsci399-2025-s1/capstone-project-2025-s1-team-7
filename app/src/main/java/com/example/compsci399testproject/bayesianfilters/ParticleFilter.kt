@@ -1,8 +1,11 @@
 package com.example.compsci399testproject.bayesianfilters
 
 import kotlinx.coroutines.*
+import org.nd4j.shade.jackson.databind.JsonSerializer
 import space.kscience.kmath.distributions.NormalDistribution
 import space.kscience.kmath.distributions.UniformDistribution
+import space.kscience.kmath.linear.Float64LinearSpace.div
+import space.kscience.kmath.misc.cumulative
 import space.kscience.kmath.misc.cumulativeSum
 import space.kscience.kmath.operations.asIterable
 import space.kscience.kmath.structures.Float64
@@ -12,6 +15,8 @@ import space.kscience.kmath.stat.nextBuffer
 import space.kscience.kmath.structures.Float64Buffer
 import space.kscience.kmath.structures.asList
 import space.kscience.kmath.structures.toDoubleArray
+import space.kscience.kmath.structures.toFloat64Buffer
+import java.util.Queue
 import kotlin.math.cos
 import kotlin.math.pow
 import kotlin.math.sin
@@ -22,18 +27,28 @@ private typealias Weight = Float64
 data class Particle(var x: Float64, var y: Float64, var h: Float64)
 
 
-// TODO: change to multivariate distributions? NVM not implemented
+// TODO: use multivariate distributions? not implemented in kmath library
 
-// TODO -> Add noise
+// TODO List
+//      -> Add noise
+//      -> Make particles be aware of walls
+//      -> Make PF z aware
 
 // I went from Float64Buffer to DoubleTensor to StructureND<Float64> to Nd4jArrayDoubleStructure back to Float64Buffer
+
+// Has to be run in coroutine otherwise main thread will be overloaded
 class ParticleFilter(initialX: Float64, initialY: Float64, initialHeading: Float64) {
 
     private companion object {
         const val N = 1000
         const val SENSOR_STD_ERROR = 0.5 // Adjustable - 0.5 is just arbitrary value
 
+        // custom rate at which a landmark (ML pos) becomes less use full
+        // Degradation? Depreciation? Obsolete? I can't think of a good word
+        const val LANDMARK_DEGRADATION_RATE = 200
+
         val RNG = RandomGenerator.default
+
     }
 
     //  TODO -> check
@@ -43,6 +58,12 @@ class ParticleFilter(initialX: Float64, initialY: Float64, initialHeading: Float
 
     //  Assume equal weightage for now
     private var weights: Float64Buffer = Float64Buffer(DoubleArray(N) { 1.0 / N } )
+
+    // treat like a queue
+    private var landmarks: ArrayDeque<XY> = ArrayDeque<XY>()
+
+    // Used to count time steps
+    private var dt: Int = 0
 
     init {
 
@@ -62,7 +83,9 @@ class ParticleFilter(initialX: Float64, initialY: Float64, initialHeading: Float
             yParticlesTemp = yND.nextBuffer(generator=RNG, size=N).toDoubleArray()
 
             // 0.00 <= h < 360.00
-            hParticlesTemp = hND.nextBuffer(generator=RNG, size=N).asList().map { h -> h.mod(360.00) }.toDoubleArray()
+            hParticlesTemp =
+                hND.nextBuffer(generator=RNG, size=N).asList().map { h -> h.mod(360.00) }
+                    .toDoubleArray()
         }
 
         xParticles = Float64Buffer(xParticlesTemp)
@@ -71,7 +94,7 @@ class ParticleFilter(initialX: Float64, initialY: Float64, initialHeading: Float
 
     }
 
-    public fun getParticles(): ArrayList<Pair<Particle, Weight>> {
+   fun getParticles(): ArrayList<Pair<Particle, Weight>> {
         val ps = ArrayList<Pair<Particle, Weight>>(N)
         for (i in 0 until N) {
             val p = Particle(x=xParticles[i], y=yParticles[i], h=hParticles[i])
@@ -81,15 +104,26 @@ class ParticleFilter(initialX: Float64, initialY: Float64, initialHeading: Float
         return ps
     }
 
+    fun addLandmark(x: Float64, y: Float64) {
+        landmarks.addFirst(XY(x, y))
+    }
+
+    private fun dtSupervisor() {
+        if (dt > LANDMARK_DEGRADATION_RATE) {
+            landmarks.removeLast()
+        }
+    }
+
+    // Resampling algorithms are kinda swappable
     private suspend fun systematicResampling(): Array<Int> {
         val indexes = Array<Int>(N) { 0 }
         val cumulativeWeights = weights.asIterable().cumulativeSum().toList()
-        val startPosition = UniformDistribution(range = 0.0..(1/N.toDouble()))
+        val start = UniformDistribution(range=0.0..(1/N.toDouble()))
 
         for (i in 0 until N) {
-            val currentPosition = startPosition.next(generator=RNG) + (1.0/N.toDouble()) * i
+            val current = start.next(generator=RNG) + (1.0/N.toDouble()) * i
             var s = 0
-            while (currentPosition > cumulativeWeights[s]) {
+            while (current > cumulativeWeights[s]) {
                 s += 1
             }
             indexes[i] = s
@@ -97,16 +131,52 @@ class ParticleFilter(initialX: Float64, initialY: Float64, initialHeading: Float
         return indexes
     }
 
-    private fun neff(): Double {
+    // nEff = Number of effective
+    private fun nEff(): Double {
         return 1.0 / weights.asList().sumOf { w -> w.pow(2) }
     }
 
-    private suspend fun resample(indexes: Array<Int>) {
-        TODO()
+    private fun resample(indexes: Array<Int>) {
+        val newX = Float64Buffer(DoubleArray(N) { 0.0 })
+        val newY = Float64Buffer(DoubleArray(N) { 0.0 })
+        val newH = Float64Buffer(DoubleArray(N) { 0.0 })
+
+        for (i in 0 until N) {
+            val index = indexes[i]
+            newX[i] = xParticles[index]
+            newY[i] = yParticles[index]
+            newH[i] = hParticles[index]
+        }
+
+        xParticles = newX
+        yParticles = newY
+        hParticles = newH
+
+        // Reset weights
+        for (i in 0 until N) {
+            weights[i] = 1.0 / N
+        }
     }
 
-    suspend fun stateEstimate(): XY {
-        // weighted mean X
+    private fun stateEstimate(): XY {
+        var weightedMeanX = 0.0
+        var weightedMeanY = 0.0
+        val weightSum = weights.asList().sum()
+
+        for (i in 0 until N) {
+            val w = weights[i]
+            weightedMeanX += xParticles[i]*w
+            weightedMeanY += yParticles[i]*w
+        }
+
+        weightedMeanX /= weightSum
+        weightedMeanY /= weightSum
+
+        return Pair(weightedMeanX, weightedMeanY)
+    }
+
+    // TODO: may be variance instead
+    private fun covEstimate() {
         TODO()
     }
 
@@ -118,15 +188,21 @@ class ParticleFilter(initialX: Float64, initialY: Float64, initialHeading: Float
         return particle
     }
 
-    // haha😂
-    private suspend fun evaluWeight(): Float64  {
-        // TODO: add landmarks - new positions from ML model
-        // A mystery
-        // TODO: redo
-        TODO()
+    // 😂haha😂
+    private suspend fun evaluWeight(index: Int): Float64  {
+        if (landmarks.isNotEmpty()) {
+            TODO()
+        } else {
+            TODO()
+        }
     }
 
     suspend fun update(hMean: Float64, hStd: Float64, dMean: Float64, dStd: Float64): XY {
+
+        // Make observer?
+        dt +=1
+        dtSupervisor()
+
         var normalizationFactor: Float64 = 0.0
 
         val newX = Float64Buffer(DoubleArray(N) { 0.0 })
@@ -138,8 +214,8 @@ class ParticleFilter(initialX: Float64, initialY: Float64, initialHeading: Float
         val distND = NormalDistribution(mean=dMean, standardDeviation=dStd)
 
         for (i in 0 until N) {
-            // TODO -> check j and make it according to weight
 
+            // TODO -> check j and make it according to weight
             // random sample according to weight -> higher weight = more common
             val j = RNG.nextInt(N)
 
@@ -148,12 +224,11 @@ class ParticleFilter(initialX: Float64, initialY: Float64, initialHeading: Float
             // apply state transition model
             particle = propagate(particle=particle, dTheta=hND.next(generator=RNG), dist=distND.next(generator=RNG))
 
-
-            // TODO: implement
-            val wI = evaluWeight()
-
             // prior * likelihood
-            newWeights[i] *= wI
+            val wI = weights[i] * evaluWeight(index=i)
+
+            // New weight = Old weight * p(z | x)
+            newWeights[i] = wI
 
             normalizationFactor += wI
 
@@ -173,14 +248,12 @@ class ParticleFilter(initialX: Float64, initialY: Float64, initialHeading: Float
             weights[i] /= normalizationFactor
         }
 
-        // Resample
-        if (neff() < (N/2)) {
-            // TODO: check
+        // Resample - N/2 can be adjusted -> N/3. N/4
+        if (nEff() < (N / 2)) {
             val indexes = systematicResampling()
             resample(indexes)
         }
 
-        // TODO: implement
         val meanXY = stateEstimate()
 
         return meanXY
