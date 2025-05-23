@@ -4,6 +4,7 @@ import kotlinx.coroutines.*
 import space.kscience.kmath.distributions.NormalDistribution
 import space.kscience.kmath.distributions.UniformDistribution
 import space.kscience.kmath.misc.cumulativeSum
+import space.kscience.kmath.operations.asIterable
 import space.kscience.kmath.structures.Float64
 import space.kscience.kmath.random.RandomGenerator
 import space.kscience.kmath.stat.next
@@ -15,11 +16,13 @@ import kotlin.math.cos
 import kotlin.math.pow
 import kotlin.math.sin
 
+private typealias XY = Pair<Float64, Float64>
+private typealias Weight = Float64
 
 data class Particle(var x: Float64, var y: Float64, var h: Float64)
 
 
-// TODO: change to multivariate distributions?
+// TODO: change to multivariate distributions? NVM not implemented
 
 // TODO -> Add noise
 
@@ -34,12 +37,12 @@ class ParticleFilter(initialX: Float64, initialY: Float64, initialHeading: Float
     }
 
     //  TODO -> check
-    var xParticles: Float64Buffer
-    var yParticles: Float64Buffer
-    var hParticles: Float64Buffer
+    private var xParticles: Float64Buffer
+    private var yParticles: Float64Buffer
+    private var hParticles: Float64Buffer
 
     //  Assume equal weightage for now
-    var weights: Float64Buffer = Float64Buffer(DoubleArray(N) { 1.0 / N } )
+    private var weights: Float64Buffer = Float64Buffer(DoubleArray(N) { 1.0 / N } )
 
     init {
 
@@ -68,14 +71,23 @@ class ParticleFilter(initialX: Float64, initialY: Float64, initialHeading: Float
 
     }
 
-    suspend  fun systematicResampling(): Array<Int> {
-        // TODO: find out how to get cumsum method working
+    public fun getParticles(): ArrayList<Pair<Particle, Weight>> {
+        val ps = ArrayList<Pair<Particle, Weight>>(N)
+        for (i in 0 until N) {
+            val p = Particle(x=xParticles[i], y=yParticles[i], h=hParticles[i])
+            val w = weights[i]
+            ps.add(Pair(p, w))
+        }
+        return ps
+    }
+
+    private suspend fun systematicResampling(): Array<Int> {
         val indexes = Array<Int>(N) { 0 }
-        val cumulativeWeights = weights.cumulativeSum(TODO())
-        var startPosition = UniformDistribution(range = 0.0..(1/N.toDouble()))
+        val cumulativeWeights = weights.asIterable().cumulativeSum().toList()
+        val startPosition = UniformDistribution(range = 0.0..(1/N.toDouble()))
 
         for (i in 0 until N) {
-            var currentPosition = startPosition.next(generator=RNG) + (1.0/N.toDouble()) * i
+            val currentPosition = startPosition.next(generator=RNG) + (1.0/N.toDouble()) * i
             var s = 0
             while (currentPosition > cumulativeWeights[s]) {
                 s += 1
@@ -85,20 +97,20 @@ class ParticleFilter(initialX: Float64, initialY: Float64, initialHeading: Float
         return indexes
     }
 
-    fun neff(): Double {
+    private fun neff(): Double {
         return 1.0 / weights.asList().sumOf { w -> w.pow(2) }
     }
 
-    suspend fun resample(indexes: Array<Int>) {
-        // TODO: need to check something
+    private suspend fun resample(indexes: Array<Int>) {
         TODO()
     }
 
-    suspend fun stateEstimate(): Particle {
+    suspend fun stateEstimate(): XY {
+        // weighted mean X
         TODO()
     }
 
-    fun propagate(particle: Particle, dTheta: Float64, dist: Float64): Particle {
+    private fun propagate(particle: Particle, dTheta: Float64, dist: Float64): Particle {
         // TODO: make this louder
         particle.h += dTheta
         particle.x += dist * cos(particle.h)
@@ -107,19 +119,20 @@ class ParticleFilter(initialX: Float64, initialY: Float64, initialHeading: Float
     }
 
     // haha😂
-    suspend fun evaluWeight(): Float64  {
+    private suspend fun evaluWeight(): Float64  {
         // TODO: add landmarks - new positions from ML model
         // A mystery
         // TODO: redo
         TODO()
     }
 
-    suspend fun update(hMean: Float64, hStd: Float64, dMean: Float64, dStd: Float64): Particle {
+    suspend fun update(hMean: Float64, hStd: Float64, dMean: Float64, dStd: Float64): XY {
         var normalizationFactor: Float64 = 0.0
-        var newX = Float64Buffer(N) { 0.0 }
-        var newY = Float64Buffer(N) { 0.0 }
-        var newH = Float64Buffer(N) { 0.0 }
-        var newWeights = Float64Buffer(N) { 0.0 }
+
+        val newX = Float64Buffer(DoubleArray(N) { 0.0 })
+        val newY = Float64Buffer(DoubleArray(N) { 0.0 })
+        val newH = Float64Buffer(DoubleArray(N) { 0.0 })
+        val newWeights = Float64Buffer(DoubleArray(N) { 0.0 })
 
         val hND = NormalDistribution(mean=hMean, standardDeviation=hStd)
         val distND = NormalDistribution(mean=dMean, standardDeviation=dStd)
@@ -162,14 +175,15 @@ class ParticleFilter(initialX: Float64, initialY: Float64, initialHeading: Float
 
         // Resample
         if (neff() < (N/2)) {
-            // TODO: some errors need to recheck
-            TODO()
+            // TODO: check
+            val indexes = systematicResampling()
+            resample(indexes)
         }
 
         // TODO: implement
-        val mean = stateEstimate()
+        val meanXY = stateEstimate()
 
-        return mean
+        return meanXY
     }
 
 }
