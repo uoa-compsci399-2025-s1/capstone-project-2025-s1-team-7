@@ -596,8 +596,8 @@ fun MapView(viewModel: MapViewModel = viewModel()) {
 
     viewModel.updateMapImageSize(with(LocalDensity.current) {floorImageSizeWidth.toPx()}, with(LocalDensity.current) {floorImageSizeHeight.toPx()})
 
-    val xModelOptions = listOf("XOriginal", "XCurrent", "X1", "X2")
-    val yModelOptions = listOf("YOriginal", "YCurrent", "Y1")
+    val xModelOptions = listOf("XOriginal", "XCurrent", "X1", "X2", "X3", "X4")
+    val yModelOptions = listOf("YOriginal", "YCurrent", "Y1", "Y2", "Y3", "Y4")
 
     var floorSelectorVisible:Boolean by remember { mutableStateOf(false) }
 

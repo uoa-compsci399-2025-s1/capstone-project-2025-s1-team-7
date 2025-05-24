@@ -10,9 +10,16 @@ import com.example.compsci399testproject.machinelearning.models.RegressionModel
 import com.example.compsci399testproject.machinelearning.models.FloorRandomForest
 import com.example.compsci399testproject.machinelearning.models.XRandomForest1
 import com.example.compsci399testproject.machinelearning.models.XRandomForest2
+import com.example.compsci399testproject.machinelearning.models.XRandomForest3
+import com.example.compsci399testproject.machinelearning.models.XRandomForest4
+//import com.example.compsci399testproject.machinelearning.models.XRandomForest10
 import com.example.compsci399testproject.machinelearning.models.XRandomForestCurrent
 import com.example.compsci399testproject.machinelearning.models.XRandomForestOriginal
 import com.example.compsci399testproject.machinelearning.models.YRandomForest1
+import com.example.compsci399testproject.machinelearning.models.YRandomForest2
+import com.example.compsci399testproject.machinelearning.models.YRandomForest3
+import com.example.compsci399testproject.machinelearning.models.YRandomForest4
+//import com.example.compsci399testproject.machinelearning.models.YRandomForest10
 import com.example.compsci399testproject.machinelearning.models.YRandomForestCurrent
 import com.example.compsci399testproject.machinelearning.models.YRandomForestOriginal
 
@@ -26,14 +33,16 @@ class LocationPredictor() {
             "XCurrent" to XRandomForestCurrent.INSTANCE,
             "X1" to XRandomForest1.INSTANCE,
             "X2" to XRandomForest2.INSTANCE,
-//            "X4" to XRandomForest4,
-//            "X10" to XRandomForest10,
+            "X3" to XRandomForest3.INSTANCE,
+            "X4" to XRandomForest4.INSTANCE,
+//            "X10" to XRandomForest10.INSTANCE,
             "YOriginal" to YRandomForestOriginal.INSTANCE,
             "YCurrent" to YRandomForestCurrent.INSTANCE,
             "Y1" to YRandomForest1.INSTANCE,
-//            "Y2" to YRandomForest2,
-//            "Y4" to YRandomForest4,
-//            "Y10" to YRandomForest10,
+            "Y2" to YRandomForest2.INSTANCE,
+            "Y3" to YRandomForest3.INSTANCE,
+            "Y4" to YRandomForest4.INSTANCE,
+//            "Y10" to YRandomForest10.INSTANCE,
             )
 
         fun  predictFloor(input: FloatArray) : Int {
