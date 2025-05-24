@@ -35,6 +35,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Place
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
@@ -383,46 +384,56 @@ fun ResetPositionButton(selectedFloor: Int, positionFloor: Int, modifier: Modifi
                         cameraLockState: CameraLockState, updateCameraLockState: (CameraLockState) -> Unit,
                         uiState: UIState
 ) {
-    Box(
-        modifier = modifier
-            .width(60.dp)
-            .height(if ((uiState.equals(UIState.MAIN) || uiState.equals(UIState.NAVIGATING)) && (selectedFloor != positionFloor || cameraLockState != CameraLockState.LOCKED_ON_USER_POSITION)) 60.dp else 0.dp)
-            .offset(x = -20.dp, y = -180.dp)
-            .background(
-                color = colorResource(id = R.color.darker_white),
-                shape = RoundedCornerShape(60.dp)
-            )
-            .border(
-                width = 2.dp,
-                color = colorResource(id = R.color.light_blue),
-                shape = RoundedCornerShape(60.dp)
-            )
-            .clickable {
-                changeFloor(positionFloor)
-                updateCameraLockState(CameraLockState.LOCKED_ON_USER_POSITION)
+    if ((uiState.equals(UIState.MAIN) || uiState.equals(UIState.NAVIGATING)) && (selectedFloor != positionFloor || cameraLockState != CameraLockState.LOCKED_ON_USER_POSITION)) {
+        Box(
+            modifier = modifier
+                .width(60.dp)
+                .height(60.dp)
+                .offset(x = -20.dp, y = -180.dp)
+                .background(
+                    color = colorResource(id = R.color.darker_white),
+                    shape = RoundedCornerShape(60.dp)
+                )
+                .border(
+                    width = 2.dp,
+                    color = colorResource(id = R.color.light_blue),
+                    shape = RoundedCornerShape(60.dp)
+                )
+                .clickable() {
+                    changeFloor(positionFloor)
+                    updateCameraLockState(CameraLockState.LOCKED_ON_USER_POSITION)
+                }
+        )
+        {
+            Image(modifier = Modifier
+                .width(36.dp)
+                .height(36.dp)
+                .offset(x = 12.dp, y = 12.dp),
+                painter = painterResource(id = R.drawable.show_location_icon),
+                contentDescription = "")
+
+            // If the user is looking at a floor different to their current floor then show the user's position floor number
+            if (selectedFloor != positionFloor) {
+                Box(modifier = modifier
+                    .width(24.dp)
+                    .height(24.dp)
+                    .offset(x = 10.dp, y = -40.dp)
+                    .background(
+                        color = colorResource(id = R.color.light_blue),
+                        shape = RoundedCornerShape(60.dp)
+                    )
+                ) {
+                    Text(text = positionFloor.toString(),
+                        color = colorResource(R.color.darker_white),
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .wrapContentHeight(align = Alignment.CenterVertically),
+                        textAlign = TextAlign.Center
+                    )
+                }
             }
-    )
-    {
-        Box(modifier = modifier
-            .width(24.dp)
-            .height(24.dp)
-            .offset(x = 10.dp, y = -40.dp)
-            .background(
-                color = colorResource(id = R.color.light_blue),
-                shape = RoundedCornerShape(60.dp)
-            )
-        ) {
-            Text(text = positionFloor.toString(),
-                color = colorResource(R.color.darker_white),
-                modifier = Modifier
-                    .fillMaxSize()
-                    .wrapContentHeight(align = Alignment.CenterVertically),
-                textAlign = TextAlign.Center
-            )
         }
-
     }
-
 }
 
 @Composable
@@ -454,7 +465,7 @@ fun SearchBar(modifier: Modifier, searchText: String, updateSearchText: (String)
                 focusedContainerColor = colorResource(id = R.color.darker_white),
                 unfocusedContainerColor = colorResource(id = R.color.darker_white)
             ),
-            leadingIcon = {Icon(imageVector = Icons.Filled.Search, contentDescription = "")},
+            trailingIcon = {Icon(imageVector = Icons.Filled.Search, contentDescription = "")},
             singleLine = true,
             shape = RoundedCornerShape(8.dp)
         )
