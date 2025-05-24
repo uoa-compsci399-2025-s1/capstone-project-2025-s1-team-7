@@ -76,6 +76,5 @@ dependencies {
     // Renesh new plugs for math
     implementation("space.kscience:kmath-core:0.4.2")
     implementation("space.kscience:kmath-stat:0.4.2")
-    implementation("space.kscience:kmath-nd4j:0.4.2")
     implementation("space.kscience:kmath-tensors:0.4.2")
 }

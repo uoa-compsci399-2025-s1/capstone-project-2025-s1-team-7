@@ -86,28 +86,28 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         if (ContextCompat.checkSelfPermission(
                 this,
-                android.Manifest.permission.ACCESS_FINE_LOCATION
+                Manifest.permission.ACCESS_FINE_LOCATION
             ) != PackageManager.PERMISSION_GRANTED ||
             ContextCompat.checkSelfPermission(
                 this,
-                android.Manifest.permission.ACCESS_COARSE_LOCATION
+                Manifest.permission.ACCESS_COARSE_LOCATION
             ) != PackageManager.PERMISSION_GRANTED ||
             ContextCompat.checkSelfPermission(
                 this,
-                android.Manifest.permission.ACCESS_WIFI_STATE
+                Manifest.permission.ACCESS_WIFI_STATE
             ) != PackageManager.PERMISSION_GRANTED ||
             ContextCompat.checkSelfPermission(
                 this,
-                android.Manifest.permission.CHANGE_WIFI_STATE
+                Manifest.permission.CHANGE_WIFI_STATE
             ) != PackageManager.PERMISSION_GRANTED
         ) {
             ActivityCompat.requestPermissions(
                 this,
                 arrayOf(
-                    android.Manifest.permission.ACCESS_FINE_LOCATION,
-                    android.Manifest.permission.ACCESS_COARSE_LOCATION,
-                    android.Manifest.permission.ACCESS_WIFI_STATE,
-                    android.Manifest.permission.CHANGE_WIFI_STATE
+                    Manifest.permission.ACCESS_FINE_LOCATION,
+                    Manifest.permission.ACCESS_COARSE_LOCATION,
+                    Manifest.permission.ACCESS_WIFI_STATE,
+                    Manifest.permission.CHANGE_WIFI_STATE
                 ),
                 LOCATION_PERMISSION_REQUEST_CODE
             )
@@ -120,7 +120,11 @@ class MainActivity : ComponentActivity() {
         )
 
         rotationService = RotationSensorService(applicationContext)
-        stepDetectionService = StepDetectionService(applicationContext)
+        stepDetectionService = StepDetectionService(
+            applicationContext,
+            onStepDetected = TODO(),
+            useRhythm = true
+        )
 
         val factory = WifiScannerViewModelFactory(applicationContext)
         wifiViewModel = ViewModelProvider(this, factory)[WifiViewModel::class.java]

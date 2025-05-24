@@ -97,6 +97,7 @@ class MapViewModel(wifiViewModel: WifiViewModel, rotationSensorService: Rotation
 
     private val _wifiViewModel = wifiViewModel
 
+    private var stepCounter = 0
 
     // TODO: add landmarks after ML has run
 
@@ -114,15 +115,20 @@ class MapViewModel(wifiViewModel: WifiViewModel, rotationSensorService: Rotation
         pf.addLandmark(x=rawPositionX, y=rawPositionY)
 
         viewModelScope.launch {
-//            stepDetectionService.
+            stepDetectionService.stepChangeFun {
+                stepCounter += 1
+            }
         }
 
         viewModelScope.launch {
             val hM = rotationSensorService.azimuthCompass.toDouble()
             val hStd = 45.00
-            val dM = 1.0
+            val dM = stepCounter * 0.6
             val dStd = 1.2
-            pf.update(hMean = hM, hStd = hStd, dMean = dM, dStd = dStd)
+            val xy = pf.update(hMean = hM, hStd = hStd, dMean = dM, dStd = dStd)
+            rawPositionX = xy.first
+            rawPositionY = xy.second
+            stepCounter = 0
             delay(2000)
         }
     }

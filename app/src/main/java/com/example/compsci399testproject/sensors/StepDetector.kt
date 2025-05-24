@@ -9,7 +9,7 @@ import kotlin.math.sqrt
 
 class StepDetectionService(
     context: Context,
-    private var onStepDetected: () -> Unit?,
+    private var onStepDetected: (() -> Unit)?,
     var useRhythm : Boolean = true
 ) : SensorEventListener {
 
@@ -71,7 +71,7 @@ class StepDetectionService(
 
         if (isPeak && now - lastStepTime > stepCooldown) {
             lastStepTime = now
-            onStepDetected()
+            onStepDetected?.invoke()
         }
     }
 
@@ -86,7 +86,7 @@ class StepDetectionService(
 
         if (isStagger && now - lastStepTime > stepCooldown) {
             lastStepTime = now
-            onStepDetected()
+            onStepDetected?.invoke()
         }
     }
 }
