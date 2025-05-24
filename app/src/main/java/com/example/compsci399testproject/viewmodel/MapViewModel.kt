@@ -286,7 +286,7 @@ class MapViewModel(wifiViewModel: WifiViewModel) : ViewModel() {
                     }
                 }
 
-                delay(30_000)
+                delay(3_000)
             }
         }
     }

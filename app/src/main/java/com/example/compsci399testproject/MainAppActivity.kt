@@ -34,9 +34,14 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.TextField
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
@@ -57,6 +62,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.times
 
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.compsci399testproject.machinelearning.LocationPredictor
 import com.example.compsci399testproject.utils.NavigationGraph
 import com.example.compsci399testproject.utils.Node
 import com.example.compsci399testproject.utils.NodeType
@@ -134,7 +140,6 @@ fun MapImageView(
     val positionIconSizeY : Dp = 4.dp
     val positionIconPosX : Dp = rawPositionX - (positionIconSizeX / 2)
     val positionIconPosY : Dp = rawPositionY - (positionIconSizeY / 2)
-
 
     Box(modifier = Modifier
         .pointerInput(Unit) {
@@ -278,6 +283,53 @@ fun MapImageView(
                 y = (((1330f - navigationNode.y) / 1536f) * floorImageSizeHeight) - 2.dp)
             .background(color = colorResource(id = R.color.light_blue), shape = RoundedCornerShape(6.dp))
         )
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun LocationModelDropdown(
+    options: List<String>,
+    onItemSelected: (String) -> Unit
+) {
+    var expanded by remember { mutableStateOf(false) }
+    var selectedOptionText by remember { mutableStateOf(options.firstOrNull() ?: "") }
+
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .wrapContentSize(Alignment.TopStart)
+    ) {
+        ExposedDropdownMenuBox(
+            expanded = expanded,
+            onExpandedChange = { expanded = !expanded },
+        ) {
+            TextField(
+                modifier = Modifier.menuAnchor(),
+                readOnly = true,
+                value = selectedOptionText,
+                onValueChange = {},
+                label = { Text("Model") },
+                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+                colors = ExposedDropdownMenuDefaults.textFieldColors(),
+            )
+            ExposedDropdownMenu(
+                expanded = expanded,
+                onDismissRequest = { expanded = false },
+            ) {
+                options.forEach { selectionOption ->
+                    DropdownMenuItem(
+                        text = { Text(selectionOption) },
+                        onClick = {
+                            selectedOptionText = selectionOption
+                            onItemSelected(selectionOption)
+                            expanded = false
+                        },
+                        contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding,
+                    )
+                }
+            }
+        }
     }
 }
 
@@ -544,6 +596,8 @@ fun MapView(viewModel: MapViewModel = viewModel()) {
 
     viewModel.updateMapImageSize(with(LocalDensity.current) {floorImageSizeWidth.toPx()}, with(LocalDensity.current) {floorImageSizeHeight.toPx()})
 
+    val xModelOptions = listOf("XOriginal", "XCurrent", "X1", "X2")
+    val yModelOptions = listOf("YOriginal", "YCurrent", "Y1")
 
     var floorSelectorVisible:Boolean by remember { mutableStateOf(false) }
 
@@ -637,6 +691,24 @@ fun MapView(viewModel: MapViewModel = viewModel()) {
             changeLockedOnPosition = {viewModel.updateLockedOnPosition(it)},
             uiState = viewModel.uiState
         )
+
+        Column(modifier = Modifier.padding(16.dp)) {
+            Text("Select a Location Prediction Model:")
+            Spacer(modifier = Modifier.height(8.dp))
+            LocationModelDropdown(
+                options = xModelOptions,
+                onItemSelected = { selectedModel ->
+                    LocationPredictor.changeXModel(selectedModel)
+                }
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            LocationModelDropdown(
+                options = yModelOptions,
+                onItemSelected = { selectedModel ->
+                    LocationPredictor.changeYModel(selectedModel)
+                }
+            )
+        }
 
         FloorSelectorButton(
             selectedFloor = viewModel.currentFloor,

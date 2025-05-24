@@ -1,7 +1,9 @@
 package com.example.compsci399testproject.machinelearning.models;
 
-public class FloorRandomForest {
-    public static double[] score(float[] input) {
+public class FloorRandomForest extends ClassifierModel{
+    public static final FloorRandomForest INSTANCE = new FloorRandomForest();
+
+    public double[] score(float[] input) {
         double[] var0;
         if (input[25] <= 20.5) {
             if (input[355] <= 12.0) {
