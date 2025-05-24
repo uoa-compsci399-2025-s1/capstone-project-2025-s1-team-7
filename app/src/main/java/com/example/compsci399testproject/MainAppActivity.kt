@@ -36,6 +36,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Place
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Icon
@@ -47,6 +48,7 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.TransformOrigin
@@ -280,24 +282,28 @@ fun MapImageView(
             }.fillMaxSize())
         }
 
-        Image(painter = painterResource(id = R.drawable.position_icon),
-            contentDescription = "${floor} image",
-            modifier = Modifier
-                .alpha(if (floor != positionFloor) 0f else 1f)
-                .size(positionIconSizeX, positionIconSizeY)
-                .offset(positionIconPosX, positionIconPosY)
-                .graphicsLayer {
-                    rotationZ = rotation
-                }
-        )
+        if (floor == positionFloor) {
+            Image(painter = painterResource(id = R.drawable.position_icon),
+                contentDescription = "${floor} image",
+                modifier = Modifier
+                    .size(positionIconSizeX, positionIconSizeY)
+                    .offset(positionIconPosX, positionIconPosY)
+                    .graphicsLayer {
+                        rotationZ = rotation
+                    }
+            )
+        }
 
-        Box(modifier = Modifier
-            .width(4.dp)
-            .height(if (uiState.equals(UIState.NAVIGATION_PREVIEW) && floor == navigationNode.floor) 4.dp else 0.dp)
-            .offset(x = (((754f + navigationNode.x) / 1536f) * floorImageSizeWidth) - 2.dp,
-                y = (((1330f - navigationNode.y) / 1536f) * floorImageSizeHeight) - 2.dp)
-            .background(color = colorResource(id = R.color.light_blue), shape = RoundedCornerShape(6.dp))
-        )
+        // Shows the location of the node when user wants to preview a room to go to
+        if (uiState == UIState.NAVIGATION_PREVIEW && floor == navigationNode.floor) {
+            Box(modifier = Modifier
+                .width(4.dp)
+                .height(4.dp)
+                .offset(x = (((754f + navigationNode.x) / 1536f) * floorImageSizeWidth) - 2.dp,
+                    y = (((1330f - navigationNode.y) / 1536f) * floorImageSizeHeight) - 2.dp)
+                .background(color = colorResource(id = R.color.light_blue), shape = RoundedCornerShape(6.dp))
+            )
+        }
     }
 }
 
