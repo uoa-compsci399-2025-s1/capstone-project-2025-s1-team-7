@@ -29,6 +29,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.detectTransformGestures
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
@@ -41,6 +42,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.composed
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
@@ -399,7 +401,9 @@ fun ResetPositionButton(selectedFloor: Int, positionFloor: Int, modifier: Modifi
                     color = colorResource(id = R.color.light_blue),
                     shape = RoundedCornerShape(60.dp)
                 )
-                .clickable() {
+                .clickable(indication = null,
+                        interactionSource = remember { MutableInteractionSource() }
+                ) {
                     changeFloor(positionFloor)
                     updateCameraLockState(CameraLockState.LOCKED_ON_USER_POSITION)
                 }
