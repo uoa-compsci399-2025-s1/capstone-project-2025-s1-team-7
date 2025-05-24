@@ -188,7 +188,7 @@ class ParticleFilter(initialX: Float64, initialY: Float64, initialHeading: Float
         for (i in 0 until N) {
             val w = weights[i]
             weightedStdX += (xParticles[i] - weightedMeanX) * w
-            weightedStdY += (yParticles[i] - weightedStdY) * w
+            weightedStdY += (yParticles[i] - weightedMeanY) * w
         }
 
         weightedStdX /= weightSum
