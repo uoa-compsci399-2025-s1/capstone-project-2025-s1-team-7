@@ -3,6 +3,7 @@ package com.example.compsci399testproject.viewmodel
 import androidx.compose.ui.graphics.Path
 import android.util.Log
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableDoubleStateOf
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -13,7 +14,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.times
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.compsci399testproject.bayesianfilters.ParticleFilter
 import com.example.compsci399testproject.machinelearning.LocationPredictor
+import com.example.compsci399testproject.sensors.RotationSensorService
+import com.example.compsci399testproject.sensors.StepDetectionService
 import com.example.compsci399testproject.utils.NavigationGraph
 import com.example.compsci399testproject.utils.Node
 import com.example.compsci399testproject.utils.NodeType
@@ -32,7 +36,7 @@ enum class UIState {
     NAVIGATING
 }
 
-class MapViewModel(wifiViewModel: WifiViewModel) : ViewModel() {
+class MapViewModel(wifiViewModel: WifiViewModel, rotationSensorService: RotationSensorService, stepDetectionService: StepDetectionService) : ViewModel() {
 
     var currentFloor by mutableStateOf(0)
         private set
@@ -74,8 +78,8 @@ class MapViewModel(wifiViewModel: WifiViewModel) : ViewModel() {
     var nextFloorPathEndNode = Node("", 0, 0, 0, NodeType.NULL, mutableListOf())
 
     // Position
-    private var rawPositionX: Float by mutableFloatStateOf(0f)
-    private var rawPositionY: Float by mutableFloatStateOf(0f)
+    private var rawPositionX: Double by mutableDoubleStateOf(0.0)
+    private var rawPositionY: Double by mutableDoubleStateOf(0.0)
 
     // Position X and Y take percentage values
     // This is because the image scaling is different and can't use the raw pixel values
@@ -93,8 +97,34 @@ class MapViewModel(wifiViewModel: WifiViewModel) : ViewModel() {
 
     private val _wifiViewModel = wifiViewModel
 
+
+    // TODO: add landmarks after ML has run
+
     init {
         startPredictingLocation()
+
+        _positionX.value = ((origin_x + rawPositionX) / actualImageSizeWidth).toFloat()
+        _positionY.value = ((origin_y - rawPositionY) / actualImageSizeHeight).toFloat()
+
+        val pf = ParticleFilter(
+            initialX = rawPositionX,
+            initialY = rawPositionY,
+            initialHeading = rotationSensorService.azimuthCompass.toDouble()
+        )
+        pf.addLandmark(x=rawPositionX, y=rawPositionY)
+
+        viewModelScope.launch {
+//            stepDetectionService.
+        }
+
+        viewModelScope.launch {
+            val hM = rotationSensorService.azimuthCompass.toDouble()
+            val hStd = 45.00
+            val dM = 1.0
+            val dStd = 1.2
+            pf.update(hMean = hM, hStd = hStd, dMean = dM, dStd = dStd)
+            delay(2000)
+        }
     }
 
     fun setFloor(floor: Int){
@@ -261,7 +291,7 @@ class MapViewModel(wifiViewModel: WifiViewModel) : ViewModel() {
             while (true) {
                 _wifiViewModel.scan()
 
-                val success = withTimeoutOrNull(10_000) {
+                withTimeoutOrNull(10_000) {
                     _wifiViewModel.scanResults.firstOrNull { results ->
                         if (results.isNotEmpty()) {
                             _wifiViewModel.updateScanResults()
@@ -271,13 +301,13 @@ class MapViewModel(wifiViewModel: WifiViewModel) : ViewModel() {
                             val x = LocationPredictor.predictX(strengthArray.toFloatArray())
                             val y = LocationPredictor.predictY(strengthArray.toFloatArray())
 
-                            rawPositionX = x
-                            rawPositionY = y
+                            rawPositionX = x.toDouble()
+                            rawPositionY = y.toDouble()
 
                             Log.d("predictor", "Predicted X: $x, Y: $y, Floor: $floor")
 
-                            _positionX.value = (origin_x + x) / actualImageSizeWidth
-                            _positionY.value = (origin_y - y) / actualImageSizeHeight
+//                            _positionX.value = (origin_x + x) / actualImageSizeWidth
+//                            _positionY.value = (origin_y - y) / actualImageSizeHeight
                             _positionFloor.value = floor
 
                             if (lockedOnPosition) {setFloor(floor)}

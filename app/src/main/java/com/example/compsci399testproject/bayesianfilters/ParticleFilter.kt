@@ -38,14 +38,14 @@ private fun randomNormal(size: Int): Float64Buffer {
 }
 
 
-// Has to be run in coroutine otherwise main thread will be overloaded
+// Has to be run in coroutine otherwise main thread will be overloaded | also uses blocking methods
 class ParticleFilter(initialX: Float64, initialY: Float64, initialHeading: Float64) {
 
     private companion object {
         const val N = 1000
         const val SENSOR_STD_ERROR = 0.5 // Adjustable - 0.5 is just arbitrary value
 
-        // custom rate at which a landmark (ML pos) becomes less use full
+        // custom rate at which a landmark (ML pos) becomes less useful
         // Degradation? Depreciation? Obsolete? I can't think of a good word
         const val LANDMARK_DEGRADATION_RATE = 200
 
@@ -81,7 +81,7 @@ class ParticleFilter(initialX: Float64, initialY: Float64, initialHeading: Float
         xParticles = xND.sample(generator=RNG).nextBufferBlocking(size=N)
         yParticles = yND.sample(generator=RNG).nextBufferBlocking(size=N)
 
-            // 0.00 <= h < 360.00
+        // 0.00 <= h < 360.00
         hParticles = hND.sample(generator=RNG)
                         .nextBufferBlocking(size=N)
                         .asList()
@@ -109,6 +109,7 @@ class ParticleFilter(initialX: Float64, initialY: Float64, initialHeading: Float
     private fun dtSupervisor() {
         if (landmarks.isNotEmpty() && dt > LANDMARK_DEGRADATION_RATE) {
             landmarks.removeLast()
+            dt = 0
         }
     }
 
@@ -130,7 +131,7 @@ class ParticleFilter(initialX: Float64, initialY: Float64, initialHeading: Float
     }
 
     // nEff = Number of effective
-    private fun nEff(): Double {
+    private fun nEff(): Float64 {
         return 1.0 / weights.asList().sumOf { w -> w.pow(2) }
     }
 

@@ -9,9 +9,8 @@ import kotlin.math.sqrt
 
 class StepDetectionService(
     context: Context,
-    private val onStepDetected: () -> Unit,
+    private var onStepDetected: () -> Unit?,
     var useRhythm : Boolean = true
-
 ) : SensorEventListener {
 
     private val sensorManager = context.getSystemService(Context.SENSOR_SERVICE) as SensorManager
@@ -22,6 +21,11 @@ class StepDetectionService(
 
     private var lastStepTime = 0L
     private val stepCooldown = 300
+
+    // TODO: add decorator or change class to make it so that this method must be set
+    fun stepChangeFun(f: () -> Unit) {
+        onStepDetected = f
+    }
 
     fun startListening() {
         sensorManager.registerListener(this, accelSensor, SensorManager.SENSOR_DELAY_GAME)

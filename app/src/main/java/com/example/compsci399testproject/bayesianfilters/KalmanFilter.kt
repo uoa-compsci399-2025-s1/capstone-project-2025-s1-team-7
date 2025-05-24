@@ -1,41 +1,52 @@
 package com.example.compsci399testproject.bayesianfilters
 
-import org.nd4j.linalg.factory.Nd4j
-import space.kscience.kmath.nd.StructureND
-import space.kscience.kmath.nd.StructureNDOfDouble
-import space.kscience.kmath.nd4j.Nd4jArrayStructure
+import space.kscience.kmath.nd.ShapeND
+import space.kscience.kmath.nd4j.DoubleNd4jTensorAlgebra.ndArray
 import space.kscience.kmath.structures.Float64
+import space.kscience.kmath.tensors.api.TensorAlgebra
+import space.kscience.kmath.tensors.core.DoubleTensor
+import space.kscience.kmath.tensors.core.DoubleTensorAlgebra
+import space.kscience.kmath.tensors.core.asDoubleTensor
+import space.kscience.kmath.tensors.core.zero
 
 
 // Generic Kalman filter implementation
 // To be ripped from here: https://github.com/zziz/kalman-filter?tab=readme-ov-file
 
-class KalmanFilter(F: StructureND<Float64>, B?, H, Q?, R?, P?, x0?) {
+class KalmanFilter(
+    fF: DoubleTensor,
+    bB: DoubleTensor?,
+    hH: DoubleTensor,
+    qQ: DoubleTensor?,
+    rR: DoubleTensor?,
+    pP: DoubleTensor?,
+    x0: DoubleTensor?
+) {
 
-    private companion object {
+    var n = fF.shape[1]
+    var m = hH.shape[1]
 
-        var n = F.shape[1]
-        var m = H.shape[1]
+    var fF = fF
+    var hH = hH
+    var bB = bB ?: 0
+    var qQ = qQ ?: DoubleTensorAlgebra.eye(n)
+    var rR = rR ?: DoubleTensorAlgebra.eye(n)
+    var pP = pP ?: DoubleTensorAlgebra.eye(n)
+    var x = x0?: DoubleTensorAlgebra.zero(shape= ShapeND(n, 1))
 
-        var F = F
-        var H = H
-        var B = if (B == null) 0 else B
-        var Q = TODO()
-        var R = TODO()
-        var P = TODO()
-        var x = TODO()
-    }
-
-    init {
-        // TODO
-    }
-
-    suspend fun predict(mean: Float64 = 0.0) {
-       // TODO
+    fun predict(mean: Float64 = 0.0): DoubleTensor {
+        // Idk why I can't use either dot product or matmul methods
+        x = TODO()
+        return x
     }
 
     // z is observation
-    suspend fun update(z: ArrayList<Float64>) {
-        // TODO
+    fun update(z: DoubleTensor) {
+        val y = z
+        val sS = rR
+        val kK = TODO()
+        x = x
+        val iI = DoubleTensorAlgebra.eye(n)
+        pP = TODO()
     }
 }

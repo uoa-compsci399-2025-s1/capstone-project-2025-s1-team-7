@@ -119,13 +119,14 @@ class MainActivity : ComponentActivity() {
             1001
         )
 
+        rotationService = RotationSensorService(applicationContext)
+        stepDetectionService = StepDetectionService(applicationContext)
+
         val factory = WifiScannerViewModelFactory(applicationContext)
         wifiViewModel = ViewModelProvider(this, factory)[WifiViewModel::class.java]
 
-        val mapFactory = MapViewModelFactory(wifiViewModel)
+        val mapFactory = MapViewModelFactory(wifiViewModel, rotationService, stepDetectionService)
         mapViewModel = ViewModelProvider(this, mapFactory)[MapViewModel::class.java]
-
-        rotationService = RotationSensorService(applicationContext)
 
 
         setContent {
