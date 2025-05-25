@@ -109,6 +109,7 @@ class MapViewModel(wifiViewModel: WifiViewModel, rotationSensorService: Rotation
         startPredictingLocation()
 
         rotationSensorService.startListening()
+        stepDetectionService.startListening()
 
         _positionX.value = ((origin_x + rawPositionX) / actualImageSizeWidth).toFloat()
         _positionY.value = ((origin_y - rawPositionY) / actualImageSizeHeight).toFloat()

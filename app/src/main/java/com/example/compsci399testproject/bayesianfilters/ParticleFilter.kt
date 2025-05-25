@@ -92,6 +92,16 @@ class ParticleFilter(initialX: Float64, initialY: Float64, initialHeading: Float
                         .asBuffer()
                         .toFloat64Buffer()
 
+        println("---- xParticles ----")
+        println(xParticles.asList().take(20))
+        println()
+        println("---- yParticles ----")
+        println(yParticles.asList().take(20))
+        println()
+        println("---- hParticles ----")
+        println(hParticles.asList().take(20))
+        println()
+
         addLandmark(x=initialX, y=initialX)
     }
 
