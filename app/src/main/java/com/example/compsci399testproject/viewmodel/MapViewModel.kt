@@ -121,15 +121,29 @@ class MapViewModel(wifiViewModel: WifiViewModel, rotationSensorService: Rotation
         }
 
         viewModelScope.launch {
-            val hM = rotationSensorService.azimuthCompass.toDouble()
-            val hStd = 45.00
-            val dM = stepCounter * 0.6
-            val dStd = 1.2
-            val xy = pf.update(hMean = hM, hStd = hStd, dMean = dM, dStd = dStd)
-            rawPositionX = xy.first
-            rawPositionY = xy.second
-            stepCounter = 0
-            delay(2000)
+            while (true) {
+                val hM = rotationSensorService.azimuthCompass.toDouble()
+                val hStd = 45.00
+                val dM = stepCounter * 0.6
+                val dStd = 1.2
+                val xy = pf.update(hMean = hM, hStd = hStd, dMean = dM, dStd = dStd)
+
+                Log.d("Step Count", "$stepCounter")
+
+                rawPositionX = xy.first
+                rawPositionY = xy.second
+                _positionX.value = ((origin_x + rawPositionX) / actualImageSizeWidth).toFloat()
+                _positionY.value = ((origin_y - rawPositionY) / actualImageSizeHeight).toFloat()
+
+                Log.d("Raw X", "$rawPositionX")
+                Log.d("Raw Y", "$rawPositionY")
+
+                Log.d("Position X", "${_positionX.value}")
+                Log.d("Position Y", "${_positionY.value}")
+
+                stepCounter = 0
+                delay(2000)
+            }
         }
     }
 

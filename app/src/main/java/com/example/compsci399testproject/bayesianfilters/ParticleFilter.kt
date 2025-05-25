@@ -43,7 +43,10 @@ class ParticleFilter(initialX: Float64, initialY: Float64, initialHeading: Float
 
     private companion object {
         const val N = 1000
-        const val SENSOR_STD_ERROR = 0.5 // Adjustable - 0.5 is just arbitrary value
+
+        // The standard deviation is the spread of the Gaussian
+        const val XY_SENSOR_STD_ERROR = 1.2 // Adjustable - 0.5 is just arbitrary value
+        const val H_SENSOR_STD_ERROR = 30.0 // Adjustable - 0.5 is just arbitrary value
 
         // custom rate at which a landmark (ML pos) becomes less useful
         // Degradation? Depreciation? Obsolete? I can't think of a good word
@@ -73,9 +76,9 @@ class ParticleFilter(initialX: Float64, initialY: Float64, initialHeading: Float
 
         // TODO -> check
         // since we have initial position through ML, get mean and std and generate a normal distribution
-        val xND = NormalDistribution(mean=initialX, standardDeviation=SENSOR_STD_ERROR)
-        val yND = NormalDistribution(mean=initialY, standardDeviation=SENSOR_STD_ERROR)
-        val hND = NormalDistribution(mean=initialHeading, standardDeviation=SENSOR_STD_ERROR)
+        val xND = NormalDistribution(mean=initialX, standardDeviation=XY_SENSOR_STD_ERROR)
+        val yND = NormalDistribution(mean=initialY, standardDeviation=XY_SENSOR_STD_ERROR)
+        val hND = NormalDistribution(mean=initialHeading, standardDeviation=H_SENSOR_STD_ERROR)
 
         // TODO -> check
         xParticles = xND.sample(generator=RNG).nextBufferBlocking(size=N)
@@ -174,13 +177,11 @@ class ParticleFilter(initialX: Float64, initialY: Float64, initialHeading: Float
         return Pair(weightedMeanX, weightedMeanY)
     }
 
-
     private fun stdEstimate(): Pair<Float64, Float64> {
 
         val weightedMean = stateEstimate()
         val weightedMeanX = weightedMean.first
         val weightedMeanY = weightedMean.second
-
 
         var weightedStdX = 0.0
         var weightedStdY = 0.0
@@ -201,11 +202,11 @@ class ParticleFilter(initialX: Float64, initialY: Float64, initialHeading: Float
     private fun propagate(particle: Particle, dTheta: Float64, dist: Float64): Particle {
 
         // dTheta + noise
-        val dThetaN = dTheta + (randomNormal(size=1)[0] * SENSOR_STD_ERROR)
+        val dThetaN = dTheta + (randomNormal(size=1)[0] * H_SENSOR_STD_ERROR)
         particle.h = (particle.h + dThetaN).mod(360.00)
 
         // dist + noise
-        val distN = dist + (randomNormal(size=1)[0] * SENSOR_STD_ERROR)
+        val distN = dist + (randomNormal(size=1)[0] * XY_SENSOR_STD_ERROR)
         particle.x += distN * cos(particle.h)
         particle.y += distN * sin(particle.h)
 
@@ -233,14 +234,14 @@ class ParticleFilter(initialX: Float64, initialY: Float64, initialHeading: Float
 
         if (landmarks.isEmpty()) {
             val norm = l2Norm(x, y)
-            val nND = NormalDistribution(mean=norm, standardDeviation=SENSOR_STD_ERROR)
+            val nND = NormalDistribution(mean=norm, standardDeviation=XY_SENSOR_STD_ERROR)
             return nND.probability(zs[0])
         }
 
         var zProb = 0.0
         for (i in 0 until landmarks.size) {
             val norm = l2Norm(x, y, landmarks[i])
-            val nND = NormalDistribution(mean=norm, standardDeviation=SENSOR_STD_ERROR)
+            val nND = NormalDistribution(mean=norm, standardDeviation=XY_SENSOR_STD_ERROR)
             zProb += nND.probability(zs[i])
         }
 
@@ -275,14 +276,14 @@ class ParticleFilter(initialX: Float64, initialY: Float64, initialHeading: Float
             zs = Float64Buffer(doubleArrayOf(observedX, observedY))
             val noise = randomNormal(size=zs.size)
 
-            zs[0] = zs[0] + (noise[0] * SENSOR_STD_ERROR)
-            zs[1] = zs[1] + (noise[1] * SENSOR_STD_ERROR)
+            zs[0] = zs[0] + (noise[0] * XY_SENSOR_STD_ERROR)
+            zs[1] = zs[1] + (noise[1] * XY_SENSOR_STD_ERROR)
 
         } else {
             zs = randomNormal(size=landmarks.size)
             for (i in 0 until landmarks.size) {
                 val norm = l2Norm(x=observedX, y=observedY, landmark=landmarks[i])
-                zs[i] = (zs[i] * SENSOR_STD_ERROR) + norm
+                zs[i] = (zs[i] * XY_SENSOR_STD_ERROR) + norm
             }
         }
 

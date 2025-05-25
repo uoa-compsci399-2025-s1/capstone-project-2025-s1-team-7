@@ -122,7 +122,7 @@ class MainActivity : ComponentActivity() {
         rotationService = RotationSensorService(applicationContext)
         stepDetectionService = StepDetectionService(
             applicationContext,
-            onStepDetected = TODO(),
+            onStepDetected = null,
             useRhythm = true
         )
 
