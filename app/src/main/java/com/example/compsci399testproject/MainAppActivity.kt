@@ -287,8 +287,8 @@ fun MapImageView(
             Box(modifier = Modifier
                 .width(1.dp)
                 .height(1.dp)
-                .offset(x = (((754f + particle.x) / 1536f) * floorImageSizeWidth) - 2.dp,
-                    y = (((1330f - particle.y) / 1536f) * floorImageSizeHeight) - 2.dp)
+                .offset(x = (((754f + particle.x) / 1536f) * floorImageSizeWidth) - 0.5.dp,
+                    y = (((1330f - particle.y) / 1536f) * floorImageSizeHeight) - 0.5.dp)
                 .background(color = Color.Red, shape = RoundedCornerShape(6.dp))
                 .border(color = Color.Green, shape = RoundedCornerShape(6.dp), width = 0.1.dp)
             )
