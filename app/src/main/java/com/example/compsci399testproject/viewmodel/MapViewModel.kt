@@ -99,12 +99,15 @@ class MapViewModel(wifiViewModel: WifiViewModel, rotationSensorService: Rotation
 
     private var stepCounter = 0
 
+    var viewModelRotationSensorService = rotationSensorService
     var particleFilter = ParticleFilter(0f.toDouble(), 0f.toDouble(), 0f.toDouble())
 
     // TODO: add landmarks after ML has run
 
     init {
         startPredictingLocation()
+
+        rotationSensorService.startListening()
 
         _positionX.value = ((origin_x + rawPositionX) / actualImageSizeWidth).toFloat()
         _positionY.value = ((origin_y - rawPositionY) / actualImageSizeHeight).toFloat()

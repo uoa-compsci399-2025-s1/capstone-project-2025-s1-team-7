@@ -58,6 +58,7 @@ import androidx.compose.ui.unit.times
 
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.compsci399testproject.bayesianfilters.ParticleFilter
+import com.example.compsci399testproject.sensors.RotationSensorService
 import com.example.compsci399testproject.utils.NavigationGraph
 import com.example.compsci399testproject.utils.Node
 import com.example.compsci399testproject.utils.NodeType
@@ -93,7 +94,8 @@ fun MapImageView(
     drawNavPath: (Int) -> Unit,
     mapImageSizeWidth: Dp,
     mapImageSizeHeight: Dp,
-    particleFilter: ParticleFilter
+    particleFilter: ParticleFilter,
+    rotationSensorService: RotationSensorService
 ) {
     val context = LocalContext.current
     val imageBitmap = remember(floor) {
@@ -269,7 +271,7 @@ fun MapImageView(
                 .size(positionIconSizeX, positionIconSizeY)
                 .offset(positionIconPosX, positionIconPosY)
                 .graphicsLayer {
-                    rotationZ = rotation
+                    rotationZ = rotationSensorService.azimuthCompass
                 }
         )
 
@@ -619,7 +621,8 @@ fun MapView(viewModel: MapViewModel = viewModel()) {
             drawNavPath = {viewModel.drawNavPath(it)},
             mapImageSizeWidth = floorImageSizeWidth,
             mapImageSizeHeight = floorImageSizeHeight,
-            particleFilter = viewModel.particleFilter
+            particleFilter = viewModel.particleFilter,
+            rotationSensorService = viewModel.viewModelRotationSensorService
         )
 
         SearchBar(
