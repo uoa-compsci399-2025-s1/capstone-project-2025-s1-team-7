@@ -57,6 +57,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.times
 
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.compsci399testproject.bayesianfilters.ParticleFilter
 import com.example.compsci399testproject.utils.NavigationGraph
 import com.example.compsci399testproject.utils.Node
 import com.example.compsci399testproject.utils.NodeType
@@ -91,7 +92,8 @@ fun MapImageView(
     nextFloorPathEndNode: Node,
     drawNavPath: (Int) -> Unit,
     mapImageSizeWidth: Dp,
-    mapImageSizeHeight: Dp
+    mapImageSizeHeight: Dp,
+    particleFilter: ParticleFilter
 ) {
     val context = LocalContext.current
     val imageBitmap = remember(floor) {
@@ -278,6 +280,19 @@ fun MapImageView(
                 y = (((1330f - navigationNode.y) / 1536f) * floorImageSizeHeight) - 2.dp)
             .background(color = colorResource(id = R.color.light_blue), shape = RoundedCornerShape(6.dp))
         )
+
+        for (pair in particleFilter.getParticles()) {
+            val particle = pair.first
+
+            Box(modifier = Modifier
+                .width(1.dp)
+                .height(1.dp)
+                .offset(x = (((754f + particle.x) / 1536f) * floorImageSizeWidth) - 2.dp,
+                    y = (((1330f - particle.y) / 1536f) * floorImageSizeHeight) - 2.dp)
+                .background(color = Color.Red, shape = RoundedCornerShape(6.dp))
+                .border(color = Color.Green, shape = RoundedCornerShape(6.dp), width = 0.1.dp)
+            )
+        }
     }
 }
 
@@ -603,7 +618,8 @@ fun MapView(viewModel: MapViewModel = viewModel()) {
             nextFloorPathEndNode = viewModel.nextFloorPathEndNode,
             drawNavPath = {viewModel.drawNavPath(it)},
             mapImageSizeWidth = floorImageSizeWidth,
-            mapImageSizeHeight = floorImageSizeHeight
+            mapImageSizeHeight = floorImageSizeHeight,
+            particleFilter = viewModel.particleFilter
         )
 
         SearchBar(

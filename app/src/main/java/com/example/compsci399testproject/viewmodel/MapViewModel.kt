@@ -99,6 +99,8 @@ class MapViewModel(wifiViewModel: WifiViewModel, rotationSensorService: Rotation
 
     private var stepCounter = 0
 
+    var particleFilter = ParticleFilter(0f.toDouble(), 0f.toDouble(), 0f.toDouble())
+
     // TODO: add landmarks after ML has run
 
     init {
@@ -107,12 +109,12 @@ class MapViewModel(wifiViewModel: WifiViewModel, rotationSensorService: Rotation
         _positionX.value = ((origin_x + rawPositionX) / actualImageSizeWidth).toFloat()
         _positionY.value = ((origin_y - rawPositionY) / actualImageSizeHeight).toFloat()
 
-        val pf = ParticleFilter(
+        particleFilter = ParticleFilter(
             initialX = rawPositionX,
             initialY = rawPositionY,
             initialHeading = rotationSensorService.azimuthCompass.toDouble()
         )
-        pf.addLandmark(x=rawPositionX, y=rawPositionY)
+        particleFilter.addLandmark(x=rawPositionX, y=rawPositionY)
 
         viewModelScope.launch {
             stepDetectionService.stepChangeFun {
@@ -126,7 +128,7 @@ class MapViewModel(wifiViewModel: WifiViewModel, rotationSensorService: Rotation
                 val hStd = 45.00
                 val dM = stepCounter * 0.6
                 val dStd = 1.2
-                val xy = pf.update(hMean = hM, hStd = hStd, dMean = dM, dStd = dStd)
+                val xy = particleFilter.update(hMean = hM, hStd = hStd, dMean = dM, dStd = dStd)
 
                 Log.d("Step Count", "$stepCounter")
 
