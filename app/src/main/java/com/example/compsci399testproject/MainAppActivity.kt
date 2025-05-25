@@ -95,6 +95,7 @@ fun MapImageView(
     mapImageSizeWidth: Dp,
     mapImageSizeHeight: Dp,
     particleFilter: ParticleFilter,
+    particleFilterEnabled: Boolean,
     rotationSensorService: RotationSensorService
 ) {
     val context = LocalContext.current
@@ -283,17 +284,19 @@ fun MapImageView(
             .background(color = colorResource(id = R.color.light_blue), shape = RoundedCornerShape(6.dp))
         )
 
-        for (pair in particleFilter.getParticles()) {
-            val particle = pair.first
+        if (particleFilterEnabled) {
+            for (pair in particleFilter.getParticles()) {
+                val particle = pair.first
 
-            Box(modifier = Modifier
-                .width(1.dp)
-                .height(1.dp)
-                .offset(x = (((754f + particle.x) / 1536f) * floorImageSizeWidth) - 0.5.dp,
-                    y = (((1330f - particle.y) / 1536f) * floorImageSizeHeight) - 0.5.dp)
-                .background(color = Color.Red, shape = RoundedCornerShape(6.dp))
-                .border(color = Color.Green, shape = RoundedCornerShape(6.dp), width = 0.1.dp)
-            )
+                Box(modifier = Modifier
+                    .width(1.dp)
+                    .height(1.dp)
+                    .offset(x = (((754f + particle.x) / 1536f) * floorImageSizeWidth) - 0.5.dp,
+                        y = (((1330f - particle.y) / 1536f) * floorImageSizeHeight) - 0.5.dp)
+                    .background(color = Color.Red, shape = RoundedCornerShape(6.dp))
+                    .border(color = Color.Green, shape = RoundedCornerShape(6.dp), width = 0.1.dp)
+                )
+            }
         }
     }
 }
@@ -345,6 +348,38 @@ fun FloorSelectorList(selectedFloor : Int, onSelect: (Int) -> Unit, visible: Boo
                     textAlign = TextAlign.Center
                 )
             }
+        }
+    }
+}
+
+@Composable()
+fun ToggleParticleFilterButton(particleFilterEnabled: Boolean, toggleParticleFilter: (Boolean) -> Unit, modifier: Modifier,
+                               uiState: UIState) {
+    if (uiState.equals(UIState.MAIN) || uiState.equals(UIState.NAVIGATING)) {
+        Button(
+            onClick = {toggleParticleFilter(!particleFilterEnabled)},
+            modifier = modifier
+                .offset(x = -20.dp, y = -340.dp)
+                .border(
+                    width = 2.dp,
+                    color = colorResource(id = R.color.light_blue),
+                    shape = RoundedCornerShape(6.dp)
+                )
+                .width(60.dp)
+                .height(60.dp),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = if (particleFilterEnabled) colorResource(id = R.color.light_blue) else colorResource(id = R.color.darker_white)
+            ),
+            shape = RoundedCornerShape(6.dp)
+
+        ) {
+            Text("PF",
+                color = if (particleFilterEnabled) colorResource(id = R.color.darker_white) else colorResource(id = R.color.light_blue),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .wrapContentHeight(align = Alignment.CenterVertically),
+                textAlign = TextAlign.Center
+            )
         }
     }
 }
@@ -622,6 +657,7 @@ fun MapView(viewModel: MapViewModel = viewModel()) {
             mapImageSizeWidth = floorImageSizeWidth,
             mapImageSizeHeight = floorImageSizeHeight,
             particleFilter = viewModel.particleFilter,
+            particleFilterEnabled = viewModel.particleFilterEnabled,
             rotationSensorService = viewModel.viewModelRotationSensorService
         )
 
@@ -645,6 +681,13 @@ fun MapView(viewModel: MapViewModel = viewModel()) {
             destinationNode = viewModel.currentNavDestinationNode,
             uiState = viewModel.uiState,
             updateUiState = {viewModel.updateUiState(it)}
+        )
+
+        ToggleParticleFilterButton(
+            particleFilterEnabled = viewModel.particleFilterEnabled,
+            toggleParticleFilter = {viewModel.toggleParticleFilter(it)},
+            modifier = Modifier.align(Alignment.BottomEnd),
+            uiState = viewModel.uiState
         )
 
         ResetPositionButton(

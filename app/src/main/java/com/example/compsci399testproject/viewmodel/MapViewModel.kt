@@ -101,6 +101,7 @@ class MapViewModel(wifiViewModel: WifiViewModel, rotationSensorService: Rotation
 
     var viewModelRotationSensorService = rotationSensorService
     var particleFilter = ParticleFilter(0f.toDouble(), 0f.toDouble(), 0f.toDouble())
+    var particleFilterEnabled by mutableStateOf(false)
 
     // TODO: add landmarks after ML has run
 
@@ -178,6 +179,10 @@ class MapViewModel(wifiViewModel: WifiViewModel, rotationSensorService: Rotation
 
     fun updateUiState(state: UIState) {
         uiState = state
+    }
+
+    fun toggleParticleFilter(state: Boolean) {
+        particleFilterEnabled = state
     }
 
     // Screen Size Functions
