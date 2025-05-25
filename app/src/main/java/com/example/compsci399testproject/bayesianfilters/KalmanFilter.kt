@@ -1,7 +1,6 @@
 package com.example.compsci399testproject.bayesianfilters
 
 import space.kscience.kmath.nd.ShapeND
-import space.kscience.kmath.nd4j.DoubleNd4jTensorAlgebra.ndArray
 import space.kscience.kmath.structures.Float64
 import space.kscience.kmath.tensors.api.TensorAlgebra
 import space.kscience.kmath.tensors.core.DoubleTensor
