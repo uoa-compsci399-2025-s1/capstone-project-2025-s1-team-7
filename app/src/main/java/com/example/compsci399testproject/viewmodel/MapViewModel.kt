@@ -29,6 +29,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeoutOrNull
+import kotlin.math.PI
 
 enum class UIState {
     MAIN,
@@ -129,10 +130,16 @@ class MapViewModel(wifiViewModel: WifiViewModel, rotationSensorService: Rotation
 
         viewModelScope.launch {
             while (true) {
-                val hM = rotationSensorService.azimuthCompass.toDouble()
-                val hStd = 45.00
-                val dM = stepCounter * 0.6
-                val dStd = 1.2
+                // convert heading to from degrees to radians
+//                val hM = rotationSensorService.azimuthCompass.toDouble() * (PI / 2)
+//                val hStd = PI / 4
+//                val dM = stepCounter * 0.6
+//                val dStd = 1.2
+
+                val hM = 0.0
+                val hStd = 0.2
+                val dM = 6.0
+                val dStd = 1.0
                 val xy = particleFilter.update(hMean = hM, hStd = hStd, dMean = dM, dStd = dStd)
 
                 Log.d("Step Count", "$stepCounter")

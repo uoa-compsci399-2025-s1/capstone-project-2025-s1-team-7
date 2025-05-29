@@ -12,6 +12,7 @@ import space.kscience.kmath.structures.Float64Buffer
 import space.kscience.kmath.structures.asBuffer
 import space.kscience.kmath.structures.asList
 import space.kscience.kmath.structures.toFloat64Buffer
+import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.pow
 import kotlin.math.sin
@@ -45,8 +46,8 @@ class ParticleFilter(initialX: Float64, initialY: Float64, initialHeading: Float
         const val N = 1000
 
         // The standard deviation is the spread of the Gaussian
-        const val XY_SENSOR_STD_ERROR = 1.2 // Adjustable - 0.5 is just arbitrary value
-        const val H_SENSOR_STD_ERROR = 30.0 // Adjustable - 0.5 is just arbitrary value
+        const val XY_SENSOR_STD_ERROR = 1.2 // Adjustable
+        const val H_SENSOR_STD_ERROR = PI / 4 // Adjustable - 45 degrees
 
         // custom rate at which a landmark (ML pos) becomes less useful
         // Degradation? Depreciation? Obsolete? I can't think of a good word
@@ -88,7 +89,7 @@ class ParticleFilter(initialX: Float64, initialY: Float64, initialHeading: Float
         hParticles = hND.sample(generator=RNG)
                         .nextBufferBlocking(size=N)
                         .asList()
-                        .map { h -> h.mod(360.00) }
+                        .map { h -> h.mod(2 * PI) }
                         .asBuffer()
                         .toFloat64Buffer()
 
@@ -130,10 +131,10 @@ class ParticleFilter(initialX: Float64, initialY: Float64, initialHeading: Float
     private suspend fun systematicResampling(): Array<Int> {
         val indexes = Array<Int>(N) { 0 }
         val cumulativeWeights = weights.asIterable().cumulativeSum().toList()
-        val start = UniformDistribution(range=0.0..(1/N.toDouble()))
+        val start = UniformDistribution(range=0.0..(1.0/N))
 
         for (i in 0 until N) {
-            val current = start.next(generator=RNG) + (1.0/N.toDouble()) * i
+            val current = start.next(generator=RNG) + (1.0/N) * i
             var s = 0
             while (current > cumulativeWeights[s]) {
                 s += 1
@@ -213,7 +214,7 @@ class ParticleFilter(initialX: Float64, initialY: Float64, initialHeading: Float
 
         // dTheta + noise
         val dThetaN = dTheta + (randomNormal(size=1)[0] * H_SENSOR_STD_ERROR)
-        particle.h = (particle.h + dThetaN).mod(360.00)
+        particle.h = (particle.h + dThetaN).mod(2 * PI)
 
         // dist + noise
         val distN = dist + (randomNormal(size=1)[0] * XY_SENSOR_STD_ERROR)
@@ -283,6 +284,7 @@ class ParticleFilter(initialX: Float64, initialY: Float64, initialHeading: Float
         val observedY = meanXY.second + (dMean * sin(hMean))
 
         if (landmarks.isEmpty()) {
+            // has norm
             zs = Float64Buffer(doubleArrayOf(observedX, observedY))
             val noise = randomNormal(size=zs.size)
 
@@ -290,6 +292,7 @@ class ParticleFilter(initialX: Float64, initialY: Float64, initialHeading: Float
             zs[1] = zs[1] + (noise[1] * XY_SENSOR_STD_ERROR)
 
         } else {
+            // has noise
             zs = randomNormal(size=landmarks.size)
             for (i in 0 until landmarks.size) {
                 val norm = l2Norm(x=observedX, y=observedY, landmark=landmarks[i])
@@ -303,7 +306,7 @@ class ParticleFilter(initialX: Float64, initialY: Float64, initialHeading: Float
             // random sample according to weight -> higher weight = more common
 //            val j = RNG.nextInt(N)
 
-            var particle= Particle(x= xParticles[i], y=yParticles[i], h=hParticles[i])
+            var particle= Particle(x=xParticles[i], y=yParticles[i], h=hParticles[i])
 
             // apply state transition model
             particle = propagate(particle=particle, dTheta=hND.next(generator=RNG), dist=distND.next(generator=RNG))
