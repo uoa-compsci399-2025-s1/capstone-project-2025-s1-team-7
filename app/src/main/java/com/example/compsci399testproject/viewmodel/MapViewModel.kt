@@ -131,15 +131,20 @@ class MapViewModel(wifiViewModel: WifiViewModel, rotationSensorService: Rotation
         viewModelScope.launch {
             while (true) {
                 // convert heading to from degrees to radians
-//                val hM = rotationSensorService.azimuthCompass.toDouble() * (PI / 2)
-//                val hStd = PI / 4
-//                val dM = stepCounter * 0.6
-//                val dStd = 1.2
+                val hM = rotationSensorService.azimuthCompass.toDouble() * (PI / 2)
+                val hStd = PI / 4
+                // usual
+//                val dM = stepCounter * 0.65
 
-                val hM = 0.0
-                val hStd = 0.2
-                val dM = 6.0
-                val dStd = 1.0
+                // exaggerated
+                val dM = stepCounter * 5.0
+                val dStd = 0.6
+
+//                val hM = 0.0
+//                val hStd = 0.2
+//                val dM = 6.0
+//                val dStd = 1.0
+
                 val xy = particleFilter.update(hMean = hM, hStd = hStd, dMean = dM, dStd = dStd)
 
                 Log.d("Step Count", "$stepCounter")

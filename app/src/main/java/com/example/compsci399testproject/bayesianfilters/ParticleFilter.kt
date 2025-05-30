@@ -17,6 +17,7 @@ import kotlin.math.cos
 import kotlin.math.pow
 import kotlin.math.sin
 import kotlin.math.sqrt
+import kotlin.random.Random
 
 
 // TODO Future List:
@@ -46,7 +47,7 @@ class ParticleFilter(initialX: Float64, initialY: Float64, initialHeading: Float
         const val N = 1000
 
         // The standard deviation is the spread of the Gaussian
-        const val XY_SENSOR_STD_ERROR = 1.2 // Adjustable
+        const val XY_SENSOR_STD_ERROR = 0.65 // Adjustable
         const val H_SENSOR_STD_ERROR = PI / 4 // Adjustable - 45 degrees
 
         // custom rate at which a landmark (ML pos) becomes less useful
@@ -230,7 +231,7 @@ class ParticleFilter(initialX: Float64, initialY: Float64, initialHeading: Float
     }
 
     // 😂haha😂
-    private fun evaluWeight(zs: Float64Buffer, particle: Particle): Float64  {
+    private fun evaluWeight(particle: Particle): Float64  {
 
         /*
 
@@ -243,17 +244,13 @@ class ParticleFilter(initialX: Float64, initialY: Float64, initialHeading: Float
         val x = particle.x
         val y = particle.y
 
-        if (landmarks.isEmpty()) {
-            val norm = l2Norm(x, y)
-            val nND = NormalDistribution(mean=norm, standardDeviation=XY_SENSOR_STD_ERROR)
-            return nND.probability(zs[0])
-        }
+        val z = l2Norm(x, y)
 
-        var zProb = 0.0
+        var zProb = 1.0
         for (i in 0 until landmarks.size) {
             val norm = l2Norm(x, y, landmarks[i])
             val nND = NormalDistribution(mean=norm, standardDeviation=XY_SENSOR_STD_ERROR)
-            zProb += nND.probability(zs[i])
+            zProb *= nND.probability(z + Random.nextFloat())
         }
 
         return zProb
@@ -275,31 +272,6 @@ class ParticleFilter(initialX: Float64, initialY: Float64, initialHeading: Float
         val hND = NormalDistribution(mean=hMean, standardDeviation=hStd)
         val distND = NormalDistribution(mean=dMean, standardDeviation=dStd)
 
-        // observed measurements
-        val zs: Float64Buffer
-
-        // educated guess?
-        // where we think person has moved given old positions, distance mean and heading mean
-        val observedX = meanXY.first + (dMean * cos(hMean))
-        val observedY = meanXY.second + (dMean * sin(hMean))
-
-        if (landmarks.isEmpty()) {
-            // has norm
-            zs = Float64Buffer(doubleArrayOf(observedX, observedY))
-            val noise = randomNormal(size=zs.size)
-
-            zs[0] = zs[0] + (noise[0] * XY_SENSOR_STD_ERROR)
-            zs[1] = zs[1] + (noise[1] * XY_SENSOR_STD_ERROR)
-
-        } else {
-            // has noise
-            zs = randomNormal(size=landmarks.size)
-            for (i in 0 until landmarks.size) {
-                val norm = l2Norm(x=observedX, y=observedY, landmark=landmarks[i])
-                zs[i] = (zs[i] * XY_SENSOR_STD_ERROR) + norm
-            }
-        }
-
         for (i in 0 until N) {
 
             // TODO -> ? check j and make it according to weight
@@ -312,7 +284,7 @@ class ParticleFilter(initialX: Float64, initialY: Float64, initialHeading: Float
             particle = propagate(particle=particle, dTheta=hND.next(generator=RNG), dist=distND.next(generator=RNG))
 
             // prior * likelihood <-> Old weight * p(z | x)
-            val wI = weights[i] * evaluWeight(zs=zs, particle=particle)
+            val wI = weights[i] * evaluWeight(particle=particle)
 
             newWeights[i] = wI
 
