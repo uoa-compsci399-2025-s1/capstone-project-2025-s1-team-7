@@ -137,6 +137,7 @@ class ParticleFilter(initialX: Float64, initialY: Float64, initialHeading: Float
         return 1.0 / weights.asList().sumOf { w -> w.pow(2) }
     }
 
+    // resample to remove low weights
     private fun resample(indexes: Array<Int>) {
         val newX = Float64Buffer(DoubleArray(N) { 0.0 })
         val newY = Float64Buffer(DoubleArray(N) { 0.0 })
@@ -159,6 +160,7 @@ class ParticleFilter(initialX: Float64, initialY: Float64, initialHeading: Float
         }
     }
 
+    // weighted X Y are position output by filter
     private fun stateEstimate(): XY {
         var weightedMeanX = 0.0
         var weightedMeanY = 0.0
@@ -176,6 +178,7 @@ class ParticleFilter(initialX: Float64, initialY: Float64, initialHeading: Float
         return Pair(weightedMeanX, weightedMeanY)
     }
 
+    // don't actually need
     private fun stdEstimate(): Pair<Float64, Float64> {
 
         val weightedMean = stateEstimate()
@@ -198,6 +201,7 @@ class ParticleFilter(initialX: Float64, initialY: Float64, initialHeading: Float
         return Pair(weightedStdX, weightedStdY)
     }
 
+    // move particles by using state transition function
     private fun propagate(particle: Particle, dTheta: Float64, dist: Float64): Particle {
 
         // (change in theta) + noise
@@ -236,7 +240,7 @@ class ParticleFilter(initialX: Float64, initialY: Float64, initialHeading: Float
         for (i in 0 until landmarks.size) {
             val norm = l2Norm(x, y, landmarks[i])
             val nND = NormalDistribution(mean=norm, standardDeviation=XY_SENSOR_STD_ERROR)
-            val z = norm + randomNormal(size=1)[0] * XY_SENSOR_STD_ERROR
+            val z = norm + (randomNormal(size=1)[0] * XY_SENSOR_STD_ERROR)
             zProb *= nND.probability(z)
         }
 
