@@ -48,7 +48,7 @@ class ParticleFilter(initialX: Float64, initialY: Float64, initialHeading: Float
 
         // The standard deviation is the spread of the Gaussian
         const val XY_SENSOR_STD_ERROR = 0.65 // Adjustable
-        const val H_SENSOR_STD_ERROR = PI / 4 // Adjustable - 45 degrees
+        const val H_SENSOR_STD_ERROR = 0.02// Adjustable
 
         // custom rate at which a landmark (ML pos) becomes less useful
         // Degradation? Depreciation? Obsolete? I can't think of a good word
@@ -58,7 +58,6 @@ class ParticleFilter(initialX: Float64, initialY: Float64, initialHeading: Float
 
     }
 
-    //  TODO -> check
     private var xParticles: Float64Buffer
     private var yParticles: Float64Buffer
     private var hParticles: Float64Buffer
@@ -76,33 +75,21 @@ class ParticleFilter(initialX: Float64, initialY: Float64, initialHeading: Float
 
     init {
 
-        // TODO -> check
         // since we have initial position through ML, get mean and std and generate a normal distribution
         val xND = NormalDistribution(mean=initialX, standardDeviation=XY_SENSOR_STD_ERROR)
         val yND = NormalDistribution(mean=initialY, standardDeviation=XY_SENSOR_STD_ERROR)
         val hND = NormalDistribution(mean=initialHeading, standardDeviation=H_SENSOR_STD_ERROR)
 
-        // TODO -> check
         xParticles = xND.sample(generator=RNG).nextBufferBlocking(size=N)
         yParticles = yND.sample(generator=RNG).nextBufferBlocking(size=N)
 
-        // 0.00 <= h < 360.00
+        // 0.00 <= h < 360.00 -> in rads
         hParticles = hND.sample(generator=RNG)
                         .nextBufferBlocking(size=N)
                         .asList()
                         .map { h -> h.mod(2 * PI) }
                         .asBuffer()
                         .toFloat64Buffer()
-
-        println("---- xParticles ----")
-        println(xParticles.asList().take(20))
-        println()
-        println("---- yParticles ----")
-        println(yParticles.asList().take(20))
-        println()
-        println("---- hParticles ----")
-        println(hParticles.asList().take(20))
-        println()
 
         addLandmark(x=initialX, y=initialX)
     }
@@ -213,8 +200,8 @@ class ParticleFilter(initialX: Float64, initialY: Float64, initialHeading: Float
 
     private fun propagate(particle: Particle, dTheta: Float64, dist: Float64): Particle {
 
-        // dTheta + noise
-        val dThetaN = dTheta + (randomNormal(size=1)[0] * H_SENSOR_STD_ERROR)
+        // (change in theta) + noise
+        val dThetaN = (dTheta - particle.h) + (randomNormal(size=1)[0] * H_SENSOR_STD_ERROR)
         particle.h = (particle.h + dThetaN).mod(2 * PI)
 
         // dist + noise
@@ -244,19 +231,19 @@ class ParticleFilter(initialX: Float64, initialY: Float64, initialHeading: Float
         val x = particle.x
         val y = particle.y
 
-        val z = l2Norm(x, y)
 
         var zProb = 1.0
         for (i in 0 until landmarks.size) {
             val norm = l2Norm(x, y, landmarks[i])
             val nND = NormalDistribution(mean=norm, standardDeviation=XY_SENSOR_STD_ERROR)
-            zProb *= nND.probability(z + Random.nextFloat())
+            val z = norm + randomNormal(size=1)[0] * XY_SENSOR_STD_ERROR
+            zProb *= nND.probability(z)
         }
 
         return zProb
     }
 
-    suspend fun update(hMean: Float64, hStd: Float64, dMean: Float64, dStd: Float64): XY {
+    suspend fun update(hMean: Float64, dMean: Float64): XY {
 
         // Make observer?
         dt +=1
@@ -269,9 +256,6 @@ class ParticleFilter(initialX: Float64, initialY: Float64, initialHeading: Float
         val newH = Float64Buffer(DoubleArray(N) { 0.0 })
         val newWeights = Float64Buffer(DoubleArray(N) { 0.0 })
 
-        val hND = NormalDistribution(mean=hMean, standardDeviation=hStd)
-        val distND = NormalDistribution(mean=dMean, standardDeviation=dStd)
-
         for (i in 0 until N) {
 
             // TODO -> ? check j and make it according to weight
@@ -281,7 +265,7 @@ class ParticleFilter(initialX: Float64, initialY: Float64, initialHeading: Float
             var particle= Particle(x=xParticles[i], y=yParticles[i], h=hParticles[i])
 
             // apply state transition model
-            particle = propagate(particle=particle, dTheta=hND.next(generator=RNG), dist=distND.next(generator=RNG))
+            particle = propagate(particle=particle, dTheta=hMean, dist=dMean)
 
             // prior * likelihood <-> Old weight * p(z | x)
             val wI = weights[i] * evaluWeight(particle=particle)
