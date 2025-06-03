@@ -310,7 +310,8 @@ fun MapImageView(
 // For Eric - this is a placeholder, feel free to overwrite however you see fit.
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun FloorSelectorList(selectedFloor : Int, onSelect: (Int) -> Unit, visible: Boolean, changeFloorVisibility: (Boolean) -> Unit, modifier: Modifier){
+fun FloorSelectorList(selectedFloor : Int, onSelect: (Int) -> Unit, visible: Boolean, changeFloorVisibility: (Boolean) -> Unit,
+                      updateCameraLockState: (CameraLockState) -> Unit, modifier: Modifier){
     val state : ScrollState = rememberScrollState()
 
     LaunchedEffect(Unit) {
@@ -336,7 +337,7 @@ fun FloorSelectorList(selectedFloor : Int, onSelect: (Int) -> Unit, visible: Boo
         verticalArrangement = Arrangement.spacedBy(0.dp)) {
         for (floor in 5 downTo 0) {
             Button(
-                onClick = { onSelect(floor) },
+                onClick = { onSelect(floor); updateCameraLockState(CameraLockState.FREE) },
                 modifier = Modifier
                     .padding(0.dp)
                     .fillMaxWidth()
@@ -710,6 +711,7 @@ fun MapView(viewModel: MapViewModel = viewModel()) {
             onSelect = { viewModel.setFloor(it)},
             visible = floorSelectorVisible,
             changeFloorVisibility = {floorSelectorVisible = it},
+            updateCameraLockState = {viewModel.updateCameraLockState(it)},
             modifier = Modifier.align(Alignment.BottomEnd)
         )
     }
