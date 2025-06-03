@@ -113,7 +113,7 @@ fun MapImageView(
         } catch (e: Exception) {
             Toast.makeText(context, "Could not find floor image", Toast.LENGTH_SHORT).show()
             val assetManager = context.assets
-            val path = "Building 302/Tiles/Floor ${0}/Floor${0}.png"
+            val path = "Building 302/image_not_found.png"
             val inputStream = assetManager.open(path)
             val bitmap = BitmapFactory.decodeStream(inputStream)
             bitmap.asImageBitmap()
