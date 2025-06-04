@@ -30,6 +30,8 @@ import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeoutOrNull
 import kotlin.math.PI
+import kotlin.math.abs
+import kotlin.math.round
 
 enum class UIState {
     MAIN,
@@ -129,23 +131,30 @@ class MapViewModel(wifiViewModel: WifiViewModel, rotationSensorService: Rotation
 
         viewModelScope.launch {
             while (true) {
+
+                val h = rotationSensorService.azimuthCompass.toDouble()
                 // convert heading to from degrees to radians
-                val hM = rotationSensorService.azimuthCompass.toDouble() * (PI / 180)
+                // compass north = 0.0 | unit circle north = 90
+                val hM = (abs(h) + 90) * (PI / 180)
                 val dM = stepCounter * 0.65
 
                 val xy = particleFilter.update(hMean = hM, dMean = dM)
 
                 Log.d("Step Count", "$stepCounter")
 
-                // Amplify result by 30
-                rawPositionX = xy.first
-                rawPositionY = xy.second
+                // Amplify result by 1.5
+                rawPositionX = round(xy.first) * 1.5
+                rawPositionY = round(xy.second) * 1.5
 
                 _positionX.value = ((origin_x + rawPositionX) / actualImageSizeWidth).toFloat()
                 _positionY.value = ((origin_y - rawPositionY) / actualImageSizeHeight).toFloat()
 
+                Log.d("H Deg", "$h")
+                Log.d("H Rad", "$hM")
+
                 Log.d("Raw X", "$rawPositionX")
                 Log.d("Raw Y", "$rawPositionY")
+
 
                 Log.d("Position X", "${_positionX.value}")
                 Log.d("Position Y", "${_positionY.value}")
