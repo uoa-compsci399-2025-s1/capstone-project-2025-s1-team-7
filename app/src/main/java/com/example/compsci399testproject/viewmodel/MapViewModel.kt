@@ -151,7 +151,7 @@ class MapViewModel(wifiViewModel: WifiViewModel, rotationSensorService: Rotation
                 Log.d("Position Y", "${_positionY.value}")
 
                 stepCounter = 0
-                delay(2000)
+                delay(1000)
             }
         }
     }
