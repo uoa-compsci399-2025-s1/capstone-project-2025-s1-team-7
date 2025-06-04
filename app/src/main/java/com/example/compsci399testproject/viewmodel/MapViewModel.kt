@@ -120,7 +120,6 @@ class MapViewModel(wifiViewModel: WifiViewModel, rotationSensorService: Rotation
             initialY = rawPositionY,
             initialHeading = rotationSensorService.azimuthCompass.toDouble()
         )
-        particleFilter.addLandmark(x=rawPositionX, y=rawPositionY)
 
         viewModelScope.launch {
             stepDetectionService.stepChangeFun {
