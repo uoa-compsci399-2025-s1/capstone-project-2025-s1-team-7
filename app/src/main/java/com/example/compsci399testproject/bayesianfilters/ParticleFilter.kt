@@ -41,7 +41,7 @@ private fun randomNormal(size: Int = 1): Float64Buffer {
 
 // l2Norm aka ||x|| aka euclidean distance
 private fun l2Norm(x: Float64, y: Float64, xp: Float64, yp: Float64): Float64 {
-    return sqrt((x - xp).pow(1) + (y - yp).pow(2) )
+    return sqrt((x - xp).pow(2) + (y - yp).pow(2) )
 }
 
 
@@ -251,7 +251,7 @@ class ParticleFilter(initialX: Float64, initialY: Float64, initialHeading: Float
 
             // Measure distance of particle from landmark
             val zNorm = l2Norm(lx, ly, x, y)
-            val z = norm + (randomNormal(size=1)[0] * XY_SENSOR_STD_ERROR)
+            val z = zNorm + (randomNormal(size=1)[0] * XY_SENSOR_STD_ERROR)
             zProb *= nND.probability(z)
         }
 
@@ -261,7 +261,7 @@ class ParticleFilter(initialX: Float64, initialY: Float64, initialHeading: Float
     suspend fun update(hMean: Float64, dMean: Float64): XY {
 
         // Make observer?
-        dt +=1
+        dt += 1
         dtSupervisor()
 
         var normalizationFactor: Float64 = 0.0
