@@ -24,7 +24,7 @@ import kotlin.random.Random
 //      -> Make particles be aware of walls
 //      -> Make PF z aware
 
-// TODO: use multivariate distributions? not implemented in kmath library
+// TODO: use multivariate noise? not implemented in kmath library
 
 // Vent: I went from Float64Buffer to DoubleTensor to StructureND<Float64> to Nd4jArrayDoubleStructure back to Float64Buffer
 
@@ -33,10 +33,15 @@ private typealias Weight = Float64
 
 data class Particle(var x: Float64, var y: Float64, var h: Float64)
 
-private fun randomNormal(size: Int): Float64Buffer {
+private fun randomNormal(size: Int = 1): Float64Buffer {
     val nd = GaussianSampler(mean=0.0, standardDeviation=1.0)
     val generator = RandomGenerator.default
     return nd.sample(generator=generator).nextBufferBlocking(size)
+}
+
+// l2Norm aka ||x|| aka euclidean distance
+private fun l2Norm(x: Float64, y: Float64, xp: Float64, yp: Float64): Float64 {
+    return sqrt((x - xp).pow(1) + (y - yp).pow(2) )
 }
 
 
@@ -44,7 +49,7 @@ private fun randomNormal(size: Int): Float64Buffer {
 class ParticleFilter(initialX: Float64, initialY: Float64, initialHeading: Float64) {
 
     private companion object {
-        const val N = 1000
+        const val N = 2000
 
         // The standard deviation is the spread of the Gaussian
         const val XY_SENSOR_STD_ERROR = 0.65 // Adjustable
@@ -71,7 +76,7 @@ class ParticleFilter(initialX: Float64, initialY: Float64, initialHeading: Float
     // Used to count time steps
     private var dt: Int = 0
 
-    private var meanXY: XY = Pair(initialX, initialX)
+    private var meanXY: XY = Pair(initialX, initialY)
 
     init {
 
@@ -91,7 +96,7 @@ class ParticleFilter(initialX: Float64, initialY: Float64, initialHeading: Float
                         .asBuffer()
                         .toFloat64Buffer()
 
-        addLandmark(x=initialX, y=initialX)
+        addLandmark(x=initialX, y=initialY)
     }
 
    fun getParticles(): ArrayList<Pair<Particle, Weight>> {
@@ -216,10 +221,6 @@ class ParticleFilter(initialX: Float64, initialY: Float64, initialHeading: Float
         return particle
     }
 
-    // l2Norm aka ||x|| aka euclidean distance
-    private fun l2Norm(x: Float64, y: Float64, landmark: XY = Pair(0.0,0.0)): Float64 {
-        return sqrt((x - landmark.first).pow(2) + (y - landmark.second).pow(2) )
-    }
 
     // 😂haha😂
     private fun evaluWeight(particle: Particle): Float64  {
@@ -230,6 +231,8 @@ class ParticleFilter(initialX: Float64, initialY: Float64, initialHeading: Float
 
         Feed observed readings (z) into distribution to get PDF -> importance sampling
 
+        For (S)IR Particle Filter -> w1 = w0 * p(z | x)
+
          */
 
         val x = particle.x
@@ -238,8 +241,16 @@ class ParticleFilter(initialX: Float64, initialY: Float64, initialHeading: Float
 
         var zProb = 1.0
         for (i in 0 until landmarks.size) {
-            val norm = l2Norm(x, y, landmarks[i])
+
+            val lx = landmarks[i].first
+            val ly = landmarks[i].second
+
+            // Construct Importance Distribution
+            val norm = l2Norm(x, y, lx, ly)
             val nND = NormalDistribution(mean=norm, standardDeviation=XY_SENSOR_STD_ERROR)
+
+            // Measure distance of particle from landmark
+            val zNorm = l2Norm(lx, ly, x, y)
             val z = norm + (randomNormal(size=1)[0] * XY_SENSOR_STD_ERROR)
             zProb *= nND.probability(z)
         }

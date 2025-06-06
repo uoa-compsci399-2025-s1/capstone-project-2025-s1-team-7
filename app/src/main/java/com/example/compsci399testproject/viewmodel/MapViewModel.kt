@@ -136,15 +136,18 @@ class MapViewModel(wifiViewModel: WifiViewModel, rotationSensorService: Rotation
                 // convert heading to from degrees to radians
                 // compass north = 0.0 | unit circle north = 90
                 val hM = (abs(h) + 90) * (PI / 180)
-                val dM = stepCounter * 0.65
+
+                // step count * avg stride distance * amplification
+                // the amplification is needed because we use pixel coordinates
+                val dM = stepCounter * 0.65 * 1.75
 
                 val xy = particleFilter.update(hMean = hM, dMean = dM)
 
                 Log.d("Step Count", "$stepCounter")
 
                 // Amplify result by 1.5
-                rawPositionX = round(xy.first) * 1.5
-                rawPositionY = round(xy.second) * 1.5
+                rawPositionX = round(xy.first)
+                rawPositionY = round(xy.second)
 
                 _positionX.value = ((origin_x + rawPositionX) / actualImageSizeWidth).toFloat()
                 _positionY.value = ((origin_y - rawPositionY) / actualImageSizeHeight).toFloat()
@@ -160,7 +163,7 @@ class MapViewModel(wifiViewModel: WifiViewModel, rotationSensorService: Rotation
                 Log.d("Position Y", "${_positionY.value}")
 
                 stepCounter = 0
-                delay(1000)
+                delay(750)
             }
         }
     }
