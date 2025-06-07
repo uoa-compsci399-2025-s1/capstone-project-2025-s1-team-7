@@ -139,7 +139,7 @@ class MapViewModel(wifiViewModel: WifiViewModel, rotationSensorService: Rotation
 
                 // step count * avg stride distance * amplification
                 // the amplification is needed because we use pixel coordinates
-                val dM = stepCounter * 0.65 * 1.75
+                val dM = stepCounter * 0.65 * 2.5
 
                 val xy = particleFilter.update(hMean = hM, dMean = dM)
 
