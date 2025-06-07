@@ -42,36 +42,6 @@ import com.example.compsci399testproject.viewmodel.MapViewModel
 import com.example.compsci399testproject.viewmodel.MapViewModelFactory
 
 
-/*
-
-TODO: Here
-
-    - Initialize step detector service
-
-    - Get mean and std of steps and heading
-        -> either Kalman filter
-        -> or generate list of readings+noise and get mean and then std
-
-   - Find where I need to change X, Y
-
-   - Feed means and stds into Particle Filter
-        -> get mean X, Y and set current X, Y to it
-
-   - Also need to find ML output and feed that in
-
-   All code in here should basically be:
-
-        stepKF = KF.update( readings )
-        headingKF = KF.update( readings )
-
-        position = PF.update( stepKF.mean, stepKF.std, headingKF.mean, headingKF.std, landmark=ML_XY )
-        X = position.X
-        Y = position.Y
-
- */
-
-
-
 class MainActivity : ComponentActivity() {
     private var LOCATION_PERMISSION_REQUEST_CODE = 1
 

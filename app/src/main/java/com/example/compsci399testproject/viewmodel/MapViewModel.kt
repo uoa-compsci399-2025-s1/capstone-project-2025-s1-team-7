@@ -39,6 +39,12 @@ enum class UIState {
     NAVIGATING
 }
 
+enum class CameraLockState {
+    LOCKED_ON_USER_POSITION,
+    LOCKED_ON_CUSTOM_POSITION,
+    FREE
+}
+
 class MapViewModel(wifiViewModel: WifiViewModel, rotationSensorService: RotationSensorService, stepDetectionService: StepDetectionService) : ViewModel() {
 
     var currentFloor by mutableStateOf(0)
@@ -53,7 +59,7 @@ class MapViewModel(wifiViewModel: WifiViewModel, rotationSensorService: Rotation
     var angle by mutableStateOf(0f)
         private set
 
-    var lockedOnPosition by mutableStateOf(true)
+    var cameraLockState by mutableStateOf(CameraLockState.LOCKED_ON_USER_POSITION)
         private set
 
     var uiState by mutableStateOf(UIState.MAIN)
@@ -74,11 +80,12 @@ class MapViewModel(wifiViewModel: WifiViewModel, rotationSensorService: Rotation
     var origin_y by mutableStateOf(1330f);
 
     // Navigation
+    var navigationGraph: NavigationGraph = NavigationGraph()
     var currentNavDestinationNode by mutableStateOf(Node("", 0, 0, 0, NodeType.ROOM, mutableListOf()))
     var navigationNodeList : List<Node> = ArrayList<Node>()
-    var navigationPath = Path()
-    var currentFloorPathEndNode = Node("", 0, 0, 0, NodeType.NULL, mutableListOf())
-    var nextFloorPathEndNode = Node("", 0, 0, 0, NodeType.NULL, mutableListOf())
+    var navigationPath by mutableStateOf(Path())
+    var currentFloorPathEndNode by mutableStateOf(Node("", 0, 0, 0, NodeType.NULL, mutableListOf()))
+    var nextFloorPathEndNode by mutableStateOf(Node("", 0, 0, 0, NodeType.NULL, mutableListOf()))
 
     // Position
     private var rawPositionX: Double by mutableDoubleStateOf(0.0)
@@ -110,6 +117,7 @@ class MapViewModel(wifiViewModel: WifiViewModel, rotationSensorService: Rotation
 
     init {
         startPredictingLocation()
+        loopFunction()
 
         rotationSensorService.startListening()
         stepDetectionService.startListening()
@@ -188,8 +196,8 @@ class MapViewModel(wifiViewModel: WifiViewModel, rotationSensorService: Rotation
         angle = newAngle
     }
 
-    fun updateLockedOnPosition(value: Boolean) {
-        lockedOnPosition = value
+    fun updateCameraLockState(value: CameraLockState) {
+        cameraLockState = value
     }
 
     fun updateUiState(state: UIState) {
@@ -230,12 +238,17 @@ class MapViewModel(wifiViewModel: WifiViewModel, rotationSensorService: Rotation
     }
 
     // Navigation functions
+    fun updateNavigationGraph(ng: NavigationGraph) {
+        navigationGraph = ng
+    }
+
+
     fun updateNavDestinationNode(n: Node) {
         currentNavDestinationNode = n
     }
 
     fun viewDestinationNode(node: Node) {
-        updateLockedOnPosition(false)
+        updateCameraLockState(CameraLockState.LOCKED_ON_CUSTOM_POSITION)
         updateUiState(UIState.NAVIGATION_PREVIEW)
         updateNavDestinationNode(node)
         setFloor(node.floor)
@@ -245,9 +258,7 @@ class MapViewModel(wifiViewModel: WifiViewModel, rotationSensorService: Rotation
         Log.d("MAP VIEWMODEL", "VIEW DESTINATION ${offset} ${zoom} ${angle} | NODE ${node.id} ${node.x}, ${node.y}")
     }
 
-    fun startNavigation(navigationGraph: NavigationGraph) {
-        updateUiState(UIState.NAVIGATING)
-
+    fun createNavPathList() {
         val currentPositionNode = Node(id = "Start Node", x = rawPositionX.toInt(), y = rawPositionY.toInt(),
             floor = positionFloor.value, type = NodeType.TRAVEL, mutableListOf()
         )
@@ -258,11 +269,19 @@ class MapViewModel(wifiViewModel: WifiViewModel, rotationSensorService: Rotation
         // val pathNodeList: List<Node> = createCustomNavNodeList()
         navigationNodeList = pathNodeList
 
-        setFloor(positionFloor.value)
-        updateLockedOnPosition(true)
+        //for (node in navigationNodeList) {
+        //    Log.d("NAVIGATION START", "${node.x}, ${node.y}, ${node.floor}, ${node.type}")
+        //}
     }
 
-    fun drawNavPath(floor: Int) {
+    fun startNavigation() {
+        updateUiState(UIState.NAVIGATING)
+        createNavPathList()
+        setFloor(positionFloor.value)
+        updateCameraLockState(CameraLockState.LOCKED_ON_USER_POSITION)
+    }
+
+    fun drawNavPath(floor: Int): Path {
         val path = Path()
         var index = 0
 
@@ -270,28 +289,31 @@ class MapViewModel(wifiViewModel: WifiViewModel, rotationSensorService: Rotation
         // Set starting position
         for (node in navigationNodeList) {
             index += 1
-            if (node.floor == currentFloor) {
+            if (node.floor == floor) {
 
                 val startX = (((origin_x + node.x) / actualImageSizeWidth) * mapImageSizeWidth)
                 val startY = (((origin_y - node.y) / actualImageSizeWidth) * mapImageSizeWidth)
                 path.moveTo(startX, startY)
+                currentFloorPathEndNode = node
                 startPositionSet = true
                 break
             }
         }
 
+        //Log.d("DRAW NAV PATH", "START POSITION SET ${startPositionSet}")
+
         if (!startPositionSet) {
             navigationPath = Path()
             currentFloorPathEndNode = Node("", 0, 0, 0, NodeType.NULL, mutableListOf())
             nextFloorPathEndNode = Node("", 0, 0, 0, NodeType.NULL, mutableListOf())
-            return
+            return navigationPath
         }
 
         // Loop through nodes on current floor to create Path UI
         for (i: Int in index..<navigationNodeList.size) {
             val node = navigationNodeList.get(i)
 
-            if (node.floor != currentFloor) {
+            if (node.floor != floor) {
                 nextFloorPathEndNode = node
                 break
             }
@@ -305,6 +327,7 @@ class MapViewModel(wifiViewModel: WifiViewModel, rotationSensorService: Rotation
         }
 
         navigationPath = path
+        return navigationPath
     }
 
     fun createCustomNavNodeList() : List<Node> { // For testing the path UI
@@ -329,6 +352,16 @@ class MapViewModel(wifiViewModel: WifiViewModel, rotationSensorService: Rotation
         return arrayList
     }
 
+    private fun loopFunction() {
+        viewModelScope.launch {
+            while (true) {
+                if (uiState == UIState.NAVIGATING) {
+                    createNavPathList()
+                }
+                delay(1_000)
+            }
+        }
+    }
 
     // Wifi Location Prediction Function
     private fun startPredictingLocation() {
@@ -355,7 +388,8 @@ class MapViewModel(wifiViewModel: WifiViewModel, rotationSensorService: Rotation
 //                            _positionY.value = (origin_y - y) / actualImageSizeHeight
                             _positionFloor.value = floor
 
-                            if (lockedOnPosition) {setFloor(floor)}
+                            if (cameraLockState == CameraLockState.LOCKED_ON_USER_POSITION) {setFloor(floor)}
+
                             true
                         } else false
                     }

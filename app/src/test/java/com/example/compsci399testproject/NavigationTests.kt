@@ -6,9 +6,8 @@ import com.example.compsci399testproject.utils.getRoomNodes
 import com.example.compsci399testproject.utils.initialiseTestGraph
 import org.junit.Test
 import org.junit.Assert.*
-class NavigationActivityTest {
+class NavigationTest {
 
-class NavigationTests {
     @Test
     fun testGetRoomNodes() {
 
@@ -32,28 +31,30 @@ class NavigationTests {
         // Create a starting location node
         val startNode = Node(
             id = "test_location",
-            x = 1000,
-            y = -968,
-            floor = 2,
+            x = (-198..47).random(),
+            y = (-2..464).random(),
+            floor = (0..2).random(),
             type = NodeType.TRAVEL,
             edges = mutableListOf()
         )
-        // Get the target node
-        val targetNode = navigationGraph.findNode("302 280")
+        val goalNode = getRoomNodes(navigationGraph).random().id
 
-        // Get the path
         val startTime = System.currentTimeMillis()
+
+        val targetNode = navigationGraph.findNode(goalNode)
+
         val path = getPath(startNode, targetNode, navigationGraph)
+        //println(path)
         val endTime = System.currentTimeMillis()
         val duration = endTime - startTime
 
-        print("getPath took $duration ms")
+        println("getPath took $duration ms")
 
         // Assertions
         assertNotNull(path)
         assertTrue(path.isNotEmpty())
         assertEquals("test_location", path.first().id)
-        assertEquals("302 280", path.last().id)
+        assertEquals(goalNode, path.last().id)
 
         // Verify path connectivity
         for (i in 0 until path.size - 1) {
@@ -62,19 +63,85 @@ class NavigationTests {
             assertTrue(currentNode.edges.any { it.to == nextNode })
         }
     }
+
     @Test
-    fun testGetPathx10() {}
+    fun testGetPathx1000() {
+        var totalRuntime = 0f
+        val tests = mutableMapOf<List<Node>, String>()
+
+        for (i in 0..999) {
+
+
+            // Create test navigation graph with test data
+            val navigationGraph = initialiseTestGraph()
+
+            // Create a starting location node
+            val startNode = Node(
+                id = "test_location",
+                x = (-198..47).random(),
+                y = (-2..464).random().toInt(),
+                floor = (0..2).random(),
+                type = NodeType.TRAVEL,
+                edges = mutableListOf()
+            )
+
+            val startTime = System.currentTimeMillis()
+
+            // Get the target node
+            val goalNode = getRoomNodes(navigationGraph).random().id
+            val targetNode = navigationGraph.findNode(goalNode)
+
+            // Get the path
+            val path = getPath(startNode, targetNode, navigationGraph)
+            tests[path] = goalNode
+            println(path)
+            val endTime = System.currentTimeMillis()
+            val duration = endTime - startTime
+            println(duration)
+            totalRuntime += duration
+            // println(totalRuntime)
+
+            // println("getPath took $duration ms")
+
+            // Verify path connectivity
+            for (i in 0 until path.size - 1) {
+                val currentNode = path[i]
+                val nextNode = path[i + 1]
+                assertTrue(currentNode.edges.any { it.to == nextNode })
+            }
+
+
+        }
+        tests.forEach { test ->
+            val path = test.key
+            val goalNode = test.value
+            assertTrue(path.isNotEmpty())
+            assertEquals("test_location", path.first().id)
+            assertEquals(goalNode, path.last().id)
+        }
+        print("Average runtime for getPath: ${(totalRuntime / 1000).toFloat()} ms from 1000 runs")
+    }
+
     @Test
-    fun testIfOutside() {}
+    fun testIfOutside() {
+    }
+
     @Test
-    fun testDifferentFloors() {}
+    fun testDifferentFloors() {
+    }
+
     @Test
-    fun testElevatosr() {}
+    fun testElevator() {
+    }
+
     @Test
-    fun testStairs() {}
+    fun testStairs() {
+    }
+
     @Test
     fun testGetClosestNodesAA() { // Annoying Areas eg. ping pong
     }
+
     @Test
     fun testRerouting() { // rerun from new location without changing destination)
     }

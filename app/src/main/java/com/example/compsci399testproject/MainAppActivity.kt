@@ -19,6 +19,8 @@ import androidx.compose.ui.graphics.Path
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.rememberSplineBasedDecay
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.ScrollState
@@ -27,21 +29,26 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.detectTransformGestures
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.filled.Place
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.composed
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.PathEffect
@@ -51,6 +58,7 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
@@ -64,10 +72,12 @@ import com.example.compsci399testproject.utils.Node
 import com.example.compsci399testproject.utils.NodeType
 import com.example.compsci399testproject.utils.getRoomNodes
 import com.example.compsci399testproject.utils.initialiseGraph
+import com.example.compsci399testproject.viewmodel.CameraLockState
 
 import com.example.compsci399testproject.viewmodel.MapViewModel
 import com.example.compsci399testproject.viewmodel.UIState
 import kotlin.math.PI
+import kotlin.math.absoluteValue
 import kotlin.math.cos
 import kotlin.math.sin
 
@@ -84,14 +94,14 @@ fun MapImageView(
     positionYPercentage: Float,
     positionFloor: Int,
     rotation: Float,
-    lockedOnPosition: Boolean,
-    changeLockOnPosition: (Boolean) -> Unit,
+    cameraLockState: CameraLockState,
+    updateCameraLockState: (CameraLockState) -> Unit,
     uiState: UIState,
     navigationNode: Node,
     navigationPath: Path,
     currentFloorPathEndNode: Node,
     nextFloorPathEndNode: Node,
-    drawNavPath: (Int) -> Unit,
+    drawNavPath: (Int) -> Path,
     mapImageSizeWidth: Dp,
     mapImageSizeHeight: Dp,
     particleFilter: ParticleFilter,
@@ -109,7 +119,7 @@ fun MapImageView(
         } catch (e: Exception) {
             Toast.makeText(context, "Could not find floor image", Toast.LENGTH_SHORT).show()
             val assetManager = context.assets
-            val path = "Building 302/Tiles/Floor ${0}/Floor${0}.png"
+            val path = "Building 302/image_not_found.png"
             val inputStream = assetManager.open(path)
             val bitmap = BitmapFactory.decodeStream(inputStream)
             bitmap.asImageBitmap()
@@ -128,6 +138,7 @@ fun MapImageView(
     var localOffset:Offset by remember { mutableStateOf(Offset.Zero) }
     var localZoom:Float by remember { mutableFloatStateOf(3.5f) }
     var localAngle:Float by remember { mutableFloatStateOf(0f) }
+    var madeGesture:Boolean by remember { mutableStateOf(false) }
 
     val floorImageSizeWidth : Dp  = mapImageSizeWidth
     val floorImageSizeHeight : Dp = mapImageSizeHeight
@@ -149,6 +160,10 @@ fun MapImageView(
                     val oldScale = localZoom
                     val newScale = Math.max(localZoom * gestureZoom, 1.5f)
 
+                    if (gestureRotate == 0f && gestureZoom == 1f && (pan.x.absoluteValue > 10f || pan.y.absoluteValue > 10f)) {
+                        updateCameraLockState(CameraLockState.FREE)
+                    }
+
                     // For natural zooming and rotating, the centroid of the gesture should
                     // be the fixed point where zooming and rotating occurs.
                     // We compute where the centroid was (in the pre-transformed coordinate
@@ -161,42 +176,50 @@ fun MapImageView(
                     localZoom = newScale
                     localAngle += gestureRotate
 
-                    updateOffset(localOffset)
-                    updateZoom(localZoom)
-                    updateAngle(localAngle)
-                    changeLockOnPosition(false)
+                    madeGesture = true
                 }
             )
         }
         .graphicsLayer {
-            if (lockedOnPosition) {
+            if (cameraLockState == CameraLockState.LOCKED_ON_USER_POSITION) {
                 val width = this.size.width
                 val height = this.size.height
 
-                val newZoom = 6f
-
-                val widthOffset = (width / 2) / newZoom
-                val heightOffset = (height / 2) / newZoom
+                val widthOffset = (width / 2) / localZoom
+                val heightOffset = (height / 2) / localZoom
 
                 val x = rawPositionX.toPx() - widthOffset
                 val y = rawPositionY.toPx() - heightOffset
 
                 localOffset = Offset(x, y)
-                localZoom = newZoom
                 localAngle = 0f
 
                 updateOffset(localOffset)
                 updateZoom(localZoom)
                 updateAngle(localAngle)
                 //Log.d("MAP", "Pixel position of User | ${x}, ${y} | Pos ${width} ${height}")
-            } else if (!uiState.equals(UIState.MAIN)) {
-                // This is a very hacky method to update the local position and should be changed later
-                localOffset = offset
-                localZoom = zoom
-                localAngle = angle
+                madeGesture = false
+            } else if (cameraLockState == CameraLockState.FREE) {
+                updateOffset(localOffset)
+                updateZoom(localZoom)
+                updateAngle(localAngle)
+                madeGesture = false
+            } else {
+                // This is a very hacky method to update the local position and should probably be changed later
+                // This is mainly here because the local positions needs to be updated when updated from the viewmodel
 
-                // Also update the UI path when the user is navigating, should be changed later
-                drawNavPath(floor)
+                if (madeGesture) {
+                    updateOffset(localOffset)
+                    updateZoom(localZoom)
+                    updateAngle(localAngle)
+
+                    updateCameraLockState(CameraLockState.FREE)
+                    madeGesture = false
+                } else {
+                    localOffset = offset
+                    localZoom = zoom
+                    localAngle = angle
+                }
             }
 
             translationX = -offset.x * zoom
@@ -211,7 +234,7 @@ fun MapImageView(
         .fillMaxSize()
     ) {
 
-        Log.d("MAP", "Zoom ${zoom} | Rotation ${angle} | Offset ${offset},  ")
+        //Log.d("MAP", "Zoom ${zoom} | Rotation ${angle} | Offset ${offset},  ")
 
         Image(bitmap = imageBitmap,
             contentDescription = "${floor} image",
@@ -225,7 +248,7 @@ fun MapImageView(
 
         Spacer(modifier = Modifier.fillMaxSize().drawWithContent {
             if (uiState.equals(UIState.NAVIGATING)) {
-                drawPath(path = navigationPath, color = pathColor, style = Stroke(1.dp.toPx(), pathEffect = PathEffect.cornerPathEffect(2.dp.toPx())))
+                drawPath(path = drawNavPath(floor), color = pathColor, style = Stroke(1.dp.toPx(), pathEffect = PathEffect.cornerPathEffect(2.dp.toPx())))
             }
         })
 
@@ -265,17 +288,28 @@ fun MapImageView(
             }.fillMaxSize())
         }
 
-        Image(painter = painterResource(id = R.drawable.position_icon),
-            contentDescription = "${floor} image",
-            modifier = Modifier
-                .alpha(if (floor != positionFloor) 0f else 1f)
-                .size(positionIconSizeX, positionIconSizeY)
-                .offset(positionIconPosX, positionIconPosY)
-                .graphicsLayer {
-                    rotationZ = rotationSensorService.azimuthCompass
-                }
-        )
+        if (floor == positionFloor) {
+            Image(painter = painterResource(id = R.drawable.position_icon),
+                contentDescription = "${floor} image",
+                modifier = Modifier
+                    .size(positionIconSizeX, positionIconSizeY)
+                    .offset(positionIconPosX, positionIconPosY)
+                    .graphicsLayer {
+                        rotationZ = rotationSensorService.azimuthCompass
+                    }
+            )
+        }
 
+        // Shows the location of the node when user wants to preview a room to go to
+        if (uiState == UIState.NAVIGATION_PREVIEW && floor == navigationNode.floor) {
+            Box(modifier = Modifier
+                .width(4.dp)
+                .height(4.dp)
+                .offset(x = (((754f + navigationNode.x) / 1536f) * floorImageSizeWidth) - 2.dp,
+                    y = (((1330f - navigationNode.y) / 1536f) * floorImageSizeHeight) - 2.dp)
+                .background(color = colorResource(id = R.color.light_blue), shape = RoundedCornerShape(6.dp))
+            )
+        }
         Box(modifier = Modifier
             .width(4.dp)
             .height(if (uiState.equals(UIState.NAVIGATION_PREVIEW) && floor == navigationNode.floor) 4.dp else 0.dp)
@@ -304,7 +338,8 @@ fun MapImageView(
 // For Eric - this is a placeholder, feel free to overwrite however you see fit.
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun FloorSelectorList(selectedFloor : Int, onSelect: (Int) -> Unit, visible: Boolean, changeFloorVisibility: (Boolean) -> Unit, modifier: Modifier){
+fun FloorSelectorList(selectedFloor : Int, onSelect: (Int) -> Unit, visible: Boolean, changeFloorVisibility: (Boolean) -> Unit,
+                      updateCameraLockState: (CameraLockState) -> Unit, modifier: Modifier){
     val state : ScrollState = rememberScrollState()
 
     LaunchedEffect(Unit) {
@@ -330,7 +365,7 @@ fun FloorSelectorList(selectedFloor : Int, onSelect: (Int) -> Unit, visible: Boo
         verticalArrangement = Arrangement.spacedBy(0.dp)) {
         for (floor in 5 downTo 0) {
             Button(
-                onClick = { onSelect(floor) },
+                onClick = { onSelect(floor); updateCameraLockState(CameraLockState.FREE) },
                 modifier = Modifier
                     .padding(0.dp)
                     .fillMaxWidth()
@@ -415,45 +450,59 @@ fun FloorSelectorButton(selectedFloor : Int, visible: Boolean, changeFloorVisibi
 
 @Composable
 fun ResetPositionButton(selectedFloor: Int, positionFloor: Int, modifier: Modifier, changeFloor: (Int) -> Unit,
-                        lockedOnPosition: Boolean, changeLockedOnPosition: (Boolean) -> Unit,
+                        cameraLockState: CameraLockState, updateCameraLockState: (CameraLockState) -> Unit,
                         uiState: UIState
 ) {
-    Box(
-        modifier = modifier
-            .width(60.dp)
-            .height(if ((uiState.equals(UIState.MAIN) || uiState.equals(UIState.NAVIGATING)) && (selectedFloor != positionFloor || !lockedOnPosition)) 60.dp else 0.dp)
-            .offset(x = -20.dp, y = -180.dp)
-            .background(
-                color = colorResource(id = R.color.darker_white),
-                shape = RoundedCornerShape(60.dp)
-            )
-            .border(
-                width = 2.dp,
-                color = colorResource(id = R.color.light_blue),
-                shape = RoundedCornerShape(60.dp)
-            )
-            .clickable {
-                changeFloor(positionFloor)
-                changeLockedOnPosition(true)
+    if ((uiState.equals(UIState.MAIN) || uiState.equals(UIState.NAVIGATING)) && (selectedFloor != positionFloor || cameraLockState != CameraLockState.LOCKED_ON_USER_POSITION)) {
+        Box(
+            modifier = modifier
+                .width(60.dp)
+                .height(60.dp)
+                .offset(x = -20.dp, y = -180.dp)
+                .background(
+                    color = colorResource(id = R.color.darker_white),
+                    shape = RoundedCornerShape(60.dp)
+                )
+                .border(
+                    width = 2.dp,
+                    color = colorResource(id = R.color.light_blue),
+                    shape = RoundedCornerShape(60.dp)
+                )
+                .clickable(indication = null,
+                        interactionSource = remember { MutableInteractionSource() }
+                ) {
+                    changeFloor(positionFloor)
+                    updateCameraLockState(CameraLockState.LOCKED_ON_USER_POSITION)
+                }
+        )
+        {
+            Image(modifier = Modifier
+                .width(36.dp)
+                .height(36.dp)
+                .offset(x = 12.dp, y = 12.dp),
+                painter = painterResource(id = R.drawable.show_location_icon),
+                contentDescription = "")
+
+            // If the user is looking at a floor different to their current floor then show the user's position floor number
+            if (selectedFloor != positionFloor) {
+                Box(modifier = modifier
+                    .width(24.dp)
+                    .height(24.dp)
+                    .offset(x = 10.dp, y = -40.dp)
+                    .background(
+                        color = colorResource(id = R.color.light_blue),
+                        shape = RoundedCornerShape(60.dp)
+                    )
+                ) {
+                    Text(text = positionFloor.toString(),
+                        color = colorResource(R.color.darker_white),
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .wrapContentHeight(align = Alignment.CenterVertically),
+                        textAlign = TextAlign.Center
+                    )
+                }
             }
-    )
-    {
-        Box(modifier = modifier
-            .width(24.dp)
-            .height(24.dp)
-            .offset(x = 10.dp, y = -40.dp)
-            .background(
-                color = colorResource(id = R.color.light_blue),
-                shape = RoundedCornerShape(60.dp)
-            )
-        ) {
-            Text(text = positionFloor.toString(),
-                color = colorResource(R.color.darker_white),
-                modifier = Modifier
-                    .fillMaxSize()
-                    .wrapContentHeight(align = Alignment.CenterVertically),
-                textAlign = TextAlign.Center
-            )
         }
 
     }
@@ -489,13 +538,13 @@ fun SearchBar(modifier: Modifier, searchText: String, updateSearchText: (String)
                 focusedContainerColor = colorResource(id = R.color.darker_white),
                 unfocusedContainerColor = colorResource(id = R.color.darker_white)
             ),
-            leadingIcon = {Icon(imageVector = Icons.Filled.Search, contentDescription = "")},
+            trailingIcon = {Icon(imageVector = Icons.Filled.Search, contentDescription = "")},
             singleLine = true,
             shape = RoundedCornerShape(8.dp)
         )
 
         LazyColumn (modifier = Modifier.fillMaxWidth()
-            .heightIn(0.dp, totalSearchHeight)
+            .heightIn(0.dp, totalSearchHeight + (singleSearchResultHeight / 1.5f))
             .height(if (uiState.equals(UIState.MAIN) && searchFocused) singleSearchResultHeight * searchResults.size else 0.dp)
             .offset(x = 0.dp, y = 62.dp)
             .clip(shape = RoundedCornerShape(8.dp))
@@ -511,7 +560,10 @@ fun SearchBar(modifier: Modifier, searchText: String, updateSearchText: (String)
                     }) {
                     Text(text = node.id, modifier = Modifier.fillMaxSize()
                         .wrapContentHeight(align = Alignment.CenterVertically)
-                        .padding(horizontal = 12.dp))
+                        .padding(horizontal = 12.dp),
+                        color = colorResource(R.color.light_blue),
+                        fontWeight = FontWeight(500)
+                    )
                 }
             }
         }
@@ -533,17 +585,27 @@ fun PreviewNavigationSearchBar(modifier: Modifier, destinationNode: Node,
         .border(color = colorResource(id = R.color.light_blue), width = 2.dp, shape = RoundedCornerShape(6.dp)),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text("From Current Location", modifier.fillMaxWidth().offset(x = 0.dp, y = 10.dp), textAlign = TextAlign.Center)
-        Text("To " + destinationNode.id, modifier.fillMaxWidth().offset(x = 0.dp, y = 20.dp), textAlign = TextAlign.Center)
+        Text("From Current Location", modifier.fillMaxWidth().offset(x = 0.dp, y = 10.dp),
+            textAlign = TextAlign.Center,
+            color = colorResource(R.color.light_blue),
+            fontWeight = FontWeight(500)
+        )
+        Text("To " + destinationNode.id, modifier.fillMaxWidth().offset(x = 0.dp, y = 20.dp),
+            textAlign = TextAlign.Center,
+            color = colorResource(R.color.light_blue),
+            fontWeight = FontWeight(500)
+        )
 
         Row(modifier = Modifier.offset(0.dp, 40.dp)) {
-            Button(onClick = {updateUiState(UIState.MAIN)}, modifier = Modifier.width(120.dp).height(36.dp).padding(0.dp, 0.dp, 10.dp, 0.dp),
+            Button(onClick = {updateUiState(UIState.MAIN)},
+                modifier = Modifier.width(120.dp).height(36.dp).padding(0.dp, 0.dp, 10.dp, 0.dp),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = colorResource(id = R.color.red_cancel)
+                    containerColor = colorResource(id = R.color.darker_white)
                 ),
-                shape = RoundedCornerShape(6.dp)
+                shape = RoundedCornerShape(6.dp),
+                border = BorderStroke(2.dp, colorResource(id = R.color.red_cancel))
             ) {
-                Text("Cancel")
+                Text("Cancel", color = colorResource(id = R.color.red_cancel))
             }
 
             Button(onClick = {startNavigation()}, modifier = Modifier.width(120.dp).height(36.dp).padding(10.dp, 0.dp, 0.dp, 0.dp),
@@ -569,15 +631,21 @@ fun NavigationTopBar(modifier: Modifier, destinationNode: Node,
         .border(color = colorResource(id = R.color.light_blue), width = 2.dp, shape = RoundedCornerShape(6.dp)),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text("Navigating to " + destinationNode.id, modifier.fillMaxWidth().offset(x = 0.dp, y = 20.dp), textAlign = TextAlign.Center)
+        Text("Navigating to " + destinationNode.id, modifier.fillMaxWidth().offset(x = 0.dp, y = 20.dp),
+            textAlign = TextAlign.Center,
+            color = colorResource(R.color.light_blue),
+            fontWeight = FontWeight(500)
+        )
 
-        Button(onClick = {updateUiState(UIState.MAIN)}, modifier = Modifier.width(120.dp).height(36.dp).offset(x = 0.dp, y = 30.dp),
+        Button(onClick = {updateUiState(UIState.MAIN)},
+            modifier = Modifier.width(120.dp).height(36.dp).offset(x = 0.dp, y = 30.dp),
             colors = ButtonDefaults.buttonColors(
-                containerColor = colorResource(id = R.color.red_cancel)
+                containerColor = colorResource(id = R.color.darker_white)
             ),
-            shape = RoundedCornerShape(6.dp)
+            shape = RoundedCornerShape(6.dp),
+            border = BorderStroke(2.dp, colorResource(id = R.color.red_cancel))
         ) {
-            Text("Cancel")
+            Text("Cancel", color = colorResource(id = R.color.red_cancel))
         }
     }
 }
@@ -606,6 +674,8 @@ fun MapView(viewModel: MapViewModel = viewModel()) {
 
     val navigationGraph: NavigationGraph = remember {initialiseGraph(context)}
     val rooms: List<Node> = remember { getRoomNodes(navigationGraph) }
+
+    viewModel.updateNavigationGraph(navigationGraph)
 
     var searchText: String by remember { mutableStateOf("") }
     var searchResults = remember { mutableStateListOf<Node>() }
@@ -646,8 +716,8 @@ fun MapView(viewModel: MapViewModel = viewModel()) {
             positionYPercentage = positionY,
             positionFloor = positionFloor,
             rotation = rotation,
-            lockedOnPosition = viewModel.lockedOnPosition,
-            changeLockOnPosition = {viewModel.updateLockedOnPosition(it)},
+            cameraLockState = viewModel.cameraLockState,
+            updateCameraLockState = {viewModel.updateCameraLockState(it)},
             uiState = viewModel.uiState,
             navigationNode = viewModel.currentNavDestinationNode,
             navigationPath = viewModel.navigationPath,
@@ -674,7 +744,7 @@ fun MapView(viewModel: MapViewModel = viewModel()) {
             destinationNode = viewModel.currentNavDestinationNode,
             uiState = viewModel.uiState,
             updateUiState = {viewModel.updateUiState(it)},
-            startNavigation = {viewModel.startNavigation(navigationGraph)}
+            startNavigation = {viewModel.startNavigation()}
         )
 
         NavigationTopBar (modifier = Modifier.align(Alignment.TopCenter),
@@ -695,8 +765,8 @@ fun MapView(viewModel: MapViewModel = viewModel()) {
             positionFloor = positionFloor,
             modifier = Modifier.align(Alignment.BottomEnd),
             changeFloor = { viewModel.setFloor(it)},
-            lockedOnPosition = viewModel.lockedOnPosition,
-            changeLockedOnPosition = {viewModel.updateLockedOnPosition(it)},
+            cameraLockState = viewModel.cameraLockState,
+            updateCameraLockState = {viewModel.updateCameraLockState(it)},
             uiState = viewModel.uiState
         )
 
@@ -713,6 +783,7 @@ fun MapView(viewModel: MapViewModel = viewModel()) {
             onSelect = { viewModel.setFloor(it)},
             visible = floorSelectorVisible,
             changeFloorVisibility = {floorSelectorVisible = it},
+            updateCameraLockState = {viewModel.updateCameraLockState(it)},
             modifier = Modifier.align(Alignment.BottomEnd)
         )
     }

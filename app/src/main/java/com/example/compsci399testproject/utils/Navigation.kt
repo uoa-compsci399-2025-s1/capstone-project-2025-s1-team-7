@@ -23,7 +23,7 @@ fun getPath(startNode: Node, goalNode: Node, navigationGraph: NavigationGraph): 
 
     // link location to the graph
     val closestNodes = getClosestNodes(startNode, navigationGraph)
-    print(closestNodes)
+    // print(closestNodes)
     for (edge in closestNodes) {
         startNode.edges.add(Edge(edge.first, edge.second))
     }
