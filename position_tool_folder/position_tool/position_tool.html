@@ -1,0 +1,27 @@
+<html>
+    <header>
+        <link rel="stylesheet" href="position_tool.css">
+    </header>
+    <body>
+        <div id = "debug_labels">
+            <label>Origin</label>
+            <input placeholder="X" id = "x_origin_input">X</input>
+            <input placeholder="Y" id = "y_origin_input">Y</input>
+            <button id = "update_origin">Update Origin</button> <br>
+
+            <label>Floor</label>
+            <input id = "floor_input"></input>
+            <button id = "update_floor">Update Floor</button>
+            
+            <p id = "current_floor">Current Floor | 0</p>
+            <p id = "current_origin">Current Origin | X: 0, Y: 0</p>
+            <p id="position_raw">Raw Position | X: 0, Y: 0</p>
+            <p id="position_calculated">Calculated Position | Please enter an origin</p>
+        </div>
+        <p class = "location_square" id = "origin_location"></p>
+        <p class = "location_square" id = "position_location"></p>
+        <p id = "position_location_label"></p>
+        <img id = "floor_img" class = "floor_plan" src="../floor 0 1536x1536.png">
+    </body>
+    <script src='position_tool.js'></script>
+</html>
