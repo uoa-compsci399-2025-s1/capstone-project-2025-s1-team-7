@@ -100,6 +100,8 @@ class MapViewModel(wifiViewModel: WifiViewModel) : ViewModel() {
 
     private val _wifiViewModel = wifiViewModel
 
+    private val _wifiScanRate : Long = 1_000 // Amount of time to wait before next WiFi scan, in milliseconds.
+
     init {
         startPredictingLocation()
         loopFunction()
@@ -325,7 +327,7 @@ class MapViewModel(wifiViewModel: WifiViewModel) : ViewModel() {
                     }
                 }
 
-                delay(30_000)
+                delay(_wifiScanRate)
             }
         }
     }
