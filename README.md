@@ -1,7 +1,19 @@
 [![Review Assignment Due Date](https://classroom.github.com/assets/deadline-readme-button-22041afd0340ce965d47ae6ef1cefeee28c7c493a6346c4f15d667ab976d596c.svg)](https://classroom.github.com/a/4-04QCSZ)
 
 # WiFinder
-WiFinder allows the user to find their location at the University of Auckland. Currently the application supports a small area on floors G, 1 and 2 in building 302.
+WiFinder allows the user to find their location at the University of Auckland. Currently the application supports a small area on floors G, 1 and 2 in building 302. The images below show the area where data points where collected, so you can expect the application to work in these areas.
+
+**Floor G (0)**
+
+![Floor 0 Data](https://github.com/uoa-compsci399-2025-s1/capstone-project-2025-s1-team-7/blob/main/WiFi-Scan-Data-Images/Floor-0.png)
+
+**Floor 1**
+
+![Floor 1 Data](https://github.com/uoa-compsci399-2025-s1/capstone-project-2025-s1-team-7/blob/main/WiFi-Scan-Data-Images/Floor-1.png)
+
+**Floor 2**
+
+![Floor 2 Data](https://github.com/uoa-compsci399-2025-s1/capstone-project-2025-s1-team-7/blob/main/WiFi-Scan-Data-Images/Floor-2.png)
 
 ## Technologies used to create the application
 The WiFinder application was made using Android Studio. The languages used were Kotlin and Java.
