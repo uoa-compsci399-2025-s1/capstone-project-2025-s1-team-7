@@ -39,6 +39,11 @@ The project requires an Android Gradle Version of 8.9.0 or above. As long as you
 
 For more information on running the application on your emulator or phone, refer to the [Android Studio Developer Page](https://developer.android.com/studio/run/device)
 
+## Note on running the application
+The main branch currently has an update rate of 1 second. However this update rate can only be achieved if you disable WiFi Scan Throttling in the developer options of your Android phone. If you don't disable this, the app will update at most, 4 times every 2 minutes. [Learn more about WiFi Scan Throttling](https://developer.android.com/develop/connectivity/wifi/wifi-scan#wifi-scan-throttling)
+
+There is a variable under [MapViewModel.kt](https://github.com/uoa-compsci399-2025-s1/capstone-project-2025-s1-team-7/blob/main/app/src/main/java/com/example/compsci399testproject/viewmodel/MapViewModel.kt) called _wifiScanRate where you can change this update rate.
+
 ## Project Management Tool
 [Project Management Tool](https://github.com/orgs/uoa-compsci399-2025-s1/projects/24)
 
