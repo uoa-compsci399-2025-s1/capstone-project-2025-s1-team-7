@@ -18,8 +18,10 @@ WiFinder allows the user to find their location at the University of Auckland. C
 ## Technologies used to create the application
 The WiFinder application was made using Android Studio. The languages used were Kotlin and Java.
 
-Extra tools can be found under other branches:
-- The interpolation branch has scripts available to interpolate the data
+The project requires an Android Gradle Version of 8.9.0 or above. As long as you install the latest version of Android Studio, there should be no problems running this project.
+
+**Extra tools can be found under other branches:**
+- The interpolation branch has scripts available to create interpolated data points based on the collected data points
 - The position-tool branch has a local webpage program that allows the user to select points on the map to get an X and Y coordinate of the floor image
 - The model-testing branch has a build of the Android application that allows developers to test different machine learning models
 - The mainWithPF branch has a build of the Android application which implements the Particle Filter. As of writing this README, the Particle Filter still has some issues which is why it's under a separate branch.
@@ -28,7 +30,7 @@ Extra tools can be found under other branches:
 - Install the latest version of Android Studio
 - Clone the Repository
 - Open Android Studio and go through the setup process
-- Once you get to the project view, select and open the cloned repository
+- Once you get to the project selection page, select and open the cloned repository
 
 - Go to the project view on the left side, open Gradle Scripts dropdown and open the build.gradle.kts file
 - A prompt will show up at the top of the editor asking you to sync the gradle files. Click the "Sync Now" option.
@@ -39,3 +41,8 @@ For more information on running the application on your emulator or phone, refer
 
 ## Project Management Tool
 [Project Management Tool](https://github.com/orgs/uoa-compsci399-2025-s1/projects/24)
+
+## Future Work
+- Client Server Architecture for better machine learning models, also allows the system to update the models as the application is being used
+- Better data collection methods, such as a small robot vehicle that scans frequently and more precisely
+- Integration with the official UoA Maps API, allowing for dynamic loading of floor images, rooms etc.
