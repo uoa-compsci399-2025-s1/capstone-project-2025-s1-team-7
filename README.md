@@ -26,6 +26,9 @@ The project requires an Android Gradle Version of 8.9.0 or above. As long as you
 - The model-testing branch has a build of the Android application that allows developers to test different machine learning models
 - The mainWithPF branch has a build of the Android application which implements the Particle Filter. As of writing this README, the Particle Filter still has some issues which is why it's under a separate branch.
 
+## Builds of the Application
+You can find development builds [here](https://github.com/uoa-compsci399-2025-s1/capstone-project-2025-s1-team-7/releases/tag/COMPSCI-399-Final) (Android only)
+
 ## How to setup the application
 - Install the latest version of Android Studio
 - Clone the Repository
