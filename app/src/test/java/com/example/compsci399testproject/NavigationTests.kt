@@ -94,10 +94,10 @@ class NavigationTest {
             // Get the path
             val path = getPath(startNode, targetNode, navigationGraph)
             tests[path] = goalNode
-            println(path)
+            // println(path)
             val endTime = System.currentTimeMillis()
             val duration = endTime - startTime
-            println(duration)
+            // println(duration)
             totalRuntime += duration
             // println(totalRuntime)
 
@@ -119,7 +119,7 @@ class NavigationTest {
             assertEquals("test_location", path.first().id)
             assertEquals(goalNode, path.last().id)
         }
-        print("Average runtime for getPath: ${(totalRuntime / 1000).toFloat()} ms from 1000 runs")
+        println("Average runtime for getPath: ${(totalRuntime / tests.size).toFloat()} ms from 1000 runs")
     }
 
 }
