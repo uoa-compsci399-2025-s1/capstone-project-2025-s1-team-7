@@ -14,10 +14,11 @@ def calculate_distance(node1, node2):
     return ((p1['x'] - p2['x'])**2 + (p1['y'] - p2['y'])**2)**0.5
 
 # Get the directory of the current script
-from_dir = "/Nodes"
-dest_dir = "/raw"
+current_dir = os.path.dirname(os.path.abspath(__file__))
+proj_root = os.path.join(current_dir, "..", "..")
+dest_dir = os.path.join(proj_root, "res", "raw")
 
-read_file_path = os.path.join(from_dir, 'nodesManualInput.json')
+read_file_path = os.path.join(current_dir, 'nodesMI.json')
 
 write_file_path = os.path.join(dest_dir, 'nodes.json')
 data = {}
