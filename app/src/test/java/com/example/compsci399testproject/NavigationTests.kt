@@ -122,28 +122,4 @@ class NavigationTest {
         print("Average runtime for getPath: ${(totalRuntime / 1000).toFloat()} ms from 1000 runs")
     }
 
-    @Test
-    fun testIfOutside() {
-    }
-
-    @Test
-    fun testDifferentFloors() {
-    }
-
-    @Test
-    fun testElevator() {
-    }
-
-    @Test
-    fun testStairs() {
-    }
-
-    @Test
-    fun testGetClosestNodesAA() { // Annoying Areas eg. ping pong
-    }
-
-    @Test
-    fun testRerouting() { // rerun from new location without changing destination)
-    }
-
 }
