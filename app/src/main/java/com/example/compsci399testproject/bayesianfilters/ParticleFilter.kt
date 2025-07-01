@@ -113,6 +113,10 @@ class ParticleFilter(initialX: Float64, initialY: Float64, initialHeading: Float
         landmarks.addFirst(XY(x, y))
     }
 
+    fun getLandmarks() {
+
+    }
+
     private fun dtSupervisor() {
         if (landmarks.isNotEmpty() && dt > LANDMARK_DEGRADATION_RATE) {
             landmarks.removeLast()

@@ -113,8 +113,6 @@ class MapViewModel(wifiViewModel: WifiViewModel, rotationSensorService: Rotation
     var particleFilter = ParticleFilter(0f.toDouble(), 0f.toDouble(), 0f.toDouble())
     var particleFilterEnabled by mutableStateOf(false)
 
-    // TODO: add landmarks after ML has run
-
     init {
         startPredictingLocation()
         loopFunction()
@@ -143,7 +141,8 @@ class MapViewModel(wifiViewModel: WifiViewModel, rotationSensorService: Rotation
                 val h = rotationSensorService.azimuthCompass.toDouble()
                 // convert heading to from degrees to radians
                 // compass north = 0.0 | unit circle north = 90
-                val hM = (abs(h) + 90) * (PI / 180)
+                // this may be different due to me trying to align with map
+                val hM = (h + 90).mod(360.0) * (PI / 180)
 
                 // step count * avg stride distance * amplification
                 // the amplification is needed because we use pixel coordinates
@@ -383,6 +382,9 @@ class MapViewModel(wifiViewModel: WifiViewModel, rotationSensorService: Rotation
                             rawPositionY = y.toDouble()
 
                             Log.d("predictor", "Predicted X: $x, Y: $y, Floor: $floor")
+
+                            // add landmark
+                            particleFilter.addLandmark(rawPositionX, rawPositionY)
 
 //                            _positionX.value = (origin_x + x) / actualImageSizeWidth
 //                            _positionY.value = (origin_y - y) / actualImageSizeHeight

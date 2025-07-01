@@ -42,7 +42,7 @@ class RotationSensorService(context: Context) : SensorEventListener {
             SensorManager.getOrientation(rotationMatrix, orientations)
 
             azimuth = Math.toDegrees(orientations[0].toDouble()).toFloat()
-            azimuthCompass = -((Math.toDegrees(orientations[0].toDouble()) + 360) % 360).toFloat()
+            azimuthCompass = ((Math.toDegrees(orientations[0].toDouble()) + 90).mod(360.0)).toFloat()
             pitch = Math.toDegrees(orientations[1].toDouble()).toFloat()
             roll = Math.toDegrees(orientations[2].toDouble()).toFloat()
         }
