@@ -113,8 +113,8 @@ class ParticleFilter(initialX: Float64, initialY: Float64, initialHeading: Float
         landmarks.addFirst(XY(x, y))
     }
 
-    fun getLandmarks() {
-
+    fun getLandmarks(): ArrayDeque<XY> {
+        return landmarks
     }
 
     private fun dtSupervisor() {
