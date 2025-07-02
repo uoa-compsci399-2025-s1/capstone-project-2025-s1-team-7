@@ -142,7 +142,7 @@ class MapViewModel(wifiViewModel: WifiViewModel, rotationSensorService: Rotation
                 // convert heading to from degrees to radians
                 // compass north = 0.0 | unit circle north = 90
                 // this may be different due to me trying to align with map
-                val hM = (h + 90).mod(360.0) * (PI / 180)
+                val hM = (h - 90).mod(360.0) * (PI / 180)
 
                 // step count * avg stride distance * amplification
                 // the amplification is needed because we use pixel coordinates
