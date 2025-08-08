@@ -9,6 +9,13 @@ import com.example.compsci399testproject.machinelearning.models.FloorRandomFores
 import com.example.compsci399testproject.machinelearning.models.XRandomForest
 import com.example.compsci399testproject.machinelearning.models.YRandomForest
 
+
+//////////////////////////////////////////////////////////////////
+//                      YOUR CHANGES BELOW                      //
+//////////////////////////////////////////////////////////////////
+//
+// LocationPredictor() class uses the random forest models to find the
+// floor, x, and y positions of the user.
 class LocationPredictor() {
     companion object{
         fun  predictFloor(input: FloatArray) : Int {
@@ -40,6 +47,8 @@ class LocationPredictor() {
             return prediction.toFloat()
         }
     }
-
+    //////////////////////////////////////////////////////////////////
+    //                      YOUR CHANGES ABOVE                      //
+    //////////////////////////////////////////////////////////////////
 
 }

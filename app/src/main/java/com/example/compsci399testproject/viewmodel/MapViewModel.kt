@@ -290,7 +290,13 @@ class MapViewModel(wifiViewModel: WifiViewModel) : ViewModel() {
         }
     }
 
-    // Wifi Location Prediction Function
+    //////////////////////////////////////////////////////////////////
+    //                      YOUR CHANGES BELOW                      //
+    //////////////////////////////////////////////////////////////////
+    //
+    // startPredictingLocation() begins the loop for continually scanning
+    // for WiFi signals and using the machine learning models for predicting
+    // the user location.
     private fun startPredictingLocation() {
         viewModelScope.launch {
             while (true) {
@@ -320,7 +326,9 @@ class MapViewModel(wifiViewModel: WifiViewModel) : ViewModel() {
                             _positionY.value = (origin_y - y) / actualImageSizeHeight
                             _positionFloor.value = floor
 
-                            if (cameraLockState == CameraLockState.LOCKED_ON_USER_POSITION) {setFloor(floor)}
+                            if (cameraLockState == CameraLockState.LOCKED_ON_USER_POSITION) {
+                                setFloor(floor)
+                            }
 
                             true
                         } else false
@@ -331,4 +339,7 @@ class MapViewModel(wifiViewModel: WifiViewModel) : ViewModel() {
             }
         }
     }
+    //////////////////////////////////////////////////////////////////
+    //                      YOUR CHANGES ABOVE                      //
+    //////////////////////////////////////////////////////////////////
 }

@@ -61,14 +61,7 @@ fun ScanTool(wifiViewModel: WifiViewModel) {
         }
     }
 
-
-    //Fun and improved.
-    val introMessage =
-        if (timeSeconds > 60) {
-            "Hey, you. Finally awake. You were trying to cross the border, right? Walked right into that Imperial ambush, same as us."
-        } else {
-            "Where are you?"
-        }
+    val introMessage = "Where are you?"
 
     //Error handling.
     val context = LocalContext.current
@@ -160,6 +153,7 @@ fun ScanTool(wifiViewModel: WifiViewModel) {
 
         Spacer(modifier = Modifier.height(25.dp))
 
+        // Capture Button
         Button(
             onClick = {
                 captureData(
@@ -192,6 +186,18 @@ fun ScanTool(wifiViewModel: WifiViewModel) {
 
 }
 
+
+
+//////////////////////////////////////////////////////////////////
+//                      YOUR CHANGES BELOW                      //
+//////////////////////////////////////////////////////////////////
+//
+// captureData() is run when the "capture" button is pressed.
+// WiFi scan results are collected and pushed to the Google Sheet.
+//
+// By default, the scan results are observed for 10 seconds. This will
+// only work if WiFi throttling is turned off, otherwise you will
+// miss captures due to the scan cooldown time.
 fun captureData(
     context: Context,
     latitudeInput: String,
@@ -230,6 +236,7 @@ fun captureData(
             wifiViewModel.scanResults.collect { results ->
                 if (results.isNotEmpty()) {
                     if (wifiViewModel.hasScanChanged(results)) {
+                        // On a successful scan, push the scan results to the Google Sheet
                         sendResultsToWebApp(
                             context = context,
                             latitude = latitude,
@@ -253,6 +260,10 @@ fun captureData(
         }
     }
 }
+//////////////////////////////////////////////////////////////////
+//                      YOUR CHANGES ABOVE                      //
+//////////////////////////////////////////////////////////////////
+
 
 fun sendResultsToWebApp(
     context: Context,
@@ -270,7 +281,6 @@ fun sendResultsToWebApp(
             val signalName = it.BSSID + "(${it.SSID})"
             signals.put(signalName, it.level)
         }
-//        signals.put(signalName, it.level)
     }
 
 

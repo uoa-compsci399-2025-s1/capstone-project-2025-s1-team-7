@@ -106,17 +106,17 @@ class MainActivity : ComponentActivity() {
                     WifiSignalList(wifiViewModel)
                 }
 
-                composable("MapLocation") {
-                    FindingLocation()
-                }
-
                 composable("ScanTool") {
                     ScanTool(wifiViewModel)
                 }
 
-                composable("SensorTool") {
-                    SensorTool()
-                }
+                // This page just shows an absolute compass position implementation
+                // but it needs a lit of work. Also has a rudimentary step detector
+                // Feel free to look at it and use if you want, but it may take more
+                // work to get it to be useful.
+//                composable("SensorTool") {
+//                    SensorTool()
+//                }
 
                 composable("MainApp") {
                     MapView(mapViewModel)
@@ -133,9 +133,8 @@ fun Menu(navController: NavController)
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center) {
         MenuButton(onClick = {navController.navigate("WifiSignals")}, text = "Wi-Fi Signals")
-        MenuButton(onClick = {navController.navigate("MapLocation")}, text = "Map Location")
         MenuButton(onClick = {navController.navigate("ScanTool")}, text = "Scan Tool")
-        MenuButton(onClick = {navController.navigate("SensorTool")}, text="Sensor Tool")
+//        MenuButton(onClick = {navController.navigate("SensorTool")}, text="Sensor Tool")
         MenuButton(onClick = {navController.navigate("MainApp")}, text = "Main App")
     }
 }
