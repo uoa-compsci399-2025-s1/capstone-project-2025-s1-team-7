@@ -41,7 +41,6 @@ fun ScanTool(wifiViewModel: WifiViewModel) {
     var floorNumber by remember { mutableStateOf("") }
     var phoneId by remember { mutableStateOf("") }
     // YOUR LINK GOES HERE INSIDE THE QUOTES eg. mutableStateOf("https://script.google.com/macros/s/AKfycbx.../exec")
-    "https://script.google.com/macros/s/AKfycbzsISU5WpqTe8rH3aYgHk3eEhRKhTZlJvRnFfvyFtMVk1dZMel-hCdfJRVCtco8_JSa/exec"
     var googleSheetLink by remember { mutableStateOf("") }
 
 
