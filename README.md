@@ -47,10 +47,7 @@ The main branch currently has an update rate of 1 second. However this update ra
 
 There is a variable under [MapViewModel.kt](https://github.com/uoa-compsci399-2025-s1/capstone-project-2025-s1-team-7/blob/main/app/src/main/java/com/example/compsci399testproject/viewmodel/MapViewModel.kt) called _wifiScanRate where you can change this update rate.
 
-## Project Management Tool
-[Project Management Tool](https://github.com/orgs/uoa-compsci399-2025-s1/projects/24)
-
-## Future Work
+## Future Work For the Project (not specifically relevant for CS742 students)
 - Client Server Architecture for better machine learning models, also allows the system to update the models as the application is being used
-- Better data collection methods, such as a small robot vehicle that scans frequently and more precisely
+- Better data collection methods, such as autonomous robotic scanning, or scan tool improvements
 - Integration with the official UoA Maps API, allowing for dynamic loading of floor images, rooms etc.
